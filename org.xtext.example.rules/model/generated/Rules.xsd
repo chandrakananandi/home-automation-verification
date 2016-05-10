@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xsd:schema xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmlns:rules="http://www.xtext.org/example/rules/Rules" xmlns:xbase="http://www.eclipse.org/xtext/xbase/Xbase" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ecore:nsPrefix="rules" ecore:package="org.xtext.example.rules.rules" targetNamespace="http://www.xtext.org/example/rules/Rules">
+  <xsd:import namespace="http://www.eclipse.org/emf/2002/Ecore" schemaLocation="platform:/plugin/org.eclipse.emf.ecore/model/Ecore.xsd"/>
+  <xsd:import namespace="http://www.eclipse.org/xtext/xbase/Xbase" schemaLocation="Xbase.xsd"/>
+  <xsd:element ecore:ignore="true" name="RuleModel" type="rules:RuleModel"/>
+  <xsd:element ecore:ignore="true" name="Import" type="rules:Import"/>
+  <xsd:element ecore:ignore="true" name="Rule" type="rules:Rule"/>
+  <xsd:element ecore:ignore="true" name="EventTrigger" type="rules:EventTrigger"/>
+  <xsd:element ecore:ignore="true" name="CommandEventTrigger" type="rules:CommandEventTrigger"/>
+  <xsd:element ecore:ignore="true" name="UpdateEventTrigger" type="rules:UpdateEventTrigger"/>
+  <xsd:element ecore:ignore="true" name="ChangedEventTrigger" type="rules:ChangedEventTrigger"/>
+  <xsd:element ecore:ignore="true" name="TimerTrigger" type="rules:TimerTrigger"/>
+  <xsd:element ecore:ignore="true" name="SystemTrigger" type="rules:SystemTrigger"/>
+  <xsd:element ecore:ignore="true" name="SystemOnStartupTrigger" type="rules:SystemOnStartupTrigger"/>
+  <xsd:element ecore:ignore="true" name="SystemOnShutdownTrigger" type="rules:SystemOnShutdownTrigger"/>
+  <xsd:complexType name="RuleModel">
+    <xsd:sequence>
+      <xsd:element ecore:resolveProxies="true" maxOccurs="unbounded" minOccurs="0" name="imports" type="rules:Import"/>
+      <xsd:element ecore:resolveProxies="true" maxOccurs="unbounded" minOccurs="0" name="variables" type="xbase:XExpression"/>
+      <xsd:element ecore:resolveProxies="true" maxOccurs="unbounded" minOccurs="0" name="rules" type="rules:Rule"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="Import">
+    <xsd:attribute name="importedNamespace" type="ecore:EString"/>
+  </xsd:complexType>
+  <xsd:complexType name="Rule">
+    <xsd:sequence>
+      <xsd:element ecore:resolveProxies="true" maxOccurs="unbounded" minOccurs="0" name="eventtrigger" type="rules:EventTrigger"/>
+      <xsd:element ecore:resolveProxies="true" minOccurs="0" name="script" type="xbase:XBlockExpression"/>
+    </xsd:sequence>
+    <xsd:attribute name="name" type="ecore:EString"/>
+  </xsd:complexType>
+  <xsd:complexType name="EventTrigger"/>
+  <xsd:complexType name="CommandEventTrigger">
+    <xsd:complexContent>
+      <xsd:extension base="rules:EventTrigger">
+        <xsd:attribute name="item" type="ecore:EString"/>
+        <xsd:attribute name="command" type="ecore:EString"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="UpdateEventTrigger">
+    <xsd:complexContent>
+      <xsd:extension base="rules:EventTrigger">
+        <xsd:attribute name="item" type="ecore:EString"/>
+        <xsd:attribute name="state" type="ecore:EString"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="ChangedEventTrigger">
+    <xsd:complexContent>
+      <xsd:extension base="rules:EventTrigger">
+        <xsd:attribute name="item" type="ecore:EString"/>
+        <xsd:attribute name="oldState" type="ecore:EString"/>
+        <xsd:attribute name="newState" type="ecore:EString"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="TimerTrigger">
+    <xsd:complexContent>
+      <xsd:extension base="rules:EventTrigger">
+        <xsd:attribute name="cron" type="ecore:EString"/>
+        <xsd:attribute name="time" type="ecore:EString"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="SystemTrigger">
+    <xsd:complexContent>
+      <xsd:extension base="rules:EventTrigger"/>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="SystemOnStartupTrigger">
+    <xsd:complexContent>
+      <xsd:extension base="rules:SystemTrigger"/>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="SystemOnShutdownTrigger">
+    <xsd:complexContent>
+      <xsd:extension base="rules:SystemTrigger"/>
+    </xsd:complexContent>
+  </xsd:complexType>
+</xsd:schema>

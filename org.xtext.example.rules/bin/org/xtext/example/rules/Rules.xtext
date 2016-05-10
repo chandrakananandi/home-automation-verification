@@ -1,0 +1,74 @@
+grammar org.xtext.example.rules.Rules with org.xtext.example.script.Script
+
+generate rules "http://www.xtext.org/example/rules/Rules"
+
+RuleModel:
+	(imports += Import)*
+	(variables+=XVariableDeclaration)*
+	(rules += Rule)*;
+	
+Import:
+	'import' importedNamespace=QualifiedNameWithWildCard2
+;
+		
+Rule:
+	'rule' name=(ID|STRING)
+	'when' eventtrigger+=EventTrigger ('or' eventtrigger+=EventTrigger)*
+	'then' script=Script
+	'end'
+;
+
+EventTrigger:
+	UpdateEventTrigger |
+	CommandEventTrigger |
+	ChangedEventTrigger |
+	TimerTrigger |
+	SystemTrigger
+;
+
+CommandEventTrigger:
+	'Item' item=ItemName 'received command' (command=ValidCommand)?
+;
+
+UpdateEventTrigger:
+	'Item' item=ItemName 'received update' (state=ValidState)?
+;
+
+ChangedEventTrigger:
+	'Item' item=ItemName 'changed' ('from' oldState=ValidState)? ('to' newState=ValidState)?
+;		
+
+TimerTrigger:
+	'Time' 'cron' cron=STRING |
+	'Time' 'is' time=('midnight' | 'noon')
+;
+
+SystemTrigger:
+	SystemOnStartupTrigger |
+	SystemOnShutdownTrigger
+;
+
+SystemOnStartupTrigger:
+	{SystemOnStartupTrigger}
+	'System' 'started'
+;
+
+SystemOnShutdownTrigger:
+	{SystemOnShutdownTrigger}
+	'System' 'shuts down'
+;
+
+QualifiedNameWithWildCard2 :
+	QualifiedName  ('.' '*')?;
+	
+ItemName :
+	ID
+;
+
+ValidState:
+	ID | Number | STRING
+;
+
+ValidCommand:
+	ID | Number | STRING
+;

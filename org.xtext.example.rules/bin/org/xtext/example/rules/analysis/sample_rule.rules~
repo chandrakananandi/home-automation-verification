@@ -1,0 +1,21 @@
+var Timer notificationTimer = null
+
+rule "Bell State" 
+when
+	Item Bell changed
+then
+
+	if( Bell.state == OPEN )
+	{
+		Bell_Last_Change.postUpdate( now.toString() )
+
+		if(notificationTimer==null)
+		{
+			notificationTimer = createTimer(now.plusSeconds(30)) [|
+				notificationTimer=null
+			]
+			pushover("Klingel: Es klingelt")
+			sendMail("holger.hees@gmail.com","Es klingelt","Es klingelt jemand an der Tür","http://192.168.0.50/cameraStrasse")
+		}
+	} else{}
+end

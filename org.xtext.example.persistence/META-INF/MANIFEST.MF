@@ -1,0 +1,30 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: org.xtext.example.persistence
+Bundle-Vendor: My Company
+Bundle-Version: 1.0.0.qualifier
+Bundle-SymbolicName: org.xtext.example.persistence; singleton:=true
+Bundle-ActivationPolicy: lazy
+Require-Bundle: org.eclipse.xtext,
+ org.eclipse.xtext.xbase,
+ org.eclipse.equinox.common;bundle-version="3.5.0",
+ org.xtext.example.items;bundle-version="1.0.0",
+ org.eclipse.emf.ecore,
+ org.eclipse.xtext.xbase.lib,
+ org.antlr.runtime,
+ org.eclipse.xtext.util,
+ org.eclipse.xtend.lib,
+ org.eclipse.emf.common
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Export-Package: org.xtext.example.persistence.persistence,
+ org.xtext.example.persistence.parser.antlr.internal,
+ org.xtext.example.persistence.persistence.util,
+ org.xtext.example.persistence.generator,
+ org.xtext.example.persistence.serializer,
+ org.xtext.example.persistence.services,
+ org.xtext.example.persistence.validation,
+ org.xtext.example.persistence.persistence.impl,
+ org.xtext.example.persistence.scoping,
+ org.xtext.example.persistence.parser.antlr,
+ org.xtext.example.persistence
+Import-Package: org.apache.log4j

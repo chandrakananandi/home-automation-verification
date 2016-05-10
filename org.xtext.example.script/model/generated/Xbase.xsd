@@ -1,0 +1,612 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xsd:schema xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmlns:types="http://www.eclipse.org/xtext/common/JavaVMTypes" xmlns:xbase="http://www.eclipse.org/xtext/xbase/Xbase" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ecore:nsPrefix="xbase" ecore:package="org.eclipse.xtext.xbase" targetNamespace="http://www.eclipse.org/xtext/xbase/Xbase">
+  <xsd:import namespace="http://www.eclipse.org/emf/2002/Ecore" schemaLocation="platform:/plugin/org.eclipse.emf.ecore/model/Ecore.xsd"/>
+  <xsd:import namespace="http://www.eclipse.org/xtext/common/JavaVMTypes" schemaLocation="JavaVMTypes.xsd"/>
+  <xsd:annotation>
+    <xsd:documentation>@since 2.7
+@noextend This interface is not intended to be extended by clients.
+@noimplement This interface is not intended to be implemented by clients.</xsd:documentation>
+  </xsd:annotation>
+  <xsd:element ecore:ignore="true" name="XExpression" type="xbase:XExpression"/>
+  <xsd:element ecore:ignore="true" name="XIfExpression" type="xbase:XIfExpression"/>
+  <xsd:element ecore:ignore="true" name="XSwitchExpression" type="xbase:XSwitchExpression"/>
+  <xsd:element ecore:ignore="true" name="XCasePart" type="xbase:XCasePart"/>
+  <xsd:element ecore:ignore="true" name="XBlockExpression" type="xbase:XBlockExpression"/>
+  <xsd:element ecore:ignore="true" name="XVariableDeclaration" type="xbase:XVariableDeclaration"/>
+  <xsd:element ecore:ignore="true" name="XAbstractFeatureCall" type="xbase:XAbstractFeatureCall"/>
+  <xsd:element ecore:ignore="true" name="XMemberFeatureCall" type="xbase:XMemberFeatureCall"/>
+  <xsd:element ecore:ignore="true" name="XFeatureCall" type="xbase:XFeatureCall"/>
+  <xsd:element ecore:ignore="true" name="XConstructorCall" type="xbase:XConstructorCall"/>
+  <xsd:element ecore:ignore="true" name="XBooleanLiteral" type="xbase:XBooleanLiteral"/>
+  <xsd:element ecore:ignore="true" name="XNullLiteral" type="xbase:XNullLiteral"/>
+  <xsd:element ecore:ignore="true" name="XNumberLiteral" type="xbase:XNumberLiteral"/>
+  <xsd:element ecore:ignore="true" name="XStringLiteral" type="xbase:XStringLiteral"/>
+  <xsd:element ecore:ignore="true" name="XCollectionLiteral" type="xbase:XCollectionLiteral"/>
+  <xsd:element ecore:ignore="true" name="XListLiteral" type="xbase:XListLiteral"/>
+  <xsd:element ecore:ignore="true" name="XSetLiteral" type="xbase:XSetLiteral"/>
+  <xsd:element ecore:ignore="true" name="XClosure" type="xbase:XClosure"/>
+  <xsd:element ecore:ignore="true" name="XCastedExpression" type="xbase:XCastedExpression"/>
+  <xsd:element ecore:ignore="true" name="XBinaryOperation" type="xbase:XBinaryOperation"/>
+  <xsd:element ecore:ignore="true" name="XUnaryOperation" type="xbase:XUnaryOperation"/>
+  <xsd:element ecore:ignore="true" name="XPostfixOperation" type="xbase:XPostfixOperation"/>
+  <xsd:element ecore:ignore="true" name="XForLoopExpression" type="xbase:XForLoopExpression"/>
+  <xsd:element ecore:ignore="true" name="XBasicForLoopExpression" type="xbase:XBasicForLoopExpression"/>
+  <xsd:element ecore:ignore="true" name="XAbstractWhileExpression" type="xbase:XAbstractWhileExpression"/>
+  <xsd:element ecore:ignore="true" name="XDoWhileExpression" type="xbase:XDoWhileExpression"/>
+  <xsd:element ecore:ignore="true" name="XWhileExpression" type="xbase:XWhileExpression"/>
+  <xsd:element ecore:ignore="true" name="XTypeLiteral" type="xbase:XTypeLiteral"/>
+  <xsd:element ecore:ignore="true" name="XInstanceOfExpression" type="xbase:XInstanceOfExpression"/>
+  <xsd:element ecore:ignore="true" name="XThrowExpression" type="xbase:XThrowExpression"/>
+  <xsd:element ecore:ignore="true" name="XTryCatchFinallyExpression" type="xbase:XTryCatchFinallyExpression"/>
+  <xsd:element ecore:ignore="true" name="XCatchClause" type="xbase:XCatchClause"/>
+  <xsd:element ecore:ignore="true" name="XAssignment" type="xbase:XAssignment"/>
+  <xsd:element ecore:ignore="true" name="XReturnExpression" type="xbase:XReturnExpression"/>
+  <xsd:element ecore:ignore="true" name="XSynchronizedExpression" type="xbase:XSynchronizedExpression"/>
+  <xsd:complexType abstract="true" name="XExpression">
+    <xsd:annotation>
+      <xsd:documentation>@since 2.7
+@noextend This interface is not intended to be extended by clients.
+@noimplement This interface is not intended to be implemented by clients.</xsd:documentation>
+    </xsd:annotation>
+  </xsd:complexType>
+  <xsd:complexType name="XIfExpression">
+    <xsd:annotation>
+      <xsd:documentation>@since 2.7
+@noextend This interface is not intended to be extended by clients.
+@noimplement This interface is not intended to be implemented by clients.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="xbase:XExpression">
+        <xsd:sequence>
+          <xsd:element ecore:resolveProxies="true" minOccurs="0" name="if" type="xbase:XExpression"/>
+          <xsd:element ecore:resolveProxies="true" minOccurs="0" name="then" type="xbase:XExpression"/>
+          <xsd:element ecore:resolveProxies="true" minOccurs="0" name="else" type="xbase:XExpression"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="XSwitchExpression">
+    <xsd:annotation>
+      <xsd:documentation>@since 2.7
+@noextend This interface is not intended to be extended by clients.
+@noimplement This interface is not intended to be implemented by clients.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="xbase:XExpression">
+        <xsd:sequence>
+          <xsd:element ecore:resolveProxies="true" minOccurs="0" name="switch" type="xbase:XExpression"/>
+          <xsd:element ecore:resolveProxies="true" maxOccurs="unbounded" minOccurs="0" name="cases" type="xbase:XCasePart"/>
+          <xsd:element ecore:resolveProxies="true" minOccurs="0" name="default" type="xbase:XExpression"/>
+          <xsd:element ecore:resolveProxies="true" minOccurs="0" name="declaredParam" type="types:JvmFormalParameter"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="XCasePart">
+    <xsd:annotation>
+      <xsd:documentation>@since 2.7
+@noextend This interface is not intended to be extended by clients.
+@noimplement This interface is not intended to be implemented by clients.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element ecore:resolveProxies="true" minOccurs="0" name="case" type="xbase:XExpression"/>
+      <xsd:element ecore:resolveProxies="true" minOccurs="0" name="then" type="xbase:XExpression"/>
+      <xsd:element ecore:resolveProxies="true" minOccurs="0" name="typeGuard" type="types:JvmTypeReference"/>
+    </xsd:sequence>
+    <xsd:attribute ecore:unsettable="false" name="fallThrough" type="ecore:EBoolean"/>
+  </xsd:complexType>
+  <xsd:complexType name="XBlockExpression">
+    <xsd:annotation>
+      <xsd:documentation>@since 2.7
+@noextend This interface is not intended to be extended by clients.
+@noimplement This interface is not intended to be implemented by clients.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="xbase:XExpression">
+        <xsd:sequence>
+          <xsd:element ecore:resolveProxies="true" maxOccurs="unbounded" minOccurs="0" name="expressions" type="xbase:XExpression"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType ecore:implements="types:JvmIdentifiableElement" name="XVariableDeclaration">
+    <xsd:annotation>
+      <xsd:documentation>@since 2.7
+@noextend This interface is not intended to be extended by clients.
+@noimplement This interface is not intended to be implemented by clients.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="xbase:XExpression">
+        <xsd:sequence>
+          <xsd:element ecore:resolveProxies="true" minOccurs="0" name="type" type="types:JvmTypeReference"/>
+          <xsd:element ecore:resolveProxies="true" minOccurs="0" name="right" type="xbase:XExpression"/>
+        </xsd:sequence>
+        <xsd:attribute name="name" type="ecore:EString"/>
+        <xsd:attribute ecore:unsettable="false" name="writeable" type="ecore:EBoolean"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType abstract="true" name="XAbstractFeatureCall">
+    <xsd:annotation>
+      <xsd:appinfo ecore:key="operations" source="http://www.eclipse.org/emf/2002/Ecore">
+        <operation lowerBound="1" name="getConcreteSyntaxFeatureName" type="ecore:EString"/>
+        <operation name="getExplicitArguments" type="xbase:XExpression" upperBound="-1">
+          <annotation source="http://www.eclipse.org/emf/2002/GenModel">
+            <detail key="documentation">@deprecated Will be removed shortly</detail>
+          </annotation>
+        </operation>
+        <operation name="isExplicitOperationCallOrBuilderSyntax" type="ecore:EBoolean"/>
+        <operation name="getActualReceiver" type="xbase:XExpression">
+          <annotation source="http://www.eclipse.org/emf/2002/GenModel">
+            <detail key="documentation">&lt;p&gt;Returns the actual receiver of the feature call. The decision will be made according
+to the linking of the feature. May not be used during linking itself.
+&lt;p/&gt;
+&lt;p&gt;Static features, constructor calls (this, super), references to local variables 
+or parameters will return &lt;code&gt;null&lt;/code&gt;.&lt;/p&gt;
+</detail>
+          </annotation>
+        </operation>
+        <operation name="getActualArguments" type="xbase:XExpression" upperBound="-1">
+          <annotation source="http://www.eclipse.org/emf/2002/GenModel">
+            <detail key="documentation">&lt;p&gt;Returns the actual arguments of the feature call. The decision will be made according
+to the linking of the feature. May not be used during linking itself.
+&lt;p/&gt;
+&lt;p&gt;References to local variables, fields 
+or parameters will return an empty list. The result is never &lt;code&gt;null&lt;/code&gt;.&lt;/p&gt;
+</detail>
+          </annotation>
+        </operation>
+        <operation name="isStatic" type="ecore:EBoolean">
+          <annotation source="http://www.eclipse.org/emf/2002/GenModel">
+            <detail key="documentation">Returns &lt;code&gt;true&lt;/code&gt; if the featuer call links to a static field or a static 
+operation. Otherwise &lt;code&gt;false&lt;/code&gt;. May not be used during linking.</detail>
+          </annotation>
+        </operation>
+        <operation name="isExtension" type="ecore:EBoolean">
+          <annotation source="http://www.eclipse.org/emf/2002/GenModel">
+            <detail key="documentation">Returns &lt;code&gt;true&lt;/code&gt; if the feature was made available by an extension. 
+Otherwise &lt;code&gt;false&lt;/code&gt;. May not be used during linking.</detail>
+          </annotation>
+        </operation>
+        <operation name="isPackageFragment" type="ecore:EBoolean"/>
+        <operation name="isTypeLiteral" type="ecore:EBoolean"/>
+        <operation name="isOperation" type="ecore:EBoolean"/>
+      </xsd:appinfo>
+      <xsd:documentation>@since 2.7
+@noextend This interface is not intended to be extended by clients.
+@noimplement This interface is not intended to be implemented by clients.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="xbase:XExpression">
+        <xsd:sequence>
+          <xsd:element ecore:resolveProxies="true" maxOccurs="unbounded" minOccurs="0" name="typeArguments" type="types:JvmTypeReference"/>
+          <xsd:element ecore:derived="true" ecore:resolveProxies="true" ecore:transient="true" minOccurs="0" name="implicitReceiver" type="xbase:XExpression">
+            <xsd:annotation>
+              <xsd:documentation>Returns the implicit receiver of the feature call if any. Otherwise <code>null</code>.
+May not be used during linking.</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element ecore:derived="true" ecore:resolveProxies="true" ecore:transient="true" minOccurs="0" name="implicitFirstArgument" type="xbase:XExpression">
+            <xsd:annotation>
+              <xsd:documentation>Returns the implicit first argument of the feature call if any. Otherwise <code>null</code>.
+May not be used during linking.</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+        </xsd:sequence>
+        <xsd:attribute ecore:reference="types:JvmIdentifiableElement" name="feature" type="xsd:anyURI"/>
+        <xsd:attribute ecore:transient="true" name="invalidFeatureIssueCode" type="ecore:EString">
+          <xsd:annotation>
+            <xsd:documentation>@deprecated Will be removed shortly</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute ecore:changeable="false" ecore:derived="true" ecore:transient="true" ecore:unsettable="false" name="validFeature" type="ecore:EBoolean">
+          <xsd:annotation>
+            <xsd:documentation>@deprecated Will be removed shortly</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="XMemberFeatureCall">
+    <xsd:annotation>
+      <xsd:documentation>@since 2.7
+@noextend This interface is not intended to be extended by clients.
+@noimplement This interface is not intended to be implemented by clients.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="xbase:XAbstractFeatureCall">
+        <xsd:sequence>
+          <xsd:element ecore:resolveProxies="true" minOccurs="0" name="memberCallTarget" type="xbase:XExpression"/>
+          <xsd:element ecore:resolveProxies="true" maxOccurs="unbounded" minOccurs="0" name="memberCallArguments" type="xbase:XExpression"/>
+        </xsd:sequence>
+        <xsd:attribute ecore:unsettable="false" name="explicitOperationCall" type="ecore:EBoolean"/>
+        <xsd:attribute ecore:unsettable="false" name="explicitStatic" type="ecore:EBoolean"/>
+        <xsd:attribute ecore:unsettable="false" name="nullSafe" type="ecore:EBoolean"/>
+        <xsd:attribute ecore:derived="true" ecore:transient="true" ecore:unsettable="false" name="typeLiteral" type="ecore:EBoolean"/>
+        <xsd:attribute ecore:derived="true" ecore:transient="true" ecore:unsettable="false" name="staticWithDeclaringType" type="ecore:EBoolean"/>
+        <xsd:attribute ecore:derived="true" ecore:transient="true" ecore:unsettable="false" name="packageFragment" type="ecore:EBoolean"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="XFeatureCall">
+    <xsd:annotation>
+      <xsd:documentation>@since 2.7
+@noextend This interface is not intended to be extended by clients.
+@noimplement This interface is not intended to be implemented by clients.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="xbase:XAbstractFeatureCall">
+        <xsd:sequence>
+          <xsd:element ecore:resolveProxies="true" maxOccurs="unbounded" minOccurs="0" name="featureCallArguments" type="xbase:XExpression"/>
+        </xsd:sequence>
+        <xsd:attribute ecore:unsettable="false" name="explicitOperationCall" type="ecore:EBoolean"/>
+        <xsd:attribute ecore:derived="true" ecore:transient="true" ecore:unsettable="false" name="typeLiteral" type="ecore:EBoolean"/>
+        <xsd:attribute ecore:derived="true" ecore:transient="true" ecore:unsettable="false" name="packageFragment" type="ecore:EBoolean"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="XConstructorCall">
+    <xsd:annotation>
+      <xsd:documentation>@since 2.7
+@noextend This interface is not intended to be extended by clients.
+@noimplement This interface is not intended to be implemented by clients.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="xbase:XExpression">
+        <xsd:sequence>
+          <xsd:element ecore:resolveProxies="true" maxOccurs="unbounded" minOccurs="0" name="arguments" type="xbase:XExpression"/>
+          <xsd:element ecore:resolveProxies="true" maxOccurs="unbounded" minOccurs="0" name="typeArguments" type="types:JvmTypeReference"/>
+        </xsd:sequence>
+        <xsd:attribute ecore:reference="types:JvmConstructor" name="constructor" type="xsd:anyURI"/>
+        <xsd:attribute ecore:transient="true" name="invalidFeatureIssueCode" type="ecore:EString"/>
+        <xsd:attribute ecore:changeable="false" ecore:derived="true" ecore:transient="true" ecore:unsettable="false" name="validFeature" type="ecore:EBoolean"/>
+        <xsd:attribute ecore:unsettable="false" name="explicitConstructorCall" type="ecore:EBoolean"/>
+        <xsd:attribute ecore:transient="true" ecore:unsettable="false" name="anonymousClassConstructorCall" type="ecore:EBoolean"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="XBooleanLiteral">
+    <xsd:annotation>
+      <xsd:documentation>@since 2.7
+@noextend This interface is not intended to be extended by clients.
+@noimplement This interface is not intended to be implemented by clients.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="xbase:XExpression">
+        <xsd:attribute ecore:unsettable="false" name="isTrue" type="ecore:EBoolean"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="XNullLiteral">
+    <xsd:annotation>
+      <xsd:documentation>@since 2.7
+@noextend This interface is not intended to be extended by clients.
+@noimplement This interface is not intended to be implemented by clients.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="xbase:XExpression"/>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="XNumberLiteral">
+    <xsd:annotation>
+      <xsd:documentation>@since 2.7
+@noextend This interface is not intended to be extended by clients.
+@noimplement This interface is not intended to be implemented by clients.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="xbase:XExpression">
+        <xsd:attribute name="value" type="ecore:EString"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="XStringLiteral">
+    <xsd:annotation>
+      <xsd:documentation>@since 2.7
+@noextend This interface is not intended to be extended by clients.
+@noimplement This interface is not intended to be implemented by clients.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="xbase:XExpression">
+        <xsd:attribute name="value" type="ecore:EString"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType abstract="true" name="XCollectionLiteral">
+    <xsd:annotation>
+      <xsd:documentation>@since 2.7
+@noextend This interface is not intended to be extended by clients.
+@noimplement This interface is not intended to be implemented by clients.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="xbase:XExpression">
+        <xsd:sequence>
+          <xsd:element ecore:resolveProxies="true" maxOccurs="unbounded" minOccurs="0" name="elements" type="xbase:XExpression"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="XListLiteral">
+    <xsd:annotation>
+      <xsd:documentation>@since 2.7
+@noextend This interface is not intended to be extended by clients.
+@noimplement This interface is not intended to be implemented by clients.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="xbase:XCollectionLiteral"/>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="XSetLiteral">
+    <xsd:annotation>
+      <xsd:documentation>@since 2.7
+@noextend This interface is not intended to be extended by clients.
+@noimplement This interface is not intended to be implemented by clients.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="xbase:XCollectionLiteral"/>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="XClosure">
+    <xsd:annotation>
+      <xsd:appinfo ecore:key="operations" source="http://www.eclipse.org/emf/2002/Ecore">
+        <operation name="getFormalParameters" type="types:JvmFormalParameter" upperBound="-1"/>
+      </xsd:appinfo>
+      <xsd:documentation>@since 2.7
+@noextend This interface is not intended to be extended by clients.
+@noimplement This interface is not intended to be implemented by clients.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="xbase:XExpression">
+        <xsd:sequence>
+          <xsd:element ecore:resolveProxies="true" maxOccurs="unbounded" minOccurs="0" name="declaredFormalParameters" type="types:JvmFormalParameter"/>
+          <xsd:element ecore:resolveProxies="true" minOccurs="0" name="expression" type="xbase:XExpression"/>
+          <xsd:element ecore:derived="true" ecore:resolveProxies="true" ecore:transient="true" maxOccurs="unbounded" minOccurs="0" name="implicitFormalParameters" type="types:JvmFormalParameter"/>
+        </xsd:sequence>
+        <xsd:attribute ecore:unsettable="false" name="explicitSyntax" type="ecore:EBoolean"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="XCastedExpression">
+    <xsd:annotation>
+      <xsd:documentation>@since 2.7
+@noextend This interface is not intended to be extended by clients.
+@noimplement This interface is not intended to be implemented by clients.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="xbase:XExpression">
+        <xsd:sequence>
+          <xsd:element ecore:resolveProxies="true" minOccurs="0" name="type" type="types:JvmTypeReference"/>
+          <xsd:element ecore:resolveProxies="true" minOccurs="0" name="target" type="xbase:XExpression"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="XBinaryOperation">
+    <xsd:annotation>
+      <xsd:documentation>@since 2.7
+@noextend This interface is not intended to be extended by clients.
+@noimplement This interface is not intended to be implemented by clients.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="xbase:XAbstractFeatureCall">
+        <xsd:sequence>
+          <xsd:element ecore:resolveProxies="true" minOccurs="0" name="leftOperand" type="xbase:XExpression"/>
+          <xsd:element ecore:resolveProxies="true" minOccurs="0" name="rightOperand" type="xbase:XExpression"/>
+        </xsd:sequence>
+        <xsd:attribute ecore:unsettable="false" name="reassignFirstArgument" type="ecore:EBoolean"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="XUnaryOperation">
+    <xsd:annotation>
+      <xsd:documentation>@since 2.7
+@noextend This interface is not intended to be extended by clients.
+@noimplement This interface is not intended to be implemented by clients.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="xbase:XAbstractFeatureCall">
+        <xsd:sequence>
+          <xsd:element ecore:resolveProxies="true" minOccurs="0" name="operand" type="xbase:XExpression"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="XPostfixOperation">
+    <xsd:annotation>
+      <xsd:documentation>@since 2.7
+@noextend This interface is not intended to be extended by clients.
+@noimplement This interface is not intended to be implemented by clients.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="xbase:XAbstractFeatureCall">
+        <xsd:sequence>
+          <xsd:element ecore:resolveProxies="true" minOccurs="0" name="operand" type="xbase:XExpression"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="XForLoopExpression">
+    <xsd:annotation>
+      <xsd:documentation>@since 2.7
+@noextend This interface is not intended to be extended by clients.
+@noimplement This interface is not intended to be implemented by clients.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="xbase:XExpression">
+        <xsd:sequence>
+          <xsd:element ecore:resolveProxies="true" minOccurs="0" name="forExpression" type="xbase:XExpression"/>
+          <xsd:element ecore:resolveProxies="true" minOccurs="0" name="eachExpression" type="xbase:XExpression"/>
+          <xsd:element ecore:resolveProxies="true" minOccurs="0" name="declaredParam" type="types:JvmFormalParameter"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="XBasicForLoopExpression">
+    <xsd:annotation>
+      <xsd:documentation>@since 2.7
+@noextend This interface is not intended to be extended by clients.
+@noimplement This interface is not intended to be implemented by clients.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="xbase:XExpression">
+        <xsd:sequence>
+          <xsd:element ecore:resolveProxies="true" minOccurs="0" name="expression" type="xbase:XExpression"/>
+          <xsd:element ecore:resolveProxies="true" minOccurs="0" name="eachExpression" type="xbase:XExpression"/>
+          <xsd:element ecore:resolveProxies="true" maxOccurs="unbounded" minOccurs="0" name="initExpressions" type="xbase:XExpression"/>
+          <xsd:element ecore:resolveProxies="true" maxOccurs="unbounded" minOccurs="0" name="updateExpressions" type="xbase:XExpression"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType abstract="true" name="XAbstractWhileExpression">
+    <xsd:annotation>
+      <xsd:documentation>@since 2.7
+@noextend This interface is not intended to be extended by clients.
+@noimplement This interface is not intended to be implemented by clients.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="xbase:XExpression">
+        <xsd:sequence>
+          <xsd:element ecore:resolveProxies="true" minOccurs="0" name="predicate" type="xbase:XExpression"/>
+          <xsd:element ecore:resolveProxies="true" minOccurs="0" name="body" type="xbase:XExpression"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="XDoWhileExpression">
+    <xsd:annotation>
+      <xsd:documentation>@since 2.7
+@noextend This interface is not intended to be extended by clients.
+@noimplement This interface is not intended to be implemented by clients.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="xbase:XAbstractWhileExpression"/>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="XWhileExpression">
+    <xsd:annotation>
+      <xsd:documentation>@since 2.7
+@noextend This interface is not intended to be extended by clients.
+@noimplement This interface is not intended to be implemented by clients.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="xbase:XAbstractWhileExpression"/>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="XTypeLiteral">
+    <xsd:annotation>
+      <xsd:documentation>@since 2.7
+@noextend This interface is not intended to be extended by clients.
+@noimplement This interface is not intended to be implemented by clients.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="xbase:XExpression">
+        <xsd:sequence>
+          <xsd:element maxOccurs="unbounded" minOccurs="0" name="arrayDimensions" nillable="true" type="ecore:EString"/>
+        </xsd:sequence>
+        <xsd:attribute ecore:reference="types:JvmType" name="type" type="xsd:anyURI" use="required"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="XInstanceOfExpression">
+    <xsd:annotation>
+      <xsd:documentation>@since 2.7
+@noextend This interface is not intended to be extended by clients.
+@noimplement This interface is not intended to be implemented by clients.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="xbase:XExpression">
+        <xsd:sequence>
+          <xsd:element ecore:resolveProxies="true" name="type" type="types:JvmTypeReference"/>
+          <xsd:element ecore:resolveProxies="true" name="expression" type="xbase:XExpression"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="XThrowExpression">
+    <xsd:annotation>
+      <xsd:documentation>@since 2.7
+@noextend This interface is not intended to be extended by clients.
+@noimplement This interface is not intended to be implemented by clients.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="xbase:XExpression">
+        <xsd:sequence>
+          <xsd:element ecore:resolveProxies="true" minOccurs="0" name="expression" type="xbase:XExpression"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="XTryCatchFinallyExpression">
+    <xsd:annotation>
+      <xsd:documentation>@since 2.7
+@noextend This interface is not intended to be extended by clients.
+@noimplement This interface is not intended to be implemented by clients.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="xbase:XExpression">
+        <xsd:sequence>
+          <xsd:element ecore:resolveProxies="true" minOccurs="0" name="expression" type="xbase:XExpression"/>
+          <xsd:element ecore:resolveProxies="true" minOccurs="0" name="finallyExpression" type="xbase:XExpression"/>
+          <xsd:element ecore:resolveProxies="true" maxOccurs="unbounded" minOccurs="0" name="catchClauses" type="xbase:XCatchClause"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="XCatchClause">
+    <xsd:annotation>
+      <xsd:documentation>@since 2.7
+@noextend This interface is not intended to be extended by clients.
+@noimplement This interface is not intended to be implemented by clients.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element ecore:resolveProxies="true" minOccurs="0" name="expression" type="xbase:XExpression"/>
+      <xsd:element ecore:resolveProxies="true" minOccurs="0" name="declaredParam" type="types:JvmFormalParameter"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="XAssignment">
+    <xsd:annotation>
+      <xsd:documentation>@since 2.7
+@noextend This interface is not intended to be extended by clients.
+@noimplement This interface is not intended to be implemented by clients.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="xbase:XAbstractFeatureCall">
+        <xsd:sequence>
+          <xsd:element ecore:resolveProxies="true" minOccurs="0" name="assignable" type="xbase:XExpression"/>
+          <xsd:element ecore:resolveProxies="true" minOccurs="0" name="value" type="xbase:XExpression"/>
+        </xsd:sequence>
+        <xsd:attribute ecore:unsettable="false" name="explicitStatic" type="ecore:EBoolean"/>
+        <xsd:attribute ecore:derived="true" ecore:transient="true" ecore:unsettable="false" name="staticWithDeclaringType" type="ecore:EBoolean"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="XReturnExpression">
+    <xsd:annotation>
+      <xsd:documentation>@since 2.7
+@noextend This interface is not intended to be extended by clients.
+@noimplement This interface is not intended to be implemented by clients.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="xbase:XExpression">
+        <xsd:sequence>
+          <xsd:element ecore:resolveProxies="true" minOccurs="0" name="expression" type="xbase:XExpression"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="XSynchronizedExpression">
+    <xsd:annotation>
+      <xsd:documentation>@since 2.7
+@noextend This interface is not intended to be extended by clients.
+@noimplement This interface is not intended to be implemented by clients.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="xbase:XExpression">
+        <xsd:sequence>
+          <xsd:element ecore:resolveProxies="true" minOccurs="0" name="param" type="xbase:XExpression"/>
+          <xsd:element ecore:resolveProxies="true" minOccurs="0" name="expression" type="xbase:XExpression"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+</xsd:schema>

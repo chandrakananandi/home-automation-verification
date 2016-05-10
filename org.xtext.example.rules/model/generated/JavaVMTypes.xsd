@@ -1,0 +1,738 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xsd:schema xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmlns:types="http://www.eclipse.org/xtext/common/JavaVMTypes" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ecore:nsPrefix="types" ecore:package="org.eclipse.xtext.common.types" targetNamespace="http://www.eclipse.org/xtext/common/JavaVMTypes">
+  <xsd:import namespace="http://www.eclipse.org/emf/2002/Ecore" schemaLocation="platform:/plugin/org.eclipse.emf.ecore/model/Ecore.xsd"/>
+  <xsd:element ecore:ignore="true" name="JvmIdentifiableElement" type="types:JvmIdentifiableElement"/>
+  <xsd:element ecore:ignore="true" name="JvmType" type="types:JvmType"/>
+  <xsd:element ecore:ignore="true" name="JvmVoid" type="types:JvmVoid"/>
+  <xsd:element ecore:ignore="true" name="JvmComponentType" type="types:JvmComponentType"/>
+  <xsd:element ecore:ignore="true" name="JvmPrimitiveType" type="types:JvmPrimitiveType"/>
+  <xsd:element ecore:ignore="true" name="JvmArrayType" type="types:JvmArrayType"/>
+  <xsd:element ecore:ignore="true" name="JvmDeclaredType" type="types:JvmDeclaredType"/>
+  <xsd:element ecore:ignore="true" name="JvmTypeParameter" type="types:JvmTypeParameter"/>
+  <xsd:element ecore:ignore="true" name="JvmTypeParameterDeclarator" type="types:JvmTypeParameterDeclarator"/>
+  <xsd:element ecore:ignore="true" name="JvmConstraintOwner" type="types:JvmConstraintOwner"/>
+  <xsd:element ecore:ignore="true" name="JvmTypeConstraint" type="types:JvmTypeConstraint"/>
+  <xsd:element ecore:ignore="true" name="JvmUpperBound" type="types:JvmUpperBound"/>
+  <xsd:element ecore:ignore="true" name="JvmLowerBound" type="types:JvmLowerBound"/>
+  <xsd:element ecore:ignore="true" name="JvmAnnotationType" type="types:JvmAnnotationType"/>
+  <xsd:element ecore:ignore="true" name="JvmEnumerationType" type="types:JvmEnumerationType"/>
+  <xsd:element ecore:ignore="true" name="JvmEnumerationLiteral" type="types:JvmEnumerationLiteral"/>
+  <xsd:element ecore:ignore="true" name="JvmGenericType" type="types:JvmGenericType"/>
+  <xsd:element ecore:ignore="true" name="JvmTypeReference" type="types:JvmTypeReference"/>
+  <xsd:element ecore:ignore="true" name="JvmParameterizedTypeReference" type="types:JvmParameterizedTypeReference"/>
+  <xsd:element ecore:ignore="true" name="JvmGenericArrayTypeReference" type="types:JvmGenericArrayTypeReference"/>
+  <xsd:element ecore:ignore="true" name="JvmWildcardTypeReference" type="types:JvmWildcardTypeReference"/>
+  <xsd:element ecore:ignore="true" name="JvmAnyTypeReference" type="types:JvmAnyTypeReference"/>
+  <xsd:element ecore:ignore="true" name="JvmMultiTypeReference" type="types:JvmMultiTypeReference"/>
+  <xsd:element ecore:ignore="true" name="JvmMember" type="types:JvmMember"/>
+  <xsd:element ecore:ignore="true" name="JvmFeature" type="types:JvmFeature"/>
+  <xsd:element ecore:ignore="true" name="JvmField" type="types:JvmField"/>
+  <xsd:element ecore:ignore="true" name="JvmExecutable" type="types:JvmExecutable"/>
+  <xsd:element ecore:ignore="true" name="JvmConstructor" type="types:JvmConstructor"/>
+  <xsd:element ecore:ignore="true" name="JvmOperation" type="types:JvmOperation"/>
+  <xsd:element ecore:ignore="true" name="JvmFormalParameter" type="types:JvmFormalParameter"/>
+  <xsd:element ecore:ignore="true" name="JvmAnnotationTarget" type="types:JvmAnnotationTarget"/>
+  <xsd:element ecore:ignore="true" name="JvmAnnotationReference" type="types:JvmAnnotationReference"/>
+  <xsd:element ecore:ignore="true" name="JvmAnnotationValue" type="types:JvmAnnotationValue"/>
+  <xsd:element ecore:ignore="true" name="JvmIntAnnotationValue" type="types:JvmIntAnnotationValue"/>
+  <xsd:element ecore:ignore="true" name="JvmBooleanAnnotationValue" type="types:JvmBooleanAnnotationValue"/>
+  <xsd:element ecore:ignore="true" name="JvmByteAnnotationValue" type="types:JvmByteAnnotationValue"/>
+  <xsd:element ecore:ignore="true" name="JvmShortAnnotationValue" type="types:JvmShortAnnotationValue"/>
+  <xsd:element ecore:ignore="true" name="JvmLongAnnotationValue" type="types:JvmLongAnnotationValue"/>
+  <xsd:element ecore:ignore="true" name="JvmDoubleAnnotationValue" type="types:JvmDoubleAnnotationValue"/>
+  <xsd:element ecore:ignore="true" name="JvmFloatAnnotationValue" type="types:JvmFloatAnnotationValue"/>
+  <xsd:element ecore:ignore="true" name="JvmCharAnnotationValue" type="types:JvmCharAnnotationValue"/>
+  <xsd:element ecore:ignore="true" name="JvmStringAnnotationValue" type="types:JvmStringAnnotationValue"/>
+  <xsd:element ecore:ignore="true" name="JvmTypeAnnotationValue" type="types:JvmTypeAnnotationValue"/>
+  <xsd:element ecore:ignore="true" name="JvmAnnotationAnnotationValue" type="types:JvmAnnotationAnnotationValue"/>
+  <xsd:element ecore:ignore="true" name="JvmEnumAnnotationValue" type="types:JvmEnumAnnotationValue"/>
+  <xsd:element ecore:ignore="true" name="JvmDelegateTypeReference" type="types:JvmDelegateTypeReference"/>
+  <xsd:element ecore:ignore="true" name="JvmSpecializedTypeReference" type="types:JvmSpecializedTypeReference"/>
+  <xsd:element ecore:ignore="true" name="JvmSynonymTypeReference" type="types:JvmSynonymTypeReference"/>
+  <xsd:element ecore:ignore="true" name="JvmUnknownTypeReference" type="types:JvmUnknownTypeReference"/>
+  <xsd:element ecore:ignore="true" name="JvmCompoundTypeReference" type="types:JvmCompoundTypeReference"/>
+  <xsd:element ecore:ignore="true" name="JvmCustomAnnotationValue" type="types:JvmCustomAnnotationValue"/>
+  <xsd:element ecore:ignore="true" name="JvmInnerTypeReference" type="types:JvmInnerTypeReference"/>
+  <xsd:complexType abstract="true" name="JvmIdentifiableElement">
+    <xsd:annotation>
+      <xsd:appinfo ecore:key="operations" source="http://www.eclipse.org/emf/2002/Ecore">
+        <operation name="getIdentifier" type="ecore:EString">
+          <annotation source="http://www.eclipse.org/emf/2002/GenModel">
+            <detail key="documentation">&lt;p&gt;The identifier of a JvmIdentifiableElement is a canonical representation of the element.&lt;/p&gt;
+&lt;p&gt;A type will return its fully qualified name as its identifier with a '$' delimiter for inner classes. 
+The identifier of an executables contains the identifiers of their respective parameter types. They do
+not contain any information about type parameters.&lt;/p&gt;
+&lt;p&gt;Examples for identifiers are:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;java.lang.String for a class&lt;/li&gt;
+&lt;li&gt;java.util.Map$Entry for an inner class&lt;/li&gt;
+&lt;li&gt;java.lang.String.String() for a constructor (note the repeated simple name)&lt;/li&gt;
+&lt;li&gt;java.lang.String.charAt(int) for a method&lt;/li&gt;
+&lt;li&gt;java.lang.String.offset for a field&lt;/li&gt;
+&lt;li&gt;java.lang.Object[][] for an array type&lt;/li&gt;
+&lt;/ul&gt;</detail>
+          </annotation>
+        </operation>
+        <operation name="getSimpleName" type="ecore:EString">
+          <annotation source="http://www.eclipse.org/emf/2002/GenModel">
+            <detail key="documentation">&lt;p&gt;The simple name of a JvmIdentifiableElement is short representation of the element.&lt;/p&gt;
+&lt;p&gt;The simple name does not contain any information about type parameters.&lt;/p&gt;
+&lt;p&gt;Examples for simple names are:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;String for class java.lang.String&lt;/li&gt;
+&lt;li&gt;Entry for class java.util.Map$Entry&lt;/li&gt;
+&lt;li&gt;charAt for method java.lang.String.charAt(int)&lt;/li&gt;
+&lt;li&gt;String for constructor java.lang.String.String(java.lang.String)&lt;/li&gt;
+&lt;/ul&gt;</detail>
+          </annotation>
+        </operation>
+        <operation name="getQualifiedName" type="ecore:EString">
+          <annotation source="http://www.eclipse.org/emf/2002/GenModel">
+            <detail key="documentation">&lt;p&gt;The qualified name of a JvmIdentifiableElement is a textual representation of the element.&lt;/p&gt;
+&lt;p&gt;The default delimiter character is the '$'.&lt;/p&gt;
+@see #getQualifiedName(char)</detail>
+          </annotation>
+        </operation>
+        <operation name="getQualifiedName" type="ecore:EString">
+          <annotation source="http://www.eclipse.org/emf/2002/GenModel">
+            <detail key="documentation">&lt;p&gt;The qualified name of a JvmIdentifiableElement is a textual representation of the element.&lt;/p&gt;
+&lt;p&gt;The name does not contain any information about type parameters. Inner classes are delimited by means of 
+the given 'innerClassDelimiter'&lt;/p&gt;
+&lt;p&gt;Examples for qualified names with a '$' delimiter are:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;java.lang.String for class java.lang.String&lt;/li&gt;
+&lt;li&gt;java.util.Map$Entry for class java.util.Map$Entry&lt;/li&gt;
+&lt;li&gt;java.lang.String.charAt for method java.lang.String.charAt(int)&lt;/li&gt;
+&lt;li&gt;java.lang.String.offset for field java.lang.String.offset&lt;/li&gt;
+&lt;li&gt;java.lang.String for a constructor that is identified by java.lang.String.String(java.lang.String)&lt;/li&gt;
+&lt;/ul&gt;</detail>
+          </annotation>
+          <parameter name="innerClassDelimiter" type="ecore:EChar"/>
+        </operation>
+      </xsd:appinfo>
+    </xsd:annotation>
+  </xsd:complexType>
+  <xsd:complexType abstract="true" name="JvmType">
+    <xsd:complexContent>
+      <xsd:extension base="types:JvmIdentifiableElement"/>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="JvmVoid">
+    <xsd:complexContent>
+      <xsd:extension base="types:JvmType"/>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType abstract="true" name="JvmComponentType">
+    <xsd:complexContent>
+      <xsd:extension base="types:JvmType">
+        <xsd:sequence>
+          <xsd:element ecore:opposite="componentType" minOccurs="0" name="arrayType" type="types:JvmArrayType"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="JvmPrimitiveType">
+    <xsd:complexContent>
+      <xsd:extension base="types:JvmComponentType">
+        <xsd:attribute name="simpleName" type="ecore:EString"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="JvmArrayType">
+    <xsd:annotation>
+      <xsd:appinfo ecore:key="operations" source="http://www.eclipse.org/emf/2002/Ecore">
+        <operation name="getDimensions" type="ecore:EInt"/>
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="types:JvmComponentType">
+        <xsd:attribute ecore:opposite="arrayType" ecore:reference="types:JvmComponentType" name="componentType" type="xsd:anyURI"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType abstract="true" ecore:implements="types:JvmComponentType" name="JvmDeclaredType">
+    <xsd:annotation>
+      <xsd:appinfo ecore:key="operations" source="http://www.eclipse.org/emf/2002/Ecore">
+        <operation lowerBound="1" name="getDeclaredOperations" type="types:Iterable{types:JvmOperation}"/>
+        <operation lowerBound="1" name="getDeclaredFields" type="types:Iterable{types:JvmField}"/>
+        <operation lowerBound="1" name="findAllFeaturesByName" type="types:Iterable{types:JvmFeature}">
+          <annotation source="http://www.eclipse.org/emf/2002/GenModel">
+            <detail key="documentation">&lt;p&gt;Returns all the fields and operations with the given simple name.&lt;/p&gt;
+&lt;p&gt;Inherited features will be returend, but overridden features are not contained in the result.&lt;/p&gt;</detail>
+          </annotation>
+          <parameter name="simpleName" type="ecore:EString"/>
+        </operation>
+        <operation lowerBound="1" name="getAllFeatures" type="types:Iterable{types:JvmFeature}">
+          <annotation source="http://www.eclipse.org/emf/2002/GenModel">
+            <detail key="documentation">&lt;p&gt;Returns all the fields and operations of this type.&lt;/p&gt;
+&lt;p&gt;Inherited features are included, but overridden features will not be returned.&lt;/p&gt;</detail>
+          </annotation>
+        </operation>
+        <operation name="getExtendedInterfaces" type="types:Iterable{types:JvmTypeReference}"/>
+        <operation name="getExtendedClass" type="types:JvmTypeReference"/>
+        <operation name="isInstantiateable" type="ecore:EBoolean"/>
+        <operation name="findAllNestedTypesByName" type="types:Iterable{types:JvmDeclaredType}">
+          <annotation source="http://www.eclipse.org/emf/2002/GenModel">
+            <detail key="documentation">&lt;p&gt;Returns all the nested types with the given simple name.&lt;/p&gt;
+&lt;p&gt;Inherited types will be returned, too.&lt;/p&gt;</detail>
+          </annotation>
+          <parameter name="simpleName" type="ecore:EString"/>
+        </operation>
+        <operation name="isLocal" type="ecore:EBoolean"/>
+        <operation lowerBound="1" name="getDeclaredConstructors" type="types:Iterable{types:JvmConstructor}"/>
+        <operation lowerBound="1" name="getAllNestedTypes" type="types:Iterable{types:JvmDeclaredType}">
+          <annotation source="http://www.eclipse.org/emf/2002/GenModel">
+            <detail key="documentation">&lt;p&gt;Returns all the nested types of this type.&lt;/p&gt;
+&lt;p&gt;Inherited types will also be returned.&lt;/p&gt;</detail>
+          </annotation>
+        </operation>
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="types:JvmMember">
+        <xsd:sequence>
+          <xsd:element maxOccurs="unbounded" minOccurs="0" name="superTypes" type="types:JvmTypeReference"/>
+          <xsd:element ecore:opposite="declaringType" maxOccurs="unbounded" minOccurs="0" name="members" type="types:JvmMember"/>
+        </xsd:sequence>
+        <xsd:attribute ecore:unsettable="false" name="abstract" type="ecore:EBoolean"/>
+        <xsd:attribute ecore:unsettable="false" name="static" type="ecore:EBoolean"/>
+        <xsd:attribute ecore:unsettable="false" name="final" type="ecore:EBoolean"/>
+        <xsd:attribute name="packageName" type="ecore:EString"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType ecore:implements="types:JvmConstraintOwner" name="JvmTypeParameter">
+    <xsd:complexContent>
+      <xsd:extension base="types:JvmComponentType">
+        <xsd:attribute name="name" type="ecore:EString"/>
+        <xsd:attribute ecore:opposite="typeParameters" ecore:reference="types:JvmTypeParameterDeclarator" name="declarator" type="xsd:anyURI"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType abstract="true" name="JvmTypeParameterDeclarator">
+    <xsd:sequence>
+      <xsd:element ecore:opposite="declarator" maxOccurs="unbounded" minOccurs="0" name="typeParameters" type="types:JvmTypeParameter"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType abstract="true" name="JvmConstraintOwner">
+    <xsd:sequence>
+      <xsd:element ecore:opposite="owner" maxOccurs="unbounded" minOccurs="0" name="constraints" type="types:JvmTypeConstraint"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType abstract="true" name="JvmTypeConstraint">
+    <xsd:annotation>
+      <xsd:appinfo ecore:key="operations" source="http://www.eclipse.org/emf/2002/Ecore">
+        <operation name="getIdentifier" type="ecore:EString">
+          <annotation source="http://www.eclipse.org/emf/2002/GenModel">
+            <detail key="documentation">&lt;p&gt;The identifier of a JvmTypeConstraint is a canonical representation of the constraint information.&lt;/p&gt;
+&lt;p&gt;Examples for constraint identifiers are:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;extends java.util.List&lt;java.lang.Map$Entry&lt;java.lang.Object,java.lang.Object&gt;&gt;&lt;/li&gt;
+&lt;li&gt;super java.lang.Object&lt;/li&gt;
+&lt;/ul&gt;</detail>
+          </annotation>
+        </operation>
+        <operation name="getSimpleName" type="ecore:EString"/>
+        <operation name="getQualifiedName" type="ecore:EString"/>
+        <operation name="getQualifiedName" type="ecore:EString">
+          <parameter name="innerClassDelimiter" type="ecore:EChar"/>
+        </operation>
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element minOccurs="0" name="typeReference" type="types:JvmTypeReference"/>
+    </xsd:sequence>
+    <xsd:attribute ecore:opposite="constraints" ecore:reference="types:JvmConstraintOwner" name="owner" type="xsd:anyURI"/>
+  </xsd:complexType>
+  <xsd:complexType name="JvmUpperBound">
+    <xsd:complexContent>
+      <xsd:extension base="types:JvmTypeConstraint"/>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="JvmLowerBound">
+    <xsd:complexContent>
+      <xsd:extension base="types:JvmTypeConstraint"/>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="JvmAnnotationType">
+    <xsd:complexContent>
+      <xsd:extension base="types:JvmDeclaredType"/>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="JvmEnumerationType">
+    <xsd:complexContent>
+      <xsd:extension base="types:JvmDeclaredType">
+        <xsd:attribute ecore:changeable="false" ecore:derived="true" ecore:reference="types:JvmEnumerationLiteral" ecore:transient="true" name="literals">
+          <xsd:simpleType>
+            <xsd:list itemType="xsd:anyURI"/>
+          </xsd:simpleType>
+        </xsd:attribute>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="JvmEnumerationLiteral">
+    <xsd:annotation>
+      <xsd:appinfo ecore:key="operations" source="http://www.eclipse.org/emf/2002/Ecore">
+        <operation name="getEnumType" type="types:JvmEnumerationType"/>
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="types:JvmField"/>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType ecore:implements="types:JvmTypeParameterDeclarator" name="JvmGenericType">
+    <xsd:complexContent>
+      <xsd:extension base="types:JvmDeclaredType">
+        <xsd:attribute ecore:unsettable="false" name="interface" type="ecore:EBoolean"/>
+        <xsd:attribute ecore:unsettable="false" name="strictFloatingPoint" type="ecore:EBoolean"/>
+        <xsd:attribute ecore:unsettable="false" name="anonymous" type="ecore:EBoolean"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType abstract="true" name="JvmTypeReference">
+    <xsd:annotation>
+      <xsd:appinfo ecore:key="operations" source="http://www.eclipse.org/emf/2002/Ecore">
+        <operation name="getType" type="types:JvmType"/>
+        <operation name="getIdentifier" type="ecore:EString">
+          <annotation source="http://www.eclipse.org/emf/2002/GenModel">
+            <detail key="documentation">&lt;p&gt;The identifier of a JvmTypeReference is a canonical representation of the referenced type 
+including its type arguments.&lt;/p&gt;
+&lt;p&gt;The types fully qualified name is used ('$' is the delimiter for inner types).&lt;/p&gt;
+&lt;p&gt;Examples for reference identifiers are:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;java.lang.String for a reference to an object type&lt;/li&gt;
+&lt;li&gt;java.util.Map$Entry&lt;java.lang.Object,java.lang.Integer&gt; for a parameterized type&lt;/li&gt;
+&lt;li&gt;java.util.List&lt;? extends java.lang.String&gt;[] for a generic array type&lt;/li&gt;
+&lt;/ul&gt;</detail>
+          </annotation>
+        </operation>
+        <operation name="getSimpleName" type="ecore:EString"/>
+        <operation name="getQualifiedName" type="ecore:EString"/>
+        <operation name="getQualifiedName" type="ecore:EString">
+          <parameter name="innerClassDelimiter" type="ecore:EChar"/>
+        </operation>
+        <operation name="accept" type="Result">
+          <typeParameter name="Result"/>
+          <parameter name="visitor" type="types:ITypeReferenceVisitor{Result}"/>
+        </operation>
+        <operation name="accept" type="Result">
+          <typeParameter name="Parameter"/>
+          <typeParameter name="Result"/>
+          <parameter name="visitor" type="types:ITypeReferenceVisitorWithParameter{Parameter, Result}"/>
+          <parameter name="parameter" type="Parameter"/>
+        </operation>
+      </xsd:appinfo>
+    </xsd:annotation>
+  </xsd:complexType>
+  <xsd:complexType name="JvmParameterizedTypeReference">
+    <xsd:complexContent>
+      <xsd:extension base="types:JvmTypeReference">
+        <xsd:sequence>
+          <xsd:element maxOccurs="unbounded" minOccurs="0" name="arguments" type="types:JvmTypeReference"/>
+        </xsd:sequence>
+        <xsd:attribute ecore:reference="types:JvmType" name="type" type="xsd:anyURI"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="JvmGenericArrayTypeReference">
+    <xsd:annotation>
+      <xsd:appinfo ecore:key="operations" source="http://www.eclipse.org/emf/2002/Ecore">
+        <operation name="getDimensions" type="ecore:EInt"/>
+        <operation name="getType" type="types:JvmArrayType"/>
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="types:JvmTypeReference">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" name="componentType" type="types:JvmTypeReference"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType ecore:implements="types:JvmConstraintOwner" name="JvmWildcardTypeReference">
+    <xsd:complexContent>
+      <xsd:extension base="types:JvmTypeReference"/>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="JvmAnyTypeReference">
+    <xsd:complexContent>
+      <xsd:extension base="types:JvmTypeReference">
+        <xsd:attribute ecore:reference="types:JvmType" name="type" type="xsd:anyURI"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="JvmMultiTypeReference">
+    <xsd:complexContent>
+      <xsd:extension base="types:JvmCompoundTypeReference"/>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType abstract="true" name="JvmMember">
+    <xsd:annotation>
+      <xsd:appinfo ecore:key="operations" source="http://www.eclipse.org/emf/2002/Ecore">
+        <operation name="internalSetIdentifier">
+          <parameter name="identifier" type="ecore:EString"/>
+        </operation>
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="types:JvmAnnotationTarget">
+        <xsd:attribute ecore:opposite="members" ecore:reference="types:JvmDeclaredType" name="declaringType" type="xsd:anyURI"/>
+        <xsd:attribute ecore:unsettable="false" name="visibility" type="types:JvmVisibility"/>
+        <xsd:attribute name="simpleName" type="ecore:EString"/>
+        <xsd:attribute ecore:changeable="false" ecore:derived="true" ecore:transient="true" name="identifier" type="ecore:EString"/>
+        <xsd:attribute name="deprecated" type="ecore:EBoolean"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType abstract="true" name="JvmFeature">
+    <xsd:annotation>
+      <xsd:appinfo ecore:key="operations" source="http://www.eclipse.org/emf/2002/Ecore">
+        <operation name="isStatic" type="ecore:EBoolean">
+          <annotation source="http://www.eclipse.org/emf/2002/GenModel">
+            <detail key="documentation">&lt;p&gt;Returns &lt;code&gt;true&lt;/code&gt; if the feature is a static field or static operation.&lt;/p&gt;
+
+@since 2.4</detail>
+          </annotation>
+        </operation>
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="types:JvmMember">
+        <xsd:sequence>
+          <xsd:element ecore:resolveProxies="true" maxOccurs="unbounded" minOccurs="0" name="localClasses" type="types:JvmGenericType"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:simpleType name="JvmVisibility">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="DEFAULT"/>
+      <xsd:enumeration value="PRIVATE"/>
+      <xsd:enumeration value="PROTECTED"/>
+      <xsd:enumeration value="PUBLIC"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:complexType name="JvmField">
+    <xsd:annotation>
+      <xsd:appinfo ecore:key="operations" source="http://www.eclipse.org/emf/2002/Ecore">
+        <operation name="getConstantValueAsLong" type="ecore:ELong"/>
+        <operation name="getConstantValueAsInt" type="ecore:EInt"/>
+        <operation name="getConstantValueAsShort" type="ecore:EShort"/>
+        <operation name="getConstantValueAsByte" type="ecore:EByte"/>
+        <operation name="getConstantValueAsDouble" type="ecore:EDouble"/>
+        <operation name="getConstantValueAsFloat" type="ecore:EFloat"/>
+        <operation name="getConstantValueAsChar" type="ecore:EChar"/>
+        <operation name="getConstantValueAsBoolean" type="ecore:EBoolean"/>
+        <operation name="getConstantValueAsString" type="ecore:EString"/>
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="types:JvmFeature">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" name="type" type="types:JvmTypeReference"/>
+        </xsd:sequence>
+        <xsd:attribute ecore:unsettable="false" name="static" type="ecore:EBoolean"/>
+        <xsd:attribute ecore:unsettable="false" name="final" type="ecore:EBoolean"/>
+        <xsd:attribute ecore:unsettable="false" name="volatile" type="ecore:EBoolean"/>
+        <xsd:attribute ecore:unsettable="false" name="transient" type="ecore:EBoolean"/>
+        <xsd:attribute name="constant" type="ecore:EBoolean"/>
+        <xsd:attribute name="constantValue" type="ecore:EJavaObject"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType abstract="true" ecore:implements="types:JvmTypeParameterDeclarator" name="JvmExecutable">
+    <xsd:complexContent>
+      <xsd:extension base="types:JvmFeature">
+        <xsd:sequence>
+          <xsd:element maxOccurs="unbounded" minOccurs="0" name="parameters" type="types:JvmFormalParameter"/>
+          <xsd:element maxOccurs="unbounded" minOccurs="0" name="exceptions" type="types:JvmTypeReference"/>
+        </xsd:sequence>
+        <xsd:attribute ecore:unsettable="false" name="varArgs" type="ecore:EBoolean"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="JvmConstructor">
+    <xsd:complexContent>
+      <xsd:extension base="types:JvmExecutable"/>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="JvmOperation">
+    <xsd:complexContent>
+      <xsd:extension base="types:JvmExecutable">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" name="returnType" type="types:JvmTypeReference"/>
+          <xsd:element minOccurs="0" name="defaultValue" type="types:JvmAnnotationValue">
+            <xsd:annotation>
+              <xsd:documentation>
+                <p>Returns the default value for the annotation member represented by this JvmOperation instance.</p>
+<p>Returns null if no default is associated with the member, or if the operation does not represent a declared member of an annotation type.</p>
+              </xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+        </xsd:sequence>
+        <xsd:attribute ecore:unsettable="false" name="static" type="ecore:EBoolean"/>
+        <xsd:attribute ecore:unsettable="false" name="final" type="ecore:EBoolean"/>
+        <xsd:attribute ecore:unsettable="false" name="abstract" type="ecore:EBoolean"/>
+        <xsd:attribute ecore:unsettable="false" name="synchronized" type="ecore:EBoolean"/>
+        <xsd:attribute ecore:unsettable="false" name="default" type="ecore:EBoolean"/>
+        <xsd:attribute ecore:unsettable="false" name="native" type="ecore:EBoolean"/>
+        <xsd:attribute ecore:unsettable="false" name="strictFloatingPoint" type="ecore:EBoolean"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="JvmFormalParameter">
+    <xsd:complexContent>
+      <xsd:extension base="types:JvmAnnotationTarget">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" name="parameterType" type="types:JvmTypeReference"/>
+        </xsd:sequence>
+        <xsd:attribute name="name" type="ecore:EString"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType abstract="true" name="JvmAnnotationTarget">
+    <xsd:complexContent>
+      <xsd:extension base="types:JvmIdentifiableElement">
+        <xsd:sequence>
+          <xsd:element maxOccurs="unbounded" minOccurs="0" name="annotations" type="types:JvmAnnotationReference"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="JvmAnnotationReference">
+    <xsd:annotation>
+      <xsd:appinfo ecore:key="operations" source="http://www.eclipse.org/emf/2002/Ecore">
+        <operation name="getValues" type="types:JvmAnnotationValue" upperBound="-1">
+          <annotation source="http://www.eclipse.org/emf/2002/GenModel">
+            <detail key="documentation">&lt;p&gt;Returns all annotation values. That is, default values are included if not explicitly given.&lt;/p&gt;</detail>
+          </annotation>
+        </operation>
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element maxOccurs="unbounded" minOccurs="0" name="explicitValues" type="types:JvmAnnotationValue">
+        <xsd:annotation>
+          <xsd:documentation>
+            <p>Returns the explicit annotation values. That is, default values are not expected to be contained in that list.</p>
+<p>Important note: Some implementations don't have enough information about default values on annotations.
+They may choose to consider all available values as explicit values.</p>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute ecore:reference="types:JvmAnnotationType" name="annotation" type="xsd:anyURI"/>
+  </xsd:complexType>
+  <xsd:complexType abstract="true" name="JvmAnnotationValue">
+    <xsd:annotation>
+      <xsd:appinfo ecore:key="operations" source="http://www.eclipse.org/emf/2002/Ecore">
+        <operation name="getValueName" type="ecore:EString"/>
+      </xsd:appinfo>
+      <xsd:documentation>
+        <p>Represents the value of an annotation member.</p>
+<p>That is, either the default value of an operation as a member of an annotation type, or the 
+concrete value in an annotation reference is returned.</p>
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:attribute ecore:reference="types:JvmOperation" name="operation" type="xsd:anyURI"/>
+  </xsd:complexType>
+  <xsd:complexType name="JvmIntAnnotationValue">
+    <xsd:complexContent>
+      <xsd:extension base="types:JvmAnnotationValue">
+        <xsd:sequence>
+          <xsd:element maxOccurs="unbounded" minOccurs="0" name="values" type="ecore:EInt"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="JvmBooleanAnnotationValue">
+    <xsd:complexContent>
+      <xsd:extension base="types:JvmAnnotationValue">
+        <xsd:sequence>
+          <xsd:element maxOccurs="unbounded" minOccurs="0" name="values" type="ecore:EBoolean"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="JvmByteAnnotationValue">
+    <xsd:complexContent>
+      <xsd:extension base="types:JvmAnnotationValue">
+        <xsd:sequence>
+          <xsd:element maxOccurs="unbounded" minOccurs="0" name="values" type="ecore:EByte"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="JvmShortAnnotationValue">
+    <xsd:complexContent>
+      <xsd:extension base="types:JvmAnnotationValue">
+        <xsd:sequence>
+          <xsd:element maxOccurs="unbounded" minOccurs="0" name="values" type="ecore:EShort"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="JvmLongAnnotationValue">
+    <xsd:complexContent>
+      <xsd:extension base="types:JvmAnnotationValue">
+        <xsd:sequence>
+          <xsd:element maxOccurs="unbounded" minOccurs="0" name="values" type="ecore:ELong"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="JvmDoubleAnnotationValue">
+    <xsd:complexContent>
+      <xsd:extension base="types:JvmAnnotationValue">
+        <xsd:sequence>
+          <xsd:element maxOccurs="unbounded" minOccurs="0" name="values" type="ecore:EDouble"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="JvmFloatAnnotationValue">
+    <xsd:complexContent>
+      <xsd:extension base="types:JvmAnnotationValue">
+        <xsd:sequence>
+          <xsd:element maxOccurs="unbounded" minOccurs="0" name="values" type="ecore:EFloat"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="JvmCharAnnotationValue">
+    <xsd:complexContent>
+      <xsd:extension base="types:JvmAnnotationValue">
+        <xsd:sequence>
+          <xsd:element maxOccurs="unbounded" minOccurs="0" name="values" type="ecore:EChar"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="JvmStringAnnotationValue">
+    <xsd:complexContent>
+      <xsd:extension base="types:JvmAnnotationValue">
+        <xsd:sequence>
+          <xsd:element maxOccurs="unbounded" minOccurs="0" name="values" nillable="true" type="ecore:EString"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="JvmTypeAnnotationValue">
+    <xsd:complexContent>
+      <xsd:extension base="types:JvmAnnotationValue">
+        <xsd:sequence>
+          <xsd:element maxOccurs="unbounded" minOccurs="0" name="values" type="types:JvmTypeReference"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="JvmAnnotationAnnotationValue">
+    <xsd:complexContent>
+      <xsd:extension base="types:JvmAnnotationValue">
+        <xsd:sequence>
+          <xsd:element maxOccurs="unbounded" minOccurs="0" name="values" type="types:JvmAnnotationReference"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="JvmEnumAnnotationValue">
+    <xsd:complexContent>
+      <xsd:extension base="types:JvmAnnotationValue">
+        <xsd:attribute ecore:reference="types:JvmEnumerationLiteral" name="values">
+          <xsd:simpleType>
+            <xsd:list itemType="xsd:anyURI"/>
+          </xsd:simpleType>
+        </xsd:attribute>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:simpleType ecore:instanceClass="java.lang.Iterable" name="Iterable">
+    <xsd:annotation>
+      <xsd:appinfo ecore:key="typeParameters" source="http://www.eclipse.org/emf/2002/Ecore">
+        <typeParameter name="E"/>
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string"/>
+  </xsd:simpleType>
+  <xsd:complexType name="JvmDelegateTypeReference">
+    <xsd:complexContent>
+      <xsd:extension base="types:JvmTypeReference">
+        <xsd:attribute ecore:reference="types:JvmTypeReference" name="delegate" type="xsd:anyURI"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType abstract="true" name="JvmSpecializedTypeReference">
+    <xsd:complexContent>
+      <xsd:extension base="types:JvmTypeReference">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" name="equivalent" type="types:JvmTypeReference"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="JvmSynonymTypeReference">
+    <xsd:complexContent>
+      <xsd:extension base="types:JvmCompoundTypeReference"/>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="JvmUnknownTypeReference">
+    <xsd:complexContent>
+      <xsd:extension base="types:JvmTypeReference">
+        <xsd:attribute ecore:transient="true" name="qualifiedName" type="ecore:EString">
+          <xsd:annotation>
+            <xsd:documentation>
+              <p>Returns the known qualified name of the otherwise unresolveable type. May be <code>null</code>.</p>
+
+@since 2.4</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:simpleType ecore:instanceClass="org.eclipse.xtext.common.types.util.ITypeReferenceVisitor" ecore:serializable="false" name="ITypeReferenceVisitor">
+    <xsd:annotation>
+      <xsd:appinfo ecore:key="typeParameters" source="http://www.eclipse.org/emf/2002/Ecore">
+        <typeParameter name="Result"/>
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string"/>
+  </xsd:simpleType>
+  <xsd:simpleType ecore:instanceClass="org.eclipse.xtext.common.types.util.ITypeReferenceVisitorWithParameter" ecore:serializable="false" name="ITypeReferenceVisitorWithParameter">
+    <xsd:annotation>
+      <xsd:appinfo ecore:key="typeParameters" source="http://www.eclipse.org/emf/2002/Ecore">
+        <typeParameter name="Parameter"/>
+        <typeParameter name="Result"/>
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string"/>
+  </xsd:simpleType>
+  <xsd:complexType abstract="true" name="JvmCompoundTypeReference">
+    <xsd:complexContent>
+      <xsd:extension base="types:JvmTypeReference">
+        <xsd:sequence>
+          <xsd:element maxOccurs="unbounded" minOccurs="0" name="references" type="types:JvmTypeReference"/>
+        </xsd:sequence>
+        <xsd:attribute ecore:reference="types:JvmType" name="type" type="xsd:anyURI"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="JvmCustomAnnotationValue">
+    <xsd:complexContent>
+      <xsd:extension base="types:JvmAnnotationValue">
+        <xsd:attribute ecore:reference="xsd:anyType" name="values">
+          <xsd:simpleType>
+            <xsd:list itemType="xsd:anyURI"/>
+          </xsd:simpleType>
+        </xsd:attribute>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="JvmInnerTypeReference">
+    <xsd:complexContent>
+      <xsd:extension base="types:JvmParameterizedTypeReference">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" name="outer" type="types:JvmParameterizedTypeReference"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+</xsd:schema>
