@@ -16,50 +16,7 @@ import org.eclipse.xtext.xbase.impl.XMemberFeatureCallImplCustom;
  */
 public class ExpressionVisitorImpl implements ExpressionVisitor {
 
-	public String switchXExpressionInformation = new String();
-	public HashMap<String, ArrayList<String>> xifExpressionInformation = new HashMap<String, ArrayList<String>>();
-	public HashMap<String, ArrayList<String>> xBlockExpressionInformation = new HashMap<String, ArrayList<String>>();
-	public HashMap<String, ArrayList<String>> xBlockExpressionCustomInformation = new HashMap<String, ArrayList<String>>();
-	public HashMap<String, ArrayList<String>> xVariableDeclarationInformation = new HashMap<String, ArrayList<String>>();
-	public HashMap<String, ArrayList<String>> xAbstractFeatureCallInformation = new HashMap<String, ArrayList<String>>();
-	public HashMap<String, ArrayList<String>> xFeatureCallInformation = new HashMap<String, ArrayList<String>>();
-	public HashMap<String, ArrayList<String>> xFeatureCallCustomInformation = new HashMap<String, ArrayList<String>>();
-	public HashMap<String, ArrayList<String>> xMemberFeatureCallInformation = new HashMap<String, ArrayList<String>>();
-	public HashMap<String, ArrayList<String>> xMemberFeatureCallCustomInformation = new HashMap<String, ArrayList<String>>();
-	public HashMap<String, ArrayList<String>> xConstructorCallInformation = new HashMap<String, ArrayList<String>>();
-	public HashMap<String, String> xBooleanLiteralInformation = new HashMap<String, String>();
-	public HashMap<String, String> xNullLiteralInformation = new HashMap<String, String>();
-	public HashMap<String, String> xNullLiteralCustomInformation = new HashMap<String, String>();
-	public HashMap<String, String> xNumberLiteralInformation = new HashMap<String, String>();
-	public HashMap<String, String> xStringLiteralInformation = new HashMap<String, String>();
-	public HashMap<String, ArrayList<String>> xCollectionLiteralInformation = new HashMap<String, ArrayList<String>>();
-	public HashMap<String, ArrayList<String>> xListLiteralInformation = new HashMap<String, ArrayList<String>>();
-	public HashMap<String, ArrayList<String>> xSetLiteralInformation = new HashMap<String, ArrayList<String>>();
-	public HashMap<String, ArrayList<String>> xClosureInformation = new HashMap<String, ArrayList<String>>();
-	public HashMap<String, ArrayList<String>> xClosureCustomInformation = new HashMap<String, ArrayList<String>>();
-	public HashMap<String, ArrayList<String>> xCastedExpressionInformation = new HashMap<String, ArrayList<String>>();
-	public HashMap<String, ArrayList<String>> xBooleanOperationInformation = new HashMap<String, ArrayList<String>>();
-	public HashMap<String, ArrayList<String>> xUnaryOperationInformation = new HashMap<String, ArrayList<String>>();
-	public HashMap<String, ArrayList<String>> xPostFixOperationInformation = new HashMap<String, ArrayList<String>>();
-	public HashMap<String, ArrayList<String>> xBasicForLoopExpressionInformation = new HashMap<String, ArrayList<String>>();
-	public HashMap<String, ArrayList<String>> xAbstractWhilExpressionInformation = new HashMap<String, ArrayList<String>>();
-	public HashMap<String, ArrayList<String>> xDoWhilExpressionInformation = new HashMap<String, ArrayList<String>>();
-	public HashMap<String, ArrayList<String>> xWhilExpressionInformation = new HashMap<String, ArrayList<String>>();
-	public HashMap<String, ArrayList<String>> xTypeLiteralInformation = new HashMap<String, ArrayList<String>>();
-	public HashMap<String, ArrayList<String>> xInstanceOfExpressionInformation = new HashMap<String, ArrayList<String>>();
-	public HashMap<String, ArrayList<String>> xThrowExpressionInformation = new HashMap<String, ArrayList<String>>();
-	public HashMap<String, ArrayList<String>> xTryCatchFinallyExpressionInformation = new HashMap<String, ArrayList<String>>();
-	public HashMap<String, ArrayList<String>> xCatchClauseInformation = new HashMap<String, ArrayList<String>>();
-	public HashMap<String, ArrayList<String>> xAssignmentInformation = new HashMap<String, ArrayList<String>>();
-	public HashMap<String, ArrayList<String>> xAssignmentCustomInformation = new HashMap<String, ArrayList<String>>();
-	public HashMap<String, ArrayList<String>> xReturnExpressionInformation = new HashMap<String, ArrayList<String>>();
-	public HashMap<String, String> xScriptExpressionInformation = new HashMap<String, String>();
-	public HashMap<String, ArrayList<String>> xSynchronizedExpressionInformation = new HashMap<String, ArrayList<String>>();
-	public HashMap<String, ArrayList<String>> xForLoopExpressionInformation = new HashMap<String, ArrayList<String>>();
-	public HashMap<String, ArrayList<String>> xBinaryOperationInformation = new HashMap<String, ArrayList<String>>();
-	public HashMap<String, ArrayList<String>> xBinaryOperationCustomInformation = new HashMap<String, ArrayList<String>>();
-
-	ScriptExpressionSwitch expressionSwitch=new ScriptExpressionSwitch();
+	private ScriptExpressionSwitch expressionSwitch=new ScriptExpressionSwitch();
 	
 	@Override
 	public void visit(XIfExpression xIfExpression) {
@@ -332,7 +289,7 @@ public class ExpressionVisitorImpl implements ExpressionVisitor {
 		for(XExpression exp: xBlockExpressionCustom.getExpression().getExpressions()){			
 			custom_expressions.add(exp.toString());
 		}
-		xBlockExpressionCustomInformation.put(xBlockExpressionCustom.getExpression().toString(), custom_expressions);
+		
 	}
 
 	@Override
