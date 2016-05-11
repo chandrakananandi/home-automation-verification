@@ -14,6 +14,7 @@ import org.eclipse.xtext.xbase.impl.XUnaryOperationImpl;
 import org.eclipse.xtext.xbase.impl.XUnaryOperationImplCustom;
 import org.eclipse.xtext.xbase.impl.XVariableDeclarationImplCustom;
 import org.eclipse.xtext.xbase.impl.XWhileExpressionImpl;
+import org.xtext.example.rules.analysis.ConflictAvoidanceChecker;
 import org.xtext.example.script.script.util.ScriptSwitch;
 import org.eclipse.xtext.xbase.impl.XAbstractFeatureCallImpl;
 import org.eclipse.xtext.xbase.impl.XAbstractWhileExpressionImpl;
@@ -32,7 +33,6 @@ import org.eclipse.xtext.xbase.impl.XCollectionLiteralImpl;
 import org.eclipse.xtext.xbase.impl.XConstructorCallImpl;
 import org.eclipse.xtext.xbase.impl.XConstructorCallImplCustom;
 import org.eclipse.xtext.xbase.impl.XDoWhileExpressionImpl;
-import org.eclipse.xtext.xbase.impl.XExpressionImpl;
 import org.eclipse.xtext.xbase.impl.XFeatureCallImpl;
 import org.eclipse.xtext.xbase.impl.XFeatureCallImplCustom;
 import org.eclipse.xtext.xbase.impl.XForLoopExpressionImpl;
@@ -230,7 +230,7 @@ public class ScriptExpressionSwitch extends ScriptSwitch<Boolean>{
 			xWhileExpression.accept(expressionVisitor);
 			break;
 		default:
-			System.out.println(object.getClass().getSimpleName());
+			ConflictAvoidanceChecker.ast_writer.println(object.getClass().getSimpleName());
 			break;
 	}
 		return true;

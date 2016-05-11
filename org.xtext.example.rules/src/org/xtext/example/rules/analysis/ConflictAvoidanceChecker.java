@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 /**
  * 
@@ -14,9 +15,19 @@ import java.util.ArrayList;
 public class ConflictAvoidanceChecker {
 
     private ArrayList<String> statesInvolved = new ArrayList<String>();
-
-
-    public static void main(String[] args) {
+    
+    public static PrintWriter ast_writer;
+    
+    static {
+    	try {
+    		 	ast_writer=new PrintWriter("ast-output.txt");
+    	}
+    	catch (FileNotFoundException f){  
+    		f.printStackTrace();
+    	}
+    }
+    
+    public static void main(String[] args) throws IOException {
         File rule_file = new File(
                 "/home/cnandi/workspace/conflict_avoidance/src/smarthome/verification/sample_rule.rules");
         File conflict_file = new File(
@@ -24,9 +35,9 @@ public class ConflictAvoidanceChecker {
 
         SpecificationParser specParser=new SpecificationParser();
         specParser.parseConflicts(conflict_file);
-        RuleParser ruleParser=new RuleParser();
+        RuleParser ruleParser=new RuleParser(rule_file.getName());
         ruleParser.analyseRules();
-       
+        ConflictAvoidanceChecker.ast_writer.close();
        }
 
     public void parseRuleForConflictingStates(File rule_file) {

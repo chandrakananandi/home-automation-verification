@@ -1,14 +1,9 @@
 package org.xtext.example.rules.analysis.scriptvisitors;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.util.EContentAdapter;
 import org.eclipse.xtext.xbase.XExpression;
-import org.eclipse.xtext.xbase.impl.XAbstractFeatureCallImplCustom;
-import org.eclipse.xtext.xbase.impl.XMemberFeatureCallImplCustom;
+import org.xtext.example.rules.analysis.ConflictAvoidanceChecker;
 /**
  * 
  * @author cnandi
@@ -20,20 +15,21 @@ public class ExpressionVisitorImpl implements ExpressionVisitor {
 	
 	@Override
 	public void visit(XIfExpression xIfExpression) {
+		ConflictAvoidanceChecker.ast_writer.println("If then else:");
 		if(xIfExpression.getExpression().eContents().size()==3){
-			System.out.println("condition: ");
+			ConflictAvoidanceChecker.ast_writer.println("condition: ");
 			expressionSwitch.caseXExpression(xIfExpression.getExpression().getIf());
-			System.out.println("then part: ");
+			ConflictAvoidanceChecker.ast_writer.println("then part: ");
 			expressionSwitch.caseXExpression(xIfExpression.getExpression().getThen());
-			System.out.println("else part: ");
+			ConflictAvoidanceChecker.ast_writer.println("else part: ");
 			expressionSwitch.caseXExpression(xIfExpression.getExpression().getElse());
 		}
 		else{
-			System.out.println("condition: ");
+			ConflictAvoidanceChecker.ast_writer.println("condition: ");
 			expressionSwitch.caseXExpression(xIfExpression.getExpression().getIf());
-			System.out.println("then part: ");
+			ConflictAvoidanceChecker.ast_writer.println("then part: ");
 			expressionSwitch.caseXExpression(xIfExpression.getExpression().getThen());
-		}	
+		}		
 	}
 
 	@Override
@@ -54,7 +50,8 @@ public class ExpressionVisitorImpl implements ExpressionVisitor {
 
 	@Override
 	public void visit(XVariableDeclarationCustom xVariableDeclaration) {
-		System.out.println("var name: "+xVariableDeclaration.getExpression().getSimpleName());
+		ConflictAvoidanceChecker.ast_writer.println("Variable declaration:");
+		ConflictAvoidanceChecker.ast_writer.println("var name: "+xVariableDeclaration.getExpression().getSimpleName());
 		if(xVariableDeclaration.getExpression().getRight() instanceof XExpression){
 				expressionSwitch.caseXExpression((XExpression)xVariableDeclaration.getExpression().getRight());
 		}		
@@ -83,8 +80,7 @@ public class ExpressionVisitorImpl implements ExpressionVisitor {
 
 	@Override
 	public void visit(XBooleanLiteral xBooleanLiteral) {
-		// TODO Auto-generated method stub
-		System.out.println(xBooleanLiteral.getExpression().isIsTrue());
+		ConflictAvoidanceChecker.ast_writer.println(xBooleanLiteral.getExpression().isIsTrue());
 	}
 
 	@Override
@@ -94,12 +90,12 @@ public class ExpressionVisitorImpl implements ExpressionVisitor {
 
 	@Override
 	public void visit(XNumberLiteral xNumberLiteral) {
-		System.out.println("value: "+xNumberLiteral.getExpression().getValue());
+		ConflictAvoidanceChecker.ast_writer.println("value: "+xNumberLiteral.getExpression().getValue());
 	}
 
 	@Override
 	public void visit(XStringLiteral xStringLiteral) {
-		System.out.println("string: "+xStringLiteral.getExpression().getValue());
+		ConflictAvoidanceChecker.ast_writer.println("string: "+xStringLiteral.getExpression().getValue());
 	}
 
 	@Override
@@ -210,6 +206,7 @@ public class ExpressionVisitorImpl implements ExpressionVisitor {
 
 	@Override
 	public void visit(XBinaryOperationCustom xBinaryOperationImplCustom) {
+		ConflictAvoidanceChecker.ast_writer.println("Binary operation:");
 		if(xBinaryOperationImplCustom.getExpression().getLeftOperand().eContents().size()==0){
 			expressionSwitch.caseXExpression(xBinaryOperationImplCustom.getExpression().getLeftOperand());	
 		}
@@ -218,8 +215,7 @@ public class ExpressionVisitorImpl implements ExpressionVisitor {
 				expressionSwitch.caseXExpression((XExpression)child);		
 			}
 		}
-		System.out.println("operator: "+xBinaryOperationImplCustom.getExpression().getConcreteSyntaxFeatureName());
-		
+			
 		if(xBinaryOperationImplCustom.getExpression().getRightOperand().eContents().size()==0){
 			expressionSwitch.caseXExpression(xBinaryOperationImplCustom.getExpression().getRightOperand());	
 		}
@@ -228,18 +224,27 @@ public class ExpressionVisitorImpl implements ExpressionVisitor {
 				expressionSwitch.caseXExpression((XExpression)child);
 			}
 		}
+		ConflictAvoidanceChecker.ast_writer.println("operator: "+xBinaryOperationImplCustom.getExpression().getConcreteSyntaxFeatureName());
 	}
 
 	@Override
 	public void visit(XFeatureCallCustom xFeatureCallImplCustom) {
+		//System.out.println("Feature call");
+		
 		if(xFeatureCallImplCustom.getExpression().getActualReceiver()!=null){
+			ConflictAvoidanceChecker.ast_writer.println("target:");
 			expressionSwitch.caseXExpression(xFeatureCallImplCustom.getExpression().getActualReceiver());
 		}
 		if(xFeatureCallImplCustom.getExpression().getImplicitReceiver()!=null){
+			ConflictAvoidanceChecker.ast_writer.println("target:");
 			expressionSwitch.caseXExpression(xFeatureCallImplCustom.getExpression().getImplicitReceiver());
 		}
-		System.out.println(xFeatureCallImplCustom.getExpression().getConcreteSyntaxFeatureName());
+		ConflictAvoidanceChecker.ast_writer.println("feature name: ");
+		ConflictAvoidanceChecker.ast_writer.println(xFeatureCallImplCustom.getExpression().getConcreteSyntaxFeatureName());
+		
+		
 		if(xFeatureCallImplCustom.getExpression().getActualArguments().size()!=0){
+			ConflictAvoidanceChecker.ast_writer.println("arguments: ");
 			for(XExpression argument: xFeatureCallImplCustom.getExpression().getActualArguments()){
 				expressionSwitch.caseXExpression(argument);
 			}			
@@ -248,11 +253,17 @@ public class ExpressionVisitorImpl implements ExpressionVisitor {
 
 	@Override
 	public void visit(XMemberFeatureCallCustom xMemberFeatureCallImplCustom) {
+		
 		if(xMemberFeatureCallImplCustom.getExpression().getMemberCallTarget()!=null){
+			ConflictAvoidanceChecker.ast_writer.println("target:");
 			expressionSwitch.caseXExpression(xMemberFeatureCallImplCustom.getExpression().getMemberCallTarget());			
 		}
-		System.out.println(xMemberFeatureCallImplCustom.getExpression().getConcreteSyntaxFeatureName());
+		ConflictAvoidanceChecker.ast_writer.println("Member feature name:");
+		ConflictAvoidanceChecker.ast_writer.println(xMemberFeatureCallImplCustom.getExpression().getConcreteSyntaxFeatureName());
+		
+		
 		if(xMemberFeatureCallImplCustom.getExpression().getActualArguments().size()!=0){
+			ConflictAvoidanceChecker.ast_writer.println("arguments:");
 			for(XExpression argument: xMemberFeatureCallImplCustom.getExpression().getActualArguments()){
 				expressionSwitch.caseXExpression(argument);
 			}
@@ -262,18 +273,19 @@ public class ExpressionVisitorImpl implements ExpressionVisitor {
 
 	@Override
 	public void visit(XNullLiteralCustom xNullLiteralCustom) {
-		System.out.println(xNullLiteralCustom.getExpression());
+		ConflictAvoidanceChecker.ast_writer.println(xNullLiteralCustom.getExpression());
 	}
 
 	@Override
 	public void visit(XClosureCustom xClosureCustom) {
+		ConflictAvoidanceChecker.ast_writer.println("Closure:");
 		expressionSwitch.caseXExpression(xClosureCustom.getExpression().getExpression());
 	}
 
 	@Override
 	public void visit(ScriptXExpression scriptXExpression) {
 		if(scriptXExpression.eContents().size()<=1){
-			System.out.println(scriptXExpression.getExpression());
+			ConflictAvoidanceChecker.ast_writer.println(scriptXExpression.getExpression());
 		}		
 	}
 
@@ -284,31 +296,29 @@ public class ExpressionVisitorImpl implements ExpressionVisitor {
 				expressionSwitch.caseXExpression((XExpression)child);
 			}
 		}
-		
-		ArrayList<String> custom_expressions=new ArrayList<String>();
-		for(XExpression exp: xBlockExpressionCustom.getExpression().getExpressions()){			
-			custom_expressions.add(exp.toString());
-		}
-		
 	}
 
 	@Override
 	public void visit(XAssignmentCustom xAssignmentCustom) {
+		ConflictAvoidanceChecker.ast_writer.println("assignment:");
 		if(xAssignmentCustom.getExpession().getActualReceiver()!=null){
 			expressionSwitch.caseXExpression(xAssignmentCustom.getExpession().getActualReceiver());
 		}
-		System.out.println(xAssignmentCustom.getExpession().getConcreteSyntaxFeatureName());
+		ConflictAvoidanceChecker.ast_writer.println(xAssignmentCustom.getExpession().getConcreteSyntaxFeatureName());
+		
 		expressionSwitch.caseXExpression(xAssignmentCustom.getExpession().getValue());
 	}
 
 	@Override
-	public void visit(XUnaryOperationCustom xUnaryOperationCustom) {		
+	public void visit(XUnaryOperationCustom xUnaryOperationCustom) {	
+		ConflictAvoidanceChecker.ast_writer.println("unary operation:");
 		expressionSwitch.caseXExpression((XExpression)xUnaryOperationCustom.getExpression().getOperand());
-		System.out.println(xUnaryOperationCustom.getExpression().getConcreteSyntaxFeatureName());
+		ConflictAvoidanceChecker.ast_writer.println(xUnaryOperationCustom.getExpression().getConcreteSyntaxFeatureName());
 	}
 
 	@Override
 	public void visit(XConstructorCallCustom xConstructorCallCustom) {
+		ConflictAvoidanceChecker.ast_writer.println("constructor call:");
 		for(EObject child: xConstructorCallCustom.getExpression().eContents()){
 			if(child instanceof XExpression){
 				expressionSwitch.caseXExpression((XExpression) child);				

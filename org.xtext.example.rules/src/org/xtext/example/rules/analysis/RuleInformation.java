@@ -20,9 +20,9 @@ public class RuleInformation {
 
 	private String name;
 	private EList<EventTrigger>triggers;
-	private XBlockExpression action;
+	private ScriptContent action;
 	
-	public RuleInformation(String name, EList<EventTrigger> triggers, XBlockExpression script){
+	public RuleInformation(String name, EList<EventTrigger> triggers, ScriptContent script){
 		this.name=name;		
 		this.triggers= triggers;
 		this.action=script;
@@ -71,13 +71,9 @@ public class RuleInformation {
 		return name;
 	}
 	
-	
-
-	public XBlockExpression getAction() {
+	public ScriptContent getAction() {
 		return action;
-	}
-
-	
+	}	
 }
 
 
