@@ -89,4 +89,8 @@ public interface ExpressionVisitor {
 	public void visit(XBlockExpressionCustom xBlockExpressionCustom);
 
 	public void visit(XAssignmentCustom xAssignmentCustom);
+
+	public void visit(XUnaryOperationCustom xUnaryOperationCustom);
+
+	public void visit(XConstructorCallCustom xConstructorCallCustom);
 }

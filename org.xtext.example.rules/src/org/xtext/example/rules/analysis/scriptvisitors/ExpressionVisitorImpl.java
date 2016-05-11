@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EContentAdapter;
 import org.eclipse.xtext.xbase.XExpression;
 import org.eclipse.xtext.xbase.impl.XAbstractFeatureCallImplCustom;
@@ -58,22 +59,24 @@ public class ExpressionVisitorImpl implements ExpressionVisitor {
 	public HashMap<String, ArrayList<String>> xBinaryOperationInformation = new HashMap<String, ArrayList<String>>();
 	public HashMap<String, ArrayList<String>> xBinaryOperationCustomInformation = new HashMap<String, ArrayList<String>>();
 
+	ScriptExpressionSwitch expressionSwitch=new ScriptExpressionSwitch();
+	
 	@Override
 	public void visit(XIfExpression xIfExpression) {
-		int i=0;
-		System.out.println(xIfExpression.getExpression().eContents().size());
-		while(i < xIfExpression.getExpression().eContents().size()){
-			System.out.println(xIfExpression.getExpression().eContents().get(i));
-			i++;
-			
-		}
-		ArrayList<String> if_parts= new ArrayList<String>();
-		if_parts.add(xIfExpression.getExpression().getIf().toString());
-		if_parts.add(xIfExpression.getExpression().getThen().toString());
 		if(xIfExpression.getExpression().eContents().size()==3){
-			if_parts.add(xIfExpression.getExpression().getElse().toString());
+			System.out.println("condition: ");
+			expressionSwitch.caseXExpression(xIfExpression.getExpression().getIf());
+			System.out.println("then part: ");
+			expressionSwitch.caseXExpression(xIfExpression.getExpression().getThen());
+			System.out.println("else part: ");
+			expressionSwitch.caseXExpression(xIfExpression.getExpression().getElse());
 		}
-		xifExpressionInformation.put(xIfExpression.getExpression().toString(), if_parts);		
+		else{
+			System.out.println("condition: ");
+			expressionSwitch.caseXExpression(xIfExpression.getExpression().getIf());
+			System.out.println("then part: ");
+			expressionSwitch.caseXExpression(xIfExpression.getExpression().getThen());
+		}	
 	}
 
 	@Override
@@ -89,19 +92,15 @@ public class ExpressionVisitorImpl implements ExpressionVisitor {
 
 	@Override
 	public void visit(XBlockExpression xBlockExpression) {
-		ArrayList<String> expressions=new ArrayList<String>();
-		for(XExpression exp: xBlockExpression.getExpression().getExpressions()){			
-			expressions.add(exp.toString());
-		}
-		xBlockExpressionInformation.put(xBlockExpression.getExpression().toString(), expressions);
+		// TODO Auto-generated method stub
 	}
 
 	@Override
 	public void visit(XVariableDeclarationCustom xVariableDeclaration) {
-		ArrayList<String>variable_decl_parts=new ArrayList<String>();
-		variable_decl_parts.add(xVariableDeclaration.getExpression().getSimpleName());
-		variable_decl_parts.add(xVariableDeclaration.getExpression().getRight().toString());
-		xVariableDeclarationInformation.put(xVariableDeclaration.toString(), variable_decl_parts);
+		System.out.println("var name: "+xVariableDeclaration.getExpression().getSimpleName());
+		if(xVariableDeclaration.getExpression().getRight() instanceof XExpression){
+				expressionSwitch.caseXExpression((XExpression)xVariableDeclaration.getExpression().getRight());
+		}		
 	}
 
 	@Override
@@ -111,22 +110,12 @@ public class ExpressionVisitorImpl implements ExpressionVisitor {
 
 	@Override
 	public void visit(XMemberFeatureCall xMemberFeatureCall) {
-		ArrayList<String>member_feature_parts=new ArrayList<String>();
-		member_feature_parts.add(xMemberFeatureCall.getExpression().getConcreteSyntaxFeatureName());
-		for(XExpression actual_argument: xMemberFeatureCall.getExpression().getActualArguments()){
-			member_feature_parts.add(actual_argument.toString());
-		}
-		xMemberFeatureCallInformation.put(xMemberFeatureCall.toString(), member_feature_parts);
+		// TODO Auto-generated method stub
 	}
 
 	@Override
 	public void visit(XFeatureCall xFeatureCall) {
-		ArrayList<String>feature_parts=new ArrayList<String>();
-		feature_parts.add(xFeatureCall.getExpression().getConcreteSyntaxFeatureName());
-		for(XExpression actual_argument: xFeatureCall.getExpression().getActualArguments()){
-			feature_parts.add(actual_argument.toString());
-		}
-		xFeatureCallInformation.put(xFeatureCall.toString(), feature_parts);
+		// TODO Auto-generated method stub
 	}
 
 	@Override
@@ -138,7 +127,7 @@ public class ExpressionVisitorImpl implements ExpressionVisitor {
 	@Override
 	public void visit(XBooleanLiteral xBooleanLiteral) {
 		// TODO Auto-generated method stub
-		xBooleanLiteralInformation.put(xBooleanLiteral.toString(), ((Boolean)xBooleanLiteral.getExpression().isIsTrue()).toString());
+		System.out.println(xBooleanLiteral.getExpression().isIsTrue());
 	}
 
 	@Override
@@ -148,13 +137,12 @@ public class ExpressionVisitorImpl implements ExpressionVisitor {
 
 	@Override
 	public void visit(XNumberLiteral xNumberLiteral) {
-		xNumberLiteralInformation.put(xNumberLiteral.toString(), xNumberLiteral.getExpression().getValue());
-	
+		System.out.println("value: "+xNumberLiteral.getExpression().getValue());
 	}
 
 	@Override
 	public void visit(XStringLiteral xStringLiteral) {
-		xStringLiteralInformation.put(xStringLiteral.toString(), xStringLiteral.getExpression().getValue());
+		System.out.println("string: "+xStringLiteral.getExpression().getValue());
 	}
 
 	@Override
@@ -175,9 +163,7 @@ public class ExpressionVisitorImpl implements ExpressionVisitor {
 
 	@Override
 	public void visit(XClosure xClosure) {
-		ArrayList<String> closure_parts=new ArrayList<String>();
-		closure_parts.add(xClosure.getExpression().getExpression().toString());
-		xClosureInformation.put(xClosure.toString(), closure_parts);
+		// TODO Auto-generated method stub
 	}
 
 	@Override
@@ -187,21 +173,12 @@ public class ExpressionVisitorImpl implements ExpressionVisitor {
 
 	@Override
 	public void visit(XBinaryOperation xBinaryOperation) {
-		ArrayList<String>binary_operation_parts=new ArrayList<String>();
-		binary_operation_parts.add(xBinaryOperation.getExpression().getConcreteSyntaxFeatureName());
-		binary_operation_parts.add(xBinaryOperation.getExpression().getLeftOperand().toString());
-		binary_operation_parts.add(xBinaryOperation.getExpression().getRightOperand().toString());
-		xBinaryOperationInformation.put(xBinaryOperation.toString(), binary_operation_parts);
-		System.out.println(xBinaryOperation.getExpression().getLeftOperand());
-		System.out.println(xBinaryOperation.getExpression().getRightOperand());
+		// TODO Auto-generated method stub
 	}
 
 	@Override
 	public void visit(XUnaryOperation xUnaryOperation) {
-		ArrayList<String>unary_operation_parts=new ArrayList<String>();
-		unary_operation_parts.add(xUnaryOperation.getExpression().getConcreteSyntaxFeatureName());
-		unary_operation_parts.add(xUnaryOperation.getExpression().getOperand().toString());
-		xUnaryOperationInformation.put(xUnaryOperation.toString(), unary_operation_parts);
+		// TODO Auto-generated method stub
 	}
 
 	@Override
@@ -256,10 +233,7 @@ public class ExpressionVisitorImpl implements ExpressionVisitor {
 
 	@Override
 	public void visit(XAssignment xAssignment) {
-		ArrayList<String>assignment_parts=new ArrayList<String>();
-		assignment_parts.add(xAssignment.getExpression().getConcreteSyntaxFeatureName());
-		assignment_parts.add(xAssignment.getExpression().getValue().toString());
-		xAssignmentInformation.put(xAssignment.toString(), assignment_parts);
+		// TODO Auto-generated method stub
 	}
 
 	@Override
@@ -279,57 +253,81 @@ public class ExpressionVisitorImpl implements ExpressionVisitor {
 
 	@Override
 	public void visit(XBinaryOperationCustom xBinaryOperationImplCustom) {
-		ArrayList<String>binary_operation_custom_parts=new ArrayList<String>();
-		binary_operation_custom_parts.add(xBinaryOperationImplCustom.getExpression().getConcreteSyntaxFeatureName());
-		binary_operation_custom_parts.add(xBinaryOperationImplCustom.getExpression().getLeftOperand().toString());
-		binary_operation_custom_parts.add(xBinaryOperationImplCustom.getExpression().getRightOperand().toString());	
-		xBinaryOperationCustomInformation.put(xBinaryOperationImplCustom.toString(), binary_operation_custom_parts);
-		System.out.println(xBinaryOperationImplCustom.getExpression().getLeftOperand());
-		System.out.println(xBinaryOperationImplCustom.getExpression().getRightOperand());
+		if(xBinaryOperationImplCustom.getExpression().getLeftOperand().eContents().size()==0){
+			expressionSwitch.caseXExpression(xBinaryOperationImplCustom.getExpression().getLeftOperand());	
+		}
+		else {
+			for(EObject child: xBinaryOperationImplCustom.getExpression().getLeftOperand().eContents()){
+				expressionSwitch.caseXExpression((XExpression)child);		
+			}
+		}
+		System.out.println("operator: "+xBinaryOperationImplCustom.getExpression().getConcreteSyntaxFeatureName());
+		
+		if(xBinaryOperationImplCustom.getExpression().getRightOperand().eContents().size()==0){
+			expressionSwitch.caseXExpression(xBinaryOperationImplCustom.getExpression().getRightOperand());	
+		}
+		else {
+			for(EObject child: xBinaryOperationImplCustom.getExpression().getRightOperand().eContents()){				
+				expressionSwitch.caseXExpression((XExpression)child);
+			}
+		}
 	}
 
 	@Override
 	public void visit(XFeatureCallCustom xFeatureCallImplCustom) {
-		ArrayList<String>feature_custom_parts=new ArrayList<String>();
-		feature_custom_parts.add(xFeatureCallImplCustom.getExpression().getConcreteSyntaxFeatureName());
-		for(XExpression actual_argument: xFeatureCallImplCustom.getExpression().getActualArguments()){
-			feature_custom_parts.add(actual_argument.toString());
+		if(xFeatureCallImplCustom.getExpression().getActualReceiver()!=null){
+			expressionSwitch.caseXExpression(xFeatureCallImplCustom.getExpression().getActualReceiver());
 		}
-		xFeatureCallInformation.put(xFeatureCallImplCustom.toString(), feature_custom_parts);
-	
+		if(xFeatureCallImplCustom.getExpression().getImplicitReceiver()!=null){
+			expressionSwitch.caseXExpression(xFeatureCallImplCustom.getExpression().getImplicitReceiver());
+		}
+		System.out.println(xFeatureCallImplCustom.getExpression().getConcreteSyntaxFeatureName());
+		if(xFeatureCallImplCustom.getExpression().getActualArguments().size()!=0){
+			for(XExpression argument: xFeatureCallImplCustom.getExpression().getActualArguments()){
+				expressionSwitch.caseXExpression(argument);
+			}			
+		}		
 	}
 
 	@Override
 	public void visit(XMemberFeatureCallCustom xMemberFeatureCallImplCustom) {
-		ArrayList<String>member_feature_custom_parts=new ArrayList<String>();
-		member_feature_custom_parts.add(xMemberFeatureCallImplCustom.getExpression().getConcreteSyntaxFeatureName());
-		for(XExpression actual_argument: xMemberFeatureCallImplCustom.getExpression().getActualArguments()){
-			member_feature_custom_parts.add(actual_argument.toString());
+		if(xMemberFeatureCallImplCustom.getExpression().getMemberCallTarget()!=null){
+			expressionSwitch.caseXExpression(xMemberFeatureCallImplCustom.getExpression().getMemberCallTarget());			
 		}
-		xMemberFeatureCallCustomInformation.put(xMemberFeatureCallImplCustom.toString(), member_feature_custom_parts);
-	
-	}
-
-	@Override
-	public void visit(XNullLiteralCustom xNullLiteralCustom) {
-		xNullLiteralCustomInformation.put(xNullLiteralCustom.toString(), xNullLiteralCustom.getExpression().toString());
+		System.out.println(xMemberFeatureCallImplCustom.getExpression().getConcreteSyntaxFeatureName());
+		if(xMemberFeatureCallImplCustom.getExpression().getActualArguments().size()!=0){
+			for(XExpression argument: xMemberFeatureCallImplCustom.getExpression().getActualArguments()){
+				expressionSwitch.caseXExpression(argument);
+			}
+		}
 		
 	}
 
 	@Override
+	public void visit(XNullLiteralCustom xNullLiteralCustom) {
+		System.out.println(xNullLiteralCustom.getExpression());
+	}
+
+	@Override
 	public void visit(XClosureCustom xClosureCustom) {
-		ArrayList<String> closure_custom_parts=new ArrayList<String>();
-		closure_custom_parts.add(xClosureCustom.getExpression().getExpression().toString());
-		xClosureInformation.put(xClosureCustom.toString(), closure_custom_parts);	
+		expressionSwitch.caseXExpression(xClosureCustom.getExpression().getExpression());
 	}
 
 	@Override
 	public void visit(ScriptXExpression scriptXExpression) {
-		xScriptExpressionInformation.put(scriptXExpression.toString(),scriptXExpression.getExpression().toString());
+		if(scriptXExpression.eContents().size()<=1){
+			System.out.println(scriptXExpression.getExpression());
+		}		
 	}
 
 	@Override
 	public void visit(XBlockExpressionCustom xBlockExpressionCustom) {
+		for(EObject child: xBlockExpressionCustom.getExpression().eContents()){
+			if(child instanceof XExpression){
+				expressionSwitch.caseXExpression((XExpression)child);
+			}
+		}
+		
 		ArrayList<String> custom_expressions=new ArrayList<String>();
 		for(XExpression exp: xBlockExpressionCustom.getExpression().getExpressions()){			
 			custom_expressions.add(exp.toString());
@@ -339,10 +337,25 @@ public class ExpressionVisitorImpl implements ExpressionVisitor {
 
 	@Override
 	public void visit(XAssignmentCustom xAssignmentCustom) {
-		ArrayList<String>assignment_custom_parts=new ArrayList<String>();
-		assignment_custom_parts.add(xAssignmentCustom.getExpession().getConcreteSyntaxFeatureName());
-		assignment_custom_parts.add(xAssignmentCustom.getExpession().getValue().toString());
-		xAssignmentCustomInformation.put(xAssignmentCustom.toString(), assignment_custom_parts);
+		if(xAssignmentCustom.getExpession().getActualReceiver()!=null){
+			expressionSwitch.caseXExpression(xAssignmentCustom.getExpession().getActualReceiver());
+		}
+		System.out.println(xAssignmentCustom.getExpession().getConcreteSyntaxFeatureName());
+		expressionSwitch.caseXExpression(xAssignmentCustom.getExpession().getValue());
 	}
 
+	@Override
+	public void visit(XUnaryOperationCustom xUnaryOperationCustom) {		
+		expressionSwitch.caseXExpression((XExpression)xUnaryOperationCustom.getExpression().getOperand());
+		System.out.println(xUnaryOperationCustom.getExpression().getConcreteSyntaxFeatureName());
+	}
+
+	@Override
+	public void visit(XConstructorCallCustom xConstructorCallCustom) {
+		for(EObject child: xConstructorCallCustom.getExpression().eContents()){
+			if(child instanceof XExpression){
+				expressionSwitch.caseXExpression((XExpression) child);				
+			}
+		}		
+	}
 }

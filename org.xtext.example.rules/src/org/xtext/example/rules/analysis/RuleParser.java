@@ -36,20 +36,18 @@ public class RuleParser {
 				RuleInformation rule_information=new RuleInformation(rule.getName(), rule.getEventtrigger(), rule.getScript());
 				rule_database.add(rule_information);
 				ScriptExpressionSwitch expressionSwitch=new ScriptExpressionSwitch();
-				System.out.println("size: "+rule.getScript().eContents().size());
-				if(rule.getScript().eAllContents().hasNext()){
-					scriptAnalyser(rule.getScript().eAllContents().next(),expressionSwitch);
-				}
-			}			
-		}		
-	}
+				System.out.println("rule name: "+rule.getName());
+				for(EObject obj: rule.getScript().eContents()){
+						scriptAnalyser(obj,expressionSwitch);
+				}	
+				System.out.println("\n");
+			}				
+		}			
+	}	
 	
 	public void scriptAnalyser(EObject scriptNode, ScriptExpressionSwitch expressionSwitch){			
 		if (scriptNode instanceof XExpression){
-			//if(scriptNode.eAllContents().hasNext()){
-				//System.out.println(scriptNode.eAllContents().next());
-				//scriptAnalyser(scriptNode.eAllContents().next(), expressionSwitch);
-			//}
+			System.out.println(scriptNode.getClass());
 			expressionSwitch.caseXExpression((XExpression) scriptNode);	
 		}
 	}

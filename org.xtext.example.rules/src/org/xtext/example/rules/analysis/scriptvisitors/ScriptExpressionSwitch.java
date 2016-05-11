@@ -5,11 +5,13 @@ import org.eclipse.xtext.xbase.impl.XNumberLiteralImpl;
 import org.eclipse.xtext.xbase.impl.XPostfixOperationImpl;
 import org.eclipse.xtext.xbase.impl.XReturnExpressionImpl;
 import org.eclipse.xtext.xbase.impl.XSetLiteralImpl;
+import org.eclipse.xtext.xbase.impl.XStringLiteralImpl;
 import org.eclipse.xtext.xbase.impl.XSwitchExpressionImpl;
 import org.eclipse.xtext.xbase.impl.XSynchronizedExpressionImpl;
 import org.eclipse.xtext.xbase.impl.XThrowExpressionImpl;
 import org.eclipse.xtext.xbase.impl.XTryCatchFinallyExpressionImpl;
 import org.eclipse.xtext.xbase.impl.XUnaryOperationImpl;
+import org.eclipse.xtext.xbase.impl.XUnaryOperationImplCustom;
 import org.eclipse.xtext.xbase.impl.XVariableDeclarationImplCustom;
 import org.eclipse.xtext.xbase.impl.XWhileExpressionImpl;
 import org.xtext.example.script.script.util.ScriptSwitch;
@@ -28,6 +30,7 @@ import org.eclipse.xtext.xbase.impl.XClosureImpl;
 import org.eclipse.xtext.xbase.impl.XClosureImplCustom;
 import org.eclipse.xtext.xbase.impl.XCollectionLiteralImpl;
 import org.eclipse.xtext.xbase.impl.XConstructorCallImpl;
+import org.eclipse.xtext.xbase.impl.XConstructorCallImplCustom;
 import org.eclipse.xtext.xbase.impl.XDoWhileExpressionImpl;
 import org.eclipse.xtext.xbase.impl.XExpressionImpl;
 import org.eclipse.xtext.xbase.impl.XFeatureCallImpl;
@@ -118,12 +121,16 @@ public class ScriptExpressionSwitch extends ScriptSwitch<Boolean>{
 			XConstructorCall xConstructorCall=new XConstructorCall((XConstructorCallImpl)object);
 			xConstructorCall.accept(expressionVisitor);
 			break;
+		case("XConstructorCallImplCustom"):
+			XConstructorCallCustom xConstructorCallCustom=new XConstructorCallCustom((XConstructorCallImplCustom)object);
+			xConstructorCallCustom.accept(expressionVisitor);
+			break;
 		case("XDoWhileExpressionImpl"):
 			XDoWhileExpression xDoWhileExpression=new  XDoWhileExpression((XDoWhileExpressionImpl)object);
 			xDoWhileExpression.accept(expressionVisitor);
 			break;
 		case("XExpressionImpl"):
-			ScriptXExpression xExpression =new ScriptXExpression((XExpressionImpl)object);
+			ScriptXExpression xExpression =new ScriptXExpression((XExpression)object);
 			xExpression.accept(expressionVisitor);
 			break;
 		case("XFeatureCallImpl"):
@@ -183,7 +190,7 @@ public class ScriptExpressionSwitch extends ScriptSwitch<Boolean>{
 			xSetLiteral.accept(expressionVisitor);
 			break;
 		case("XStringLiteralImpl"):
-			XStringLiteral xStringLiteral=new XStringLiteral((XStringLiteral)object);
+			XStringLiteral xStringLiteral=new XStringLiteral((XStringLiteralImpl)object);
 			xStringLiteral.accept(expressionVisitor);
 			break;
 		case("XSwitchExpressionImpl"):
@@ -209,6 +216,10 @@ public class ScriptExpressionSwitch extends ScriptSwitch<Boolean>{
 		case("XUnaryOperationImpl"):
 			XUnaryOperation xUnaryOperation = new XUnaryOperation((XUnaryOperationImpl)object);
 			xUnaryOperation.accept(expressionVisitor);
+			break;
+		case("XUnaryOperationImplCustom"):
+			XUnaryOperationCustom xUnaryOperationCustom = new XUnaryOperationCustom((XUnaryOperationImplCustom)object);
+			xUnaryOperationCustom.accept(expressionVisitor);
 			break;
 		case("XVariableDeclarationImplCustom"):
 			XVariableDeclarationCustom xVariableDeclaration = new XVariableDeclarationCustom((XVariableDeclarationImplCustom)object);

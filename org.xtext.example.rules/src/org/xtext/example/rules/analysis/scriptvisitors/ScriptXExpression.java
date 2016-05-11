@@ -1,5 +1,6 @@
 package org.xtext.example.rules.analysis.scriptvisitors;
 
+import org.eclipse.xtext.xbase.XExpression;
 import org.eclipse.xtext.xbase.impl.XExpressionImpl;
 
 /**
@@ -7,15 +8,15 @@ import org.eclipse.xtext.xbase.impl.XExpressionImpl;
  * @author cnandi
  *
  */
-public class ScriptXExpression extends org.eclipse.xtext.xbase.impl.XExpressionImpl implements Expression {
+public class ScriptXExpression extends XExpressionImpl implements Expression {
 
-private XExpressionImpl expression;
+private XExpression expression;
 	
-	public ScriptXExpression(XExpressionImpl exp) {
+	public ScriptXExpression(XExpression exp) {
 		expression = exp;
 	}
 	
-	public XExpressionImpl getExpression(){
+	public XExpression getExpression(){
 		return expression;
 	}
 	@Override
