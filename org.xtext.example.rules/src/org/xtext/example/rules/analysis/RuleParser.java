@@ -1,13 +1,8 @@
 package org.xtext.example.rules.analysis;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.PrintStream;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +15,10 @@ import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.xtext.xbase.XExpression;
 import org.xtext.example.rules.RulesStandaloneSetupGenerated;
 import org.xtext.example.rules.analysis.scriptvisitors.ScriptExpressionSwitch;
+import org.xtext.example.rules.analysis.statements.BinaryCondition;
+import org.xtext.example.rules.analysis.statements.Condition;
+import org.xtext.example.rules.analysis.statements.IfThenElse;
+import org.xtext.example.rules.analysis.statements.UnaryCondition;
 import org.xtext.example.rules.rules.Rule;
 /**
  * 
@@ -28,7 +27,6 @@ import org.xtext.example.rules.rules.Rule;
  */
 public class RuleParser {
 	protected String rule_file_name; 
-	protected List<String> rule_names=new ArrayList<String>();
 	protected List<RuleInformation> rule_database=new ArrayList<RuleInformation>();
 	
 	public RuleParser(String file_name){
@@ -45,42 +43,98 @@ public class RuleParser {
 		ResourceSet resourceSet=new ResourceSetImpl();
 		Resource resource=resourceSet.getResource(URI.createURI("src/org/xtext/example/rules/analysis/"+getRuleFileName()), true);
 		TreeIterator<EObject> eobjects=resource.getAllContents();
+		ArrayList<Rule>rules=new ArrayList<Rule>();		
 		
 		while(eobjects.hasNext()){			
 			EObject eobj=eobjects.next();
 			if (eobj.getClass().getSimpleName().equals("RuleImpl")){
 				Rule rule= (Rule) eobj;
 				ScriptExpressionSwitch expressionSwitch=new ScriptExpressionSwitch();
+				rules.add(rule);
 				ConflictAvoidanceChecker.ast_writer.println("rule name: "+rule.getName());
 				for(EObject obj: rule.getScript().eContents()){
-					scriptAnalyser(obj,expressionSwitch);
+					generateAST(obj,expressionSwitch);
 				}	
-				ConflictAvoidanceChecker.ast_writer.println("\n");				
+				//ConflictAvoidanceChecker.ast_writer.println("\n");				
 			}				
 		}		
+		
+		ConflictAvoidanceChecker.ast_writer.close();
 		BufferedReader br=new BufferedReader(new FileReader("/home/cnandi/openHABworkspace/org.xtext.example.rules/ast-output.txt"));
 		
-		while(eobjects.hasNext()){
-			EObject eobj=eobjects.next();
-			if(eobj.getClass().getSimpleName().equals("RuleImpl")){
-				Rule rule=(Rule) eobj;				
-				ScriptContent scriptContent=analyseAST(br);
-				RuleInformation rule_information=new RuleInformation(rule.getName(), rule.getEventtrigger(), scriptContent);
-				rule_database.add(rule_information);
-				
+		for(Rule rule: rules){
+			ScriptContent scriptContent=analyseAST(rule.getName(), br);
+			RuleInformation rule_information=new RuleInformation(rule.getName(), rule.getEventtrigger(), scriptContent);
+			rule_database.add(rule_information);				
 			}
 		}
-	}	
 	
-	public void scriptAnalyser(EObject scriptNode, ScriptExpressionSwitch expressionSwitch){			
+	public void generateAST(EObject scriptNode, ScriptExpressionSwitch expressionSwitch){			
 		if (scriptNode instanceof XExpression){
 			expressionSwitch.caseXExpression((XExpression) scriptNode);	
 		}		
 	}
 	
-	public ScriptContent analyseAST(BufferedReader astFileReader) throws IOException{
-		System.out.println("bla");
-		System.out.println(astFileReader.lines().count());
+	public ScriptContent analyseAST(String ruleName, BufferedReader astFileReader) throws IOException{
+		String line;
+		ArrayList<String> script=new ArrayList<String>();
+		while((line = astFileReader.readLine())!=null){
+			if(line.contains(ruleName)){				
+				while((line = astFileReader.readLine())!=null){
+					System.out.println(line);
+					script.add(line);					
+				}
+			}
+		}
+		ScriptContent scriptContent=extractScriptInformation(script);
+		astFileReader.close();
+		return scriptContent;
+	}
+	
+	public ScriptContent extractScriptInformation(ArrayList<String> script){
+		int i=0;
+		while(i<script.size()){
+			if(script.get(i).equals("If then else:")){
+				i = i+2;
+				if(script.get(i).equals("Binary operation:")) {
+					i++;
+					ArrayList<String> binary_condition=new ArrayList<String>();
+					
+					int j=i;
+					while(j<script.size()){
+						if(!script.get(j).equals("then part:")){
+							System.out.println(script.get(j));
+							binary_condition.add(script.get(j));
+							j++;
+						}
+					}
+					BinaryCondition binaryCondition=manipulateBinaryCondition(binary_condition);						
+				}	
+				else if(script.get(i).equals("Unary operation:")) {
+					i++;
+					ArrayList<String> unary_condition=new ArrayList<String>();
+					int k=i;
+					while(k<script.size()){
+						if(!script.get(i).equals("then part:")){
+							unary_condition.add(script.get(i));						
+						}
+						k++;
+					}
+					UnaryCondition unaryCondition=manipulateUnaryCondition(unary_condition);
+				}
+				i++;
+			}
+		}
+		
+		return null;
+	}
+	
+	public BinaryCondition manipulateBinaryCondition(ArrayList<String>binary_condition){
+		
+		return null;
+	}
+	
+	public UnaryCondition manipulateUnaryCondition(ArrayList<String>unary_condition){
 		return null;
 	}
 }
