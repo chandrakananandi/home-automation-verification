@@ -1,24 +1,3 @@
-rule "Timer Demo"
-when
-	Item Light_GF_Corridor_Ceiling received command
-then
-	if(receivedCommand==ON) {
-		if(timer==null) {			
-			timer = createTimer(now.plusSeconds(10)) [|
-				sendCommand(Light_GF_Corridor_Ceiling, OFF)
-			]
-		} else {
-			timer.reschedule(now.plusSeconds(10))
-		}
-	} else if(receivedCommand==OFF) {
-		if(timer!=null) {
-			timer.cancel
-			timer = null
-		}	
-	}
-	
-end
-
 rule "Away rule"
 when
 	Item State_Away changed 
@@ -37,13 +16,3 @@ then
 end
 
 
-rule "Update max and min temperatures"
-when
-	Item Weather_Temperature changed or
-	Time cron "0 0 0 * * ?" or
-	System started
-then	
-	postUpdate(Weather_Temp_Max, Weather_Temperature.maximumSince(now.toDateMidnight).state)
-	postUpdate(Weather_Temp_Min, Weather_Temperature.minimumSince(now.toDateMidnight).state)
-	logInfo("Weather", "Temperature evolved of " + Weather_Temperature.deltaSince(now.minusMinutes(2)) + " degrees.")
-end
