@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.eclipse.emf.common.util.EList;
-import org.eclipse.xtext.xbase.XBlockExpression;
 import org.xtext.example.rules.analysis.constants.Constants;
 import org.xtext.example.rules.rules.EventTrigger;
 import org.xtext.example.rules.rules.impl.ChangedEventTriggerImpl;

@@ -2,7 +2,9 @@ package org.xtext.example.rules.analysis;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,41 +55,44 @@ public class RuleParser {
 				rules.add(rule);
 				ConflictAvoidanceChecker.ast_writer.println("rule name: "+rule.getName());
 				for(EObject obj: rule.getScript().eContents()){
-					generateAST(obj,expressionSwitch);
+					generateSimplerAST(obj,expressionSwitch);
 				}	
-				//ConflictAvoidanceChecker.ast_writer.println("\n");				
+				ConflictAvoidanceChecker.ast_writer.println("rule end");				
 			}				
 		}		
 		
 		ConflictAvoidanceChecker.ast_writer.close();
-		BufferedReader br=new BufferedReader(new FileReader("/home/cnandi/openHABworkspace/org.xtext.example.rules/ast-output.txt"));
-		
+
 		for(Rule rule: rules){
-			ScriptContent scriptContent=analyseAST(rule.getName(), br);
+			BufferedReader br=new BufferedReader(new FileReader("/home/cnandi/openHABworkspace/org.xtext.example.rules/ast-output.txt"));
+			ScriptContent scriptContent=analyseSimplerAST(rule.getName(), br);
 			RuleInformation rule_information=new RuleInformation(rule.getName(), rule.getEventtrigger(), scriptContent);
-			rule_database.add(rule_information);				
-			}
+			rule_database.add(rule_information);
+			br.close();
 		}
+		
+	}
 	
-	public void generateAST(EObject scriptNode, ScriptExpressionSwitch expressionSwitch){			
+	public void generateSimplerAST(EObject scriptNode, ScriptExpressionSwitch expressionSwitch){			
 		if (scriptNode instanceof XExpression){
 			expressionSwitch.caseXExpression((XExpression) scriptNode);	
 		}		
 	}
 	
-	public ScriptContent analyseAST(String ruleName, BufferedReader astFileReader) throws IOException{
+	public ScriptContent analyseSimplerAST(String ruleName, BufferedReader astFileReader) throws IOException{
 		String line;
 		ArrayList<String> script=new ArrayList<String>();
 		while((line = astFileReader.readLine())!=null){
-			if(line.contains(ruleName)){				
-				while((line = astFileReader.readLine())!=null){
-					System.out.println(line);
-					script.add(line);					
+			if(line.contains(ruleName)){	
+				while(!(line = astFileReader.readLine()).equals("rule end")){
+					script.add(line);	
 				}
 			}
+			else {
+				continue;
+			}
 		}
-		ScriptContent scriptContent=extractScriptInformation(script);
-		astFileReader.close();
+		ScriptContent scriptContent=extractScriptInformation(script);		
 		return scriptContent;
 	}
 	
@@ -125,7 +130,7 @@ public class RuleParser {
 				i++;
 			}
 		}
-		
+
 		return null;
 	}
 	

@@ -28,7 +28,7 @@ public class ConflictAvoidanceChecker {
     }
     
     public static void main(String[] args) throws IOException {
-        File rule_file = new File(
+    	File rule_file = new File(
                 "/home/cnandi/workspace/conflict_avoidance/src/smarthome/verification/sample_rule.rules");
         File conflict_file = new File(
                 "src/org/xtext/example/rules/analysis/sample_conflict.conflicts");
@@ -36,8 +36,7 @@ public class ConflictAvoidanceChecker {
         SpecificationParser specParser=new SpecificationParser();
         specParser.parseConflicts(conflict_file);
         RuleParser ruleParser=new RuleParser(rule_file.getName());
-        ruleParser.analyseRules();
-        ConflictAvoidanceChecker.ast_writer.close();
+        ruleParser.analyseRules();        
        }
 
     public void parseRuleForConflictingStates(File rule_file) {

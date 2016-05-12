@@ -47,8 +47,8 @@ import org.eclipse.xtext.xbase.impl.XTypeLiteralImpl;
 
 
 
-public class ScriptExpressionSwitch extends ScriptSwitch<Boolean>{
-	public Boolean caseXExpression(XExpression object){
+public class ScriptExpressionSwitch extends ScriptSwitch<String>{
+	public String caseXExpression(XExpression object){
 		ExpressionVisitor expressionVisitor=new ExpressionVisitorImpl();
 		switch(object.getClass().getSimpleName()){
 		case("XAbstractFeatureCallImpl"):
@@ -233,6 +233,7 @@ public class ScriptExpressionSwitch extends ScriptSwitch<Boolean>{
 			ConflictAvoidanceChecker.ast_writer.println(object.getClass().getSimpleName());
 			break;
 	}
-		return true;
+		return object.eContents().toString();
 	}
+
 }
