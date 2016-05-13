@@ -19,7 +19,9 @@ import org.xtext.example.rules.RulesStandaloneSetupGenerated;
 import org.xtext.example.rules.analysis.scriptvisitors.ScriptExpressionSwitch;
 import org.xtext.example.rules.analysis.statements.BinaryCondition;
 import org.xtext.example.rules.analysis.statements.Condition;
+import org.xtext.example.rules.analysis.statements.FeatureInvocation;
 import org.xtext.example.rules.analysis.statements.IfThenElse;
+import org.xtext.example.rules.analysis.statements.MemberFeatureInvocation;
 import org.xtext.example.rules.analysis.statements.UnaryCondition;
 import org.xtext.example.rules.rules.Rule;
 
@@ -106,7 +108,7 @@ public class RuleParser {
 		ArrayList<String> feature_part = new ArrayList<String>();
 		ArrayList<String> member_feature_part = new ArrayList<String>();
 
-		if (script.size() > 0) {
+		if(script.size()>1){
 			int i = 0;
 			String if_tracker;
 			String feature_tracker;
@@ -166,9 +168,7 @@ public class RuleParser {
 								}
 								k = m;
 								i = m;
-							}
-
-							else if (script.get(k).contains("else part:" + if_tracker)) {
+							} else if (script.get(k).contains("else part:" + if_tracker)) {
 								int m = k + 1;
 								while (!script.get(m).contains("else part ends here:" + if_tracker)) {
 									if (!script.get(m).contains("else part ends here:" + if_tracker)) {
@@ -186,42 +186,61 @@ public class RuleParser {
 				if (script.get(i).contains("Feature name:")) {
 					feature_tracker = script.get(i).split(":")[1].trim();
 					i++;
-					int j=i;
-					while(j<script.size()){
-						if(!script.get(j).contains("Feature ends:"+feature_tracker)){
+					int j = i;
+					while (j < script.size()) {
+						if (!script.get(j).contains("Feature ends:" + feature_tracker)) {
 							feature_part.add(script.get(j));
 							j++;
 						} else {
 							break;
 						}
 					}
-					i=j;
+					i = j;
 				}
-				
+
 				if (script.get(i).contains("Member feature name:")) {
 					member_feature_tracker = script.get(i).split(":")[1].trim();
 					i++;
-					int j=i;
-					while(j<script.size()){
-						if(!script.get(j).contains("Member feature ends:"+member_feature_tracker)){
+					int j = i;
+					while (j < script.size()) {
+						if (!script.get(j).contains("Member feature ends:" + member_feature_tracker)) {
 							member_feature_part.add(script.get(j));
 							j++;
 						} else {
 							break;
 						}
 					}
-					i=j;
+					i = j;
 				}
 				i++;
 			}
 		}
-		System.out.println();
+		if(script.size()<1){
+			return null;
+		}
 
+		extractScriptInformation(binary_condition);
+		extractScriptInformation(unary_condition);
+		extractScriptInformation(then_part);
+		extractScriptInformation(else_part);
+		extractScriptInformation(member_feature_part);
+		extractScriptInformation(feature_part);
 		return null;
 	}
 
 	public BinaryCondition manipulateBinaryCondition(ArrayList<String> binary_condition) {
+		return null;
+	}
 
+	public IfThenElse manipulateConditional(ArrayList<String> conditional) {
+		return null;
+	}
+
+	public FeatureInvocation manipulateFeatureCall(ArrayList<String> feature_call) {
+		return null;
+	}
+
+	public MemberFeatureInvocation manipulateMemberFeatureCall(ArrayList<String> member_feature_call) {
 		return null;
 	}
 

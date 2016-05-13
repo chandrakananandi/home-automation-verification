@@ -4,12 +4,14 @@ import java.util.List;
 
 import org.xtext.example.rules.analysis.statements.Assignment;
 import org.xtext.example.rules.analysis.statements.IfThenElse;
-import org.xtext.example.rules.analysis.statements.MethodInvocation;
+import org.xtext.example.rules.analysis.statements.MemberFeatureInvocation;
+import org.xtext.example.rules.analysis.statements.FeatureInvocation;
 
 public class ScriptContent {
 	private List<IfThenElse> conditional_statements;
 	private List<Assignment> assignments;
-	private List<MethodInvocation> method_invoations;
+	private List<FeatureInvocation> feature_invocations;
+	private List<MemberFeatureInvocation> member_feature_invocations;
 
 	public void addIfThenElse(IfThenElse conditional) {
 		conditional_statements.add(conditional);
@@ -19,8 +21,13 @@ public class ScriptContent {
 		assignments.add(assignment);
 	}
 
-	public void addMethodInvocation(MethodInvocation methodInvocation) {
-		method_invoations.add(methodInvocation);
+	public void addFeatureInvocation(FeatureInvocation featureInvocation) {
+		feature_invocations.add(featureInvocation);
 	}
+	
+	public void addMemberfeatureInvocation(MemberFeatureInvocation memberFeatureInvocation) {
+		member_feature_invocations.add(memberFeatureInvocation);
+	}
+
 
 }

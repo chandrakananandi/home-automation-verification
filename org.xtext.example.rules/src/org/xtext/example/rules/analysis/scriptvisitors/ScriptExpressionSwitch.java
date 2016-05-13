@@ -237,10 +237,10 @@ public class ScriptExpressionSwitch extends ScriptSwitch<String> {
 			xWhileExpression.accept(expressionVisitor);
 			break;
 		default:
-			ConflictAvoidanceChecker.ast_writer.println(object.getClass().getSimpleName());
+			ConflictAvoidanceChecker.ast_writer.println("default:"+object.getClass().getSimpleName());
 			break;
 		}
-		return object.eContents().toString();
+		return null;
 	}
 
 }
