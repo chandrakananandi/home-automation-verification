@@ -10,16 +10,16 @@ import org.eclipse.xtext.xbase.impl.XFeatureCallImpl;
  */
 public class XFeatureCall extends org.eclipse.xtext.xbase.impl.XFeatureCallImpl implements Expression {
 
-private XFeatureCallImpl expression;
-	
+	private XFeatureCallImpl expression;
+
 	public XFeatureCall(XFeatureCallImpl exp) {
 		expression = exp;
 	}
-	
-	public XFeatureCallImpl getExpression(){
+
+	public XFeatureCallImpl getExpression() {
 		return expression;
 	}
-	
+
 	@Override
 	public void accept(ExpressionVisitor expressionVisitor) {
 		expressionVisitor.visit(this);

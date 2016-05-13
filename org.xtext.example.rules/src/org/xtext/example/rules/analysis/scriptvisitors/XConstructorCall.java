@@ -10,15 +10,16 @@ import org.eclipse.xtext.xbase.impl.XConstructorCallImpl;
  */
 public class XConstructorCall extends org.eclipse.xtext.xbase.impl.XConstructorCallImpl implements Expression {
 
-private XConstructorCallImpl expression;
-	
+	private XConstructorCallImpl expression;
+
 	public XConstructorCall(XConstructorCallImpl exp) {
 		expression = exp;
 	}
-	
-	public XConstructorCallImpl getExpression(){
+
+	public XConstructorCallImpl getExpression() {
 		return expression;
 	}
+
 	@Override
 	public void accept(ExpressionVisitor expressionVisitor) {
 		expressionVisitor.visit(this);

@@ -11,17 +11,18 @@ import org.eclipse.xtext.xbase.impl.XFeatureCallImplCustom;
 public class XFeatureCallCustom extends org.eclipse.xtext.xbase.impl.XFeatureCallImplCustom implements Expression {
 
 	private XFeatureCallImplCustom expression;
-	
+
 	public XFeatureCallCustom(XFeatureCallImplCustom exp) {
-		expression=exp;		
+		expression = exp;
 	}
+
 	@Override
 	public void accept(ExpressionVisitor expressionVisitor) {
 		expressionVisitor.visit(this);
 
 	}
-	
-	public XFeatureCallImplCustom getExpression(){
+
+	public XFeatureCallImplCustom getExpression() {
 		return expression;
 	}
 

@@ -10,15 +10,16 @@ import org.eclipse.xtext.xbase.impl.XUnaryOperationImpl;
  */
 public class XUnaryOperation extends org.eclipse.xtext.xbase.impl.XUnaryOperationImpl implements Expression {
 
-private XUnaryOperationImpl expression;
-	
+	private XUnaryOperationImpl expression;
+
 	public XUnaryOperation(XUnaryOperationImpl exp) {
 		expression = exp;
 	}
-	
-	public XUnaryOperationImpl getExpression(){
+
+	public XUnaryOperationImpl getExpression() {
 		return expression;
 	}
+
 	@Override
 	public void accept(ExpressionVisitor expressionVisitor) {
 		expressionVisitor.visit(this);

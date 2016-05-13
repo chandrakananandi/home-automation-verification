@@ -1,4 +1,5 @@
 package org.xtext.example.rules.analysis;
+
 /**
  * 
  * @author cnandi

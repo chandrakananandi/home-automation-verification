@@ -8,17 +8,19 @@ import org.eclipse.xtext.xbase.impl.XConstructorCallImplCustom;
  * @author cnandi
  *
  */
-public class XConstructorCallCustom extends org.eclipse.xtext.xbase.impl.XConstructorCallImplCustom implements Expression {
+public class XConstructorCallCustom extends org.eclipse.xtext.xbase.impl.XConstructorCallImplCustom
+		implements Expression {
 
-private XConstructorCallImplCustom expression;
-	
+	private XConstructorCallImplCustom expression;
+
 	public XConstructorCallCustom(XConstructorCallImplCustom exp) {
 		expression = exp;
 	}
-	
-	public XConstructorCallImplCustom getExpression(){
+
+	public XConstructorCallImplCustom getExpression() {
 		return expression;
 	}
+
 	@Override
 	public void accept(ExpressionVisitor expressionVisitor) {
 		expressionVisitor.visit(this);

@@ -12,14 +12,15 @@ import org.eclipse.xtext.xbase.impl.XAbstractFeatureCallImpl;
 public class XAbstractFeatureCall extends org.eclipse.xtext.xbase.impl.XAbstractFeatureCallImpl implements Expression {
 
 	private XAbstractFeatureCallImpl expression;
-	
+
 	public XAbstractFeatureCall(XAbstractFeatureCallImpl exp) {
 		expression = exp;
 	}
-	
-	public XAbstractFeatureCallImpl getExpression(){
+
+	public XAbstractFeatureCallImpl getExpression() {
 		return expression;
 	}
+
 	@Override
 	public void accept(ExpressionVisitor expressionVisitor) {
 		expressionVisitor.visit(this);

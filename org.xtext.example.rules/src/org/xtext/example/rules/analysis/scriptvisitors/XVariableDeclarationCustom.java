@@ -9,17 +9,19 @@ import org.eclipse.xtext.xbase.impl.XVariableDeclarationImplCustom;
  * @author cnandi
  *
  */
-public class XVariableDeclarationCustom extends org.eclipse.xtext.xbase.impl.XVariableDeclarationImplCustom implements Expression {
+public class XVariableDeclarationCustom extends org.eclipse.xtext.xbase.impl.XVariableDeclarationImplCustom
+		implements Expression {
 
-private XVariableDeclarationImplCustom expression;
-	
+	private XVariableDeclarationImplCustom expression;
+
 	public XVariableDeclarationCustom(XVariableDeclarationImplCustom exp) {
 		expression = exp;
 	}
-	
-	public XVariableDeclarationImplCustom getExpression(){
+
+	public XVariableDeclarationImplCustom getExpression() {
 		return expression;
 	}
+
 	@Override
 	public void accept(ExpressionVisitor expressionVisitor) {
 		expressionVisitor.visit(this);

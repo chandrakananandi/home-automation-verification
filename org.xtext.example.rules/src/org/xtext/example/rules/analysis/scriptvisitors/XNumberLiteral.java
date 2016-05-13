@@ -10,14 +10,15 @@ import org.eclipse.xtext.xbase.impl.XNumberLiteralImpl;
 public class XNumberLiteral extends org.eclipse.xtext.xbase.impl.XNumberLiteralImpl implements Expression {
 
 	private XNumberLiteralImpl expression;
-	
+
 	public XNumberLiteral(XNumberLiteralImpl exp) {
-		expression=exp;
+		expression = exp;
 	}
 
-	public XNumberLiteralImpl getExpression(){
+	public XNumberLiteralImpl getExpression() {
 		return expression;
 	}
+
 	@Override
 	public void accept(ExpressionVisitor expressionVisitor) {
 		expressionVisitor.visit(this);

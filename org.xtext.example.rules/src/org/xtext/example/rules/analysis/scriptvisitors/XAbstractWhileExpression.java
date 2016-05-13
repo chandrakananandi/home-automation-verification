@@ -11,15 +11,15 @@ public class XAbstractWhileExpression extends org.eclipse.xtext.xbase.impl.XAbst
 		implements Expression {
 
 	private XExpression expression;
-	
+
 	public XAbstractWhileExpression(XExpression exp) {
 		expression = exp;
 	}
-	
-	public XExpression getExpression(){
+
+	public XExpression getExpression() {
 		return expression;
 	}
-	
+
 	@Override
 	public void accept(ExpressionVisitor expressionVisitor) {
 		expressionVisitor.visit(this);

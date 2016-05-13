@@ -10,15 +10,16 @@ import org.eclipse.xtext.xbase.impl.XExpressionImpl;
  */
 public class ScriptXExpression extends XExpressionImpl implements Expression {
 
-private XExpression expression;
-	
+	private XExpression expression;
+
 	public ScriptXExpression(XExpression exp) {
 		expression = exp;
 	}
-	
-	public XExpression getExpression(){
+
+	public XExpression getExpression() {
 		return expression;
 	}
+
 	@Override
 	public void accept(ExpressionVisitor expressionVisitor) {
 		expressionVisitor.visit(this);

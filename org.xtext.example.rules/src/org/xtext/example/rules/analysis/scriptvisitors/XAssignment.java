@@ -11,15 +11,15 @@ import org.eclipse.xtext.xbase.impl.XAssignmentImpl;
 public class XAssignment extends org.eclipse.xtext.xbase.impl.XAssignmentImpl implements Expression {
 
 	private XAssignmentImpl expression;
-	
+
 	public XAssignment(XAssignmentImpl exp) {
 		expression = exp;
 	}
-	
-	public XAssignmentImpl getExpression(){
+
+	public XAssignmentImpl getExpression() {
 		return expression;
 	}
-	
+
 	@Override
 	public void accept(ExpressionVisitor expressionVisitor) {
 		expressionVisitor.visit(this);

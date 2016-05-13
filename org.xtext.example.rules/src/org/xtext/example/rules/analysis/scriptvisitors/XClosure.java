@@ -10,16 +10,16 @@ import org.eclipse.xtext.xbase.impl.XClosureImpl;
  */
 public class XClosure extends org.eclipse.xtext.xbase.impl.XClosureImpl implements Expression {
 
-private XClosureImpl expression;
-	
+	private XClosureImpl expression;
+
 	public XClosure(XClosureImpl exp) {
 		expression = exp;
 	}
-	
-	public XClosureImpl getExpression(){
+
+	public XClosureImpl getExpression() {
 		return expression;
 	}
-	
+
 	@Override
 	public void accept(ExpressionVisitor expressionVisitor) {
 		expressionVisitor.visit(this);

@@ -8,17 +8,19 @@ import org.eclipse.xtext.xbase.impl.XUnaryOperationImplCustom;
  * @author cnandi
  *
  */
-public class XUnaryOperationCustom extends org.eclipse.xtext.xbase.impl.XUnaryOperationImplCustom implements Expression {
+public class XUnaryOperationCustom extends org.eclipse.xtext.xbase.impl.XUnaryOperationImplCustom
+		implements Expression {
 
-private XUnaryOperationImplCustom expression;
-	
+	private XUnaryOperationImplCustom expression;
+
 	public XUnaryOperationCustom(XUnaryOperationImplCustom exp) {
 		expression = exp;
 	}
-	
-	public XUnaryOperationImplCustom getExpression(){
+
+	public XUnaryOperationImplCustom getExpression() {
 		return expression;
 	}
+
 	@Override
 	public void accept(ExpressionVisitor expressionVisitor) {
 		expressionVisitor.visit(this);

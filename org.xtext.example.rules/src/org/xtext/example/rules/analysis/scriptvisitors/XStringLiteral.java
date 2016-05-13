@@ -10,15 +10,16 @@ import org.eclipse.xtext.xbase.impl.XStringLiteralImpl;
  */
 public class XStringLiteral extends org.eclipse.xtext.xbase.impl.XStringLiteralImpl implements Expression {
 
-private XStringLiteralImpl expression;
-	
+	private XStringLiteralImpl expression;
+
 	public XStringLiteral(XStringLiteralImpl exp) {
 		expression = exp;
 	}
-	
-	public XStringLiteralImpl getExpression(){
+
+	public XStringLiteralImpl getExpression() {
 		return expression;
 	}
+
 	@Override
 	public void accept(ExpressionVisitor expressionVisitor) {
 		expressionVisitor.visit(this);

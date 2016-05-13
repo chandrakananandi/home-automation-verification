@@ -9,16 +9,16 @@ import org.eclipse.xtext.xbase.impl.XListLiteralImpl;
  */
 public class XListLiteral extends org.eclipse.xtext.xbase.impl.XListLiteralImpl implements Expression {
 
-private XListLiteralImpl expression;
-	
+	private XListLiteralImpl expression;
+
 	public XListLiteral(XListLiteralImpl exp) {
 		expression = exp;
 	}
-	
-	public XListLiteralImpl getExpression(){
+
+	public XListLiteralImpl getExpression() {
 		return expression;
 	}
-	
+
 	@Override
 	public void accept(ExpressionVisitor expressionVisitor) {
 		expressionVisitor.visit(this);

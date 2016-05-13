@@ -10,19 +10,20 @@ import org.eclipse.xtext.xbase.impl.XIfExpressionImpl;
  */
 public class XIfExpression extends org.eclipse.xtext.xbase.impl.XIfExpressionImpl implements Expression {
 
-private XIfExpressionImpl expression;
-	
+	private XIfExpressionImpl expression;
+
 	public XIfExpression(XIfExpressionImpl exp) {
 		expression = exp;
 	}
-	
-	public XIfExpressionImpl getExpression(){
+
+	public XIfExpressionImpl getExpression() {
 		return expression;
 	}
+
 	@Override
 	public void accept(ExpressionVisitor expressionVisitor) {
 		expressionVisitor.visit(this);
 
 	}
-	
+
 }
