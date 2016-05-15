@@ -1,7 +1,5 @@
 package org.xtext.example.rules.analysis.scriptvisitors;
 
-import org.eclipse.emf.ecore.EObject;
-import org.eclipse.xtext.xbase.XExpression;
 import org.eclipse.xtext.xbase.impl.XAbstractFeatureCallImpl;
 
 /**
@@ -22,7 +20,7 @@ public class XAbstractFeatureCall extends org.eclipse.xtext.xbase.impl.XAbstract
 	}
 
 	@Override
-	public void accept(ExpressionVisitor expressionVisitor) {
-		expressionVisitor.visit(this);
+	public <R>R accept(ExpressionVisitor<R> expressionVisitor) {
+		return expressionVisitor.visit(this);
 	}
 }

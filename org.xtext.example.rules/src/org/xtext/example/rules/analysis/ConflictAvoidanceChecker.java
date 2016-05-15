@@ -36,6 +36,7 @@ public class ConflictAvoidanceChecker {
 		specParser.parseConflicts(conflict_file);
 		RuleParser ruleParser = new RuleParser(rule_file.getName());
 		ruleParser.analyseRules();
+		
 	}
 
 	public void parseRuleForConflictingStates(File rule_file) {
@@ -58,8 +59,8 @@ public class ConflictAvoidanceChecker {
 		}
 	}
 
-	public boolean checkConflict() {
-
+	public static boolean checkConflict() {
+		
 		return true;
 	}
 }

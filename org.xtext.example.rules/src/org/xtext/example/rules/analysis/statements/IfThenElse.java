@@ -27,19 +27,24 @@ public class IfThenElse {
 }
 
 class Then {
-	private ArrayList<MethodInvocation> methodInvocations;
+	private ArrayList<FeatureInvocation> featureInvocations;
+	private ArrayList<MemberFeatureInvocation> memberFeatureInvocations;
 	private ArrayList<Assignment> assignments;
 	private ArrayList<IfThenElse> conditionals;
 
-	public Then(ArrayList<MethodInvocation> methodInvocations, ArrayList<Assignment> assignments,
+	public Then(ArrayList<FeatureInvocation> featureInvocations, ArrayList<MemberFeatureInvocation> memberFeatureInvocations, ArrayList<Assignment> assignments,
 			ArrayList<IfThenElse> conditionals) {
-		this.methodInvocations = methodInvocations;
+		this.featureInvocations = featureInvocations;
+		this.memberFeatureInvocations=memberFeatureInvocations;
 		this.assignments = assignments;
 		this.conditionals = conditionals;
 	}
 
-	public ArrayList<MethodInvocation> getMethodInvocations() {
-		return methodInvocations;
+	public ArrayList<FeatureInvocation> getFeatureInvocations() {
+		return featureInvocations;
+	}
+	public ArrayList<MemberFeatureInvocation>getMemberFeatureInvocations(){
+		return memberFeatureInvocations;
 	}
 
 	public ArrayList<Assignment> getAssignments() {
@@ -52,7 +57,31 @@ class Then {
 }
 
 class Else {
-	ArrayList<MethodInvocation> methodInvocations;
-	ArrayList<Assignment> assignments;
-	ArrayList<IfThenElse> conditionals;
+	private ArrayList<FeatureInvocation> featureInvocations;
+	private ArrayList<MemberFeatureInvocation> memberFeatureInvocations;
+	private ArrayList<Assignment> assignments;
+	private ArrayList<IfThenElse> conditionals;
+
+	public Else(ArrayList<FeatureInvocation> featureInvocations, ArrayList<MemberFeatureInvocation> memberFeatureInvocations, ArrayList<Assignment> assignments,
+			ArrayList<IfThenElse> conditionals) {
+		this.featureInvocations = featureInvocations;
+		this.memberFeatureInvocations=memberFeatureInvocations;
+		this.assignments = assignments;
+		this.conditionals = conditionals;
+	}
+
+	public ArrayList<FeatureInvocation> getFeatureInvocations() {
+		return featureInvocations;
+	}
+	public ArrayList<MemberFeatureInvocation>getMemberFeatureInvocations(){
+		return memberFeatureInvocations;
+	}
+
+	public ArrayList<Assignment> getAssignments() {
+		return assignments;
+	}
+
+	public ArrayList<IfThenElse> getIfThenElse() {
+		return conditionals;
+	}
 }

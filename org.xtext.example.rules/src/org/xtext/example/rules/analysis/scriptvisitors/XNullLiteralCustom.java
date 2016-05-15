@@ -1,6 +1,5 @@
 package org.xtext.example.rules.analysis.scriptvisitors;
 
-import org.eclipse.xtext.xbase.XExpression;
 import org.eclipse.xtext.xbase.impl.XNullLiteralImplCustom;
 
 public class XNullLiteralCustom extends org.eclipse.xtext.xbase.impl.XNullLiteralImplCustom implements Expression {
@@ -16,8 +15,8 @@ public class XNullLiteralCustom extends org.eclipse.xtext.xbase.impl.XNullLitera
 	}
 
 	@Override
-	public void accept(ExpressionVisitor expressionVisitor) {
-		expressionVisitor.visit(this);
+	public <R>R accept(ExpressionVisitor<R> expressionVisitor) {
+		return expressionVisitor.visit(this);
 
 	}
 

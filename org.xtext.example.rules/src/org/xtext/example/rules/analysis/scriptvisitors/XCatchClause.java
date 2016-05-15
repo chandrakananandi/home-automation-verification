@@ -20,8 +20,8 @@ public class XCatchClause extends org.eclipse.xtext.xbase.impl.XCatchClauseImpl 
 	}
 
 	@Override
-	public void accept(ExpressionVisitor expressionVisitor) {
-		expressionVisitor.visit(this);
+	public <R>R accept(ExpressionVisitor<R> expressionVisitor) {
+		return expressionVisitor.visit(this);
 
 	}
 

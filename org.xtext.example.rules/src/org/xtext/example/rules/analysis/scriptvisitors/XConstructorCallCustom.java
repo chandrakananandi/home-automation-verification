@@ -1,6 +1,5 @@
 package org.xtext.example.rules.analysis.scriptvisitors;
 
-import org.eclipse.xtext.xbase.impl.XConstructorCallImpl;
 import org.eclipse.xtext.xbase.impl.XConstructorCallImplCustom;
 
 /**
@@ -22,8 +21,8 @@ public class XConstructorCallCustom extends org.eclipse.xtext.xbase.impl.XConstr
 	}
 
 	@Override
-	public void accept(ExpressionVisitor expressionVisitor) {
-		expressionVisitor.visit(this);
+	public <R>R accept(ExpressionVisitor<R> expressionVisitor) {
+		return expressionVisitor.visit(this);
 
 	}
 

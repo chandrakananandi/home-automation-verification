@@ -1,6 +1,5 @@
 package org.xtext.example.rules.analysis.scriptvisitors;
 
-import org.eclipse.xtext.xbase.XExpression;
 import org.eclipse.xtext.xbase.impl.XBlockExpressionImpl;
 
 /**
@@ -21,9 +20,8 @@ public class XBlockExpression extends org.eclipse.xtext.xbase.impl.XBlockExpress
 	}
 
 	@Override
-	public void accept(ExpressionVisitor expressionVisitor) {
-		expressionVisitor.visit(this);
+	public <R>R accept(ExpressionVisitor<R> expressionVisitor) {
+		return expressionVisitor.visit(this);
 
 	}
-
 }

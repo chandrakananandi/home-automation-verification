@@ -5,93 +5,93 @@ package org.xtext.example.rules.analysis.scriptvisitors;
  * @author cnandi
  *
  */
-public interface ExpressionVisitor {
+public interface ExpressionVisitor<R> {
 
-	public void visit(XIfExpression xIfExpression);
+	public R visit(XIfExpression xIfExpression);
 
-	public void visit(XSwitchExpression xSwitchExpression);
+	public R visit(XSwitchExpression xSwitchExpression);
 
-	public void visit(XCasePart xCasePart);
+	public R visit(XCasePart xCasePart);
 
-	public void visit(XBlockExpression xBlockExpression);
+	public R visit(XBlockExpression xBlockExpression);
 
-	public void visit(XVariableDeclarationCustom xvariableDeclarationCustom);
+	public R visit(XVariableDeclarationCustom xvariableDeclarationCustom);
 
-	public void visit(XAbstractFeatureCall xAbstractFeatureCall);
+	public R visit(XAbstractFeatureCall xAbstractFeatureCall);
 
-	public void visit(XMemberFeatureCall xMemberFeatureCall);
+	public R visit(XMemberFeatureCall xMemberFeatureCall);
 
-	public void visit(XFeatureCall xFeatureCall);
+	public R visit(XFeatureCall xFeatureCall);
 
-	public void visit(XConstructorCall xConstructorCall);
+	public R visit(XConstructorCall xConstructorCall);
 
-	public void visit(XBooleanLiteral xBooleanLiteral);
+	public R visit(XBooleanLiteral xBooleanLiteral);
 
-	public void visit(XNullLiteral xNullLiteral);
+	public R visit(XNullLiteral xNullLiteral);
 
-	public void visit(XNumberLiteral xNumberLiteral);
+	public R visit(XNumberLiteral xNumberLiteral);
 
-	public void visit(XStringLiteral xStringLiteral);
+	public R visit(XStringLiteral xStringLiteral);
 
-	public void visit(XCollectionLiteral xCollectionLiteral);
+	public R visit(XCollectionLiteral xCollectionLiteral);
 
-	public void visit(XListLiteral xListLiteral);
+	public R visit(XListLiteral xListLiteral);
 
-	public void visit(XSetLiteral xSetLiteral);
+	public R visit(XSetLiteral xSetLiteral);
 
-	public void visit(XClosure xClosure);
+	public R visit(XClosure xClosure);
 
-	public void visit(XCastedExpression xCastedExpression);
+	public R visit(XCastedExpression xCastedExpression);
 
-	public void visit(XBinaryOperation xBinaryOperation);
+	public R visit(XBinaryOperation xBinaryOperation);
 
-	public void visit(XUnaryOperation xUnaryOperation);
+	public R visit(XUnaryOperation xUnaryOperation);
 
-	public void visit(XPostfixOperation xPostfixOperation);
+	public R visit(XPostfixOperation xPostfixOperation);
 
-	public void visit(XForLoopExpression xForLoopExpression);
+	public R visit(XForLoopExpression xForLoopExpression);
 
-	public void visit(XBasicForLoopExpression xBasicForLoopExpression);
+	public R visit(XBasicForLoopExpression xBasicForLoopExpression);
 
-	public void visit(XAbstractWhileExpression xAbstractWhileExpression);
+	public R visit(XAbstractWhileExpression xAbstractWhileExpression);
 
-	public void visit(XDoWhileExpression xDoWhileExpression);
+	public R visit(XDoWhileExpression xDoWhileExpression);
 
-	public void visit(XWhileExpression xWhileExpression);
+	public R visit(XWhileExpression xWhileExpression);
 
-	public void visit(XTypeLiteral xTypeLiteral);
+	public R visit(XTypeLiteral xTypeLiteral);
 
-	public void visit(XInstanceOfExpression xInstanceOfExpression);
+	public R visit(XInstanceOfExpression xInstanceOfExpression);
 
-	public void visit(XThrowExpression xThrowExpression);
+	public R visit(XThrowExpression xThrowExpression);
 
-	public void visit(XTryCatchFinallyExpression xTryCatchFinallyExpression);
+	public R visit(XTryCatchFinallyExpression xTryCatchFinallyExpression);
 
-	public void visit(XCatchClause xCatchClause);
+	public R visit(XCatchClause xCatchClause);
 
-	public void visit(XAssignment xAssignment);
+	public R visit(XAssignment xAssignment);
 
-	public void visit(XReturnExpression xReturnExpression);
+	public R visit(XReturnExpression xReturnExpression);
 
-	public void visit(XSynchronizedExpression xSynchronizedExpression);
+	public R visit(XSynchronizedExpression xSynchronizedExpression);
 
-	public void visit(XBinaryOperationCustom xBinaryOperationImplCustom);
+	public R visit(XBinaryOperationCustom xBinaryOperationImplCustom);
 
-	public void visit(XFeatureCallCustom xFeatureCallImplCustom);
+	public R visit(XFeatureCallCustom xFeatureCallImplCustom);
 
-	public void visit(XMemberFeatureCallCustom xMemberFeatureCallImplCustom);
+	public R visit(XMemberFeatureCallCustom xMemberFeatureCallImplCustom);
 
-	public void visit(XNullLiteralCustom xNullLiteralCustom);
+	public R visit(XNullLiteralCustom xNullLiteralCustom);
 
-	public void visit(XClosureCustom xClosureCustom);
+	public R visit(XClosureCustom xClosureCustom);
 
-	public void visit(ScriptXExpression scriptXExpression);
+	public R visit(ScriptXExpression scriptXExpression);
 
-	public void visit(XBlockExpressionCustom xBlockExpressionCustom);
+	public R visit(XBlockExpressionCustom xBlockExpressionCustom);
 
-	public void visit(XAssignmentCustom xAssignmentCustom);
+	public R visit(XAssignmentCustom xAssignmentCustom);
 
-	public void visit(XUnaryOperationCustom xUnaryOperationCustom);
+	public R visit(XUnaryOperationCustom xUnaryOperationCustom);
 
-	public void visit(XConstructorCallCustom xConstructorCallCustom);
+	public R visit(XConstructorCallCustom xConstructorCallCustom);
 }

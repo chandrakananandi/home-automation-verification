@@ -1,6 +1,5 @@
 package org.xtext.example.rules.analysis.scriptvisitors;
 
-import org.eclipse.xtext.xbase.XExpression;
 import org.eclipse.xtext.xbase.impl.XFeatureCallImplCustom;
 
 /**
@@ -16,14 +15,15 @@ public class XFeatureCallCustom extends org.eclipse.xtext.xbase.impl.XFeatureCal
 		expression = exp;
 	}
 
-	@Override
-	public void accept(ExpressionVisitor expressionVisitor) {
-		expressionVisitor.visit(this);
-
-	}
-
 	public XFeatureCallImplCustom getExpression() {
 		return expression;
 	}
+	
+	@Override
+	public <R>R accept(ExpressionVisitor<R> expressionVisitor) {
+		return expressionVisitor.visit(this);
+
+	}
+
 
 }

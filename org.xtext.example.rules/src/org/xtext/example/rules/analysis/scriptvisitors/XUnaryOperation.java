@@ -1,6 +1,5 @@
 package org.xtext.example.rules.analysis.scriptvisitors;
 
-import org.eclipse.xtext.xbase.XExpression;
 import org.eclipse.xtext.xbase.impl.XUnaryOperationImpl;
 
 /**
@@ -21,8 +20,8 @@ public class XUnaryOperation extends org.eclipse.xtext.xbase.impl.XUnaryOperatio
 	}
 
 	@Override
-	public void accept(ExpressionVisitor expressionVisitor) {
-		expressionVisitor.visit(this);
+	public <R>R accept(ExpressionVisitor<R> expressionVisitor) {
+		return expressionVisitor.visit(this);
 
 	}
 

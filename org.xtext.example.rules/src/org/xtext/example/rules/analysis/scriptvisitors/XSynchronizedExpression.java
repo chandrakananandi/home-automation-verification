@@ -19,10 +19,10 @@ public class XSynchronizedExpression extends org.eclipse.xtext.xbase.impl.XSynch
 	public XExpression getExpression() {
 		return expression;
 	}
-
+	
 	@Override
-	public void accept(ExpressionVisitor expressionVisitor) {
-		expressionVisitor.visit(this);
+	public <R>R accept(ExpressionVisitor<R> expressionVisitor) {
+		return expressionVisitor.visit(this);
 
 	}
 

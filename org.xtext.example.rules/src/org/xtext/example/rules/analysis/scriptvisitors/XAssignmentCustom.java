@@ -15,9 +15,8 @@ public class XAssignmentCustom extends org.eclipse.xtext.xbase.impl.XAssignmentI
 	}
 
 	@Override
-	public void accept(ExpressionVisitor expressionVisitor) {
-		expressionVisitor.visit(this);
+	public <R>R accept(ExpressionVisitor<R> expressionVisitor) {
+		return expressionVisitor.visit(this);
 
 	}
-
 }

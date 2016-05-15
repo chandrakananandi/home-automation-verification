@@ -45,202 +45,203 @@ import org.eclipse.xtext.xbase.impl.XNullLiteralImpl;
 import org.eclipse.xtext.xbase.impl.XNullLiteralImplCustom;
 import org.eclipse.xtext.xbase.impl.XTypeLiteralImpl;
 
-public class ScriptExpressionSwitch extends ScriptSwitch<String> {
-	public String caseXExpression(XExpression object) {
-		ExpressionVisitor expressionVisitor = new ExpressionVisitorImpl();
+public class ScriptExpressionSwitch<R> extends ScriptSwitch<Object> {
+	public R caseXExpression(XExpression object) {
+		ExpressionVisitor<R> expressionVisitor = new ExpressionVisitorImpl();
 		switch (object.getClass().getSimpleName()) {
 		case ("XAbstractFeatureCallImpl"):
 			XAbstractFeatureCall abstractFeatureCall = new XAbstractFeatureCall((XAbstractFeatureCallImpl) object);
-			abstractFeatureCall.accept(expressionVisitor);
-			break;
+			return abstractFeatureCall.accept(expressionVisitor);
+			
 		case ("XAbstractWhileExpressionImpl"):
 			XAbstractWhileExpression whileExpression = new XAbstractWhileExpression(
 					(XAbstractWhileExpressionImpl) object);
-			whileExpression.accept(expressionVisitor);
-			break;
+			return whileExpression.accept(expressionVisitor);
+			
 		case ("XAssignmentImpl"):
 			XAssignment xAssignment = new XAssignment((XAssignmentImpl) object);
-			xAssignment.accept(expressionVisitor);
-			break;
+			return xAssignment.accept(expressionVisitor);
+			
 		case ("XAssignmentImplCustom"):
 			XAssignmentCustom xAssignmentCustom = new XAssignmentCustom((XAssignmentImplCustom) object);
-			xAssignmentCustom.accept(expressionVisitor);
-			break;
+			return xAssignmentCustom.accept(expressionVisitor);
+		
 		case ("XBasicForLoopExpressionImpl"):
 			XBasicForLoopExpression xBasicForLoopExpression = new XBasicForLoopExpression(
 					(XBasicForLoopExpressionImpl) object);
-			xBasicForLoopExpression.accept(expressionVisitor);
-			break;
+			return xBasicForLoopExpression.accept(expressionVisitor);
+			
 		case ("XBinaryOperationImpl"):
 			XBinaryOperation xBinaryOperation = new XBinaryOperation((XBinaryOperationImpl) object);
-			xBinaryOperation.accept(expressionVisitor);
-			break;
+			return xBinaryOperation.accept(expressionVisitor);
+			
 		case ("XBinaryOperationImplCustom"):
 			XBinaryOperationCustom xbinaryOperationCustom = new XBinaryOperationCustom(
 					(XBinaryOperationImplCustom) object);
-			xbinaryOperationCustom.accept(expressionVisitor);
-			break;
+			return xbinaryOperationCustom.accept(expressionVisitor);
+			
 		case ("XBlockExpressionImpl"):
 			XBlockExpression xBlockExpression = new XBlockExpression((XBlockExpressionImpl) object);
-			xBlockExpression.accept(expressionVisitor);
-			break;
+			return xBlockExpression.accept(expressionVisitor);
+			
 		case ("XBlockExpressionImplCustom"):
 			XBlockExpressionCustom xBlockExpressionCustom = new XBlockExpressionCustom(
 					(XBlockExpressionImplCustom) object);
-			xBlockExpressionCustom.accept(expressionVisitor);
-			break;
+			return xBlockExpressionCustom.accept(expressionVisitor);
+			
 		case ("XBooleanLiteralImpl"):
 			XBooleanLiteral xBooleanLiteral = new XBooleanLiteral((XBooleanLiteralImpl) object);
-			xBooleanLiteral.accept(expressionVisitor);
-			break;
+		    return xBooleanLiteral.accept(expressionVisitor);
+			
 		case ("XCastPartImpl"):
 			// TODO fix the casting later
 			XCasePart xCasePart = new XCasePart(object);
-			xCasePart.accept(expressionVisitor);
-			break;
+			return xCasePart.accept(expressionVisitor);
+			
 		case ("XCastedExpressionImpl"):
 			XCastedExpression xCastedExpressionImpl = new XCastedExpression((XCastedExpressionImpl) object);
-			xCastedExpressionImpl.accept(expressionVisitor);
-			break;
+			return xCastedExpressionImpl.accept(expressionVisitor);
+			
 		case ("XCatchClauseImpl"):
 			// TODO fix the casting later
 			XCatchClause xCatchClause = new XCatchClause(object);
-			xCatchClause.accept(expressionVisitor);
-			break;
+			return xCatchClause.accept(expressionVisitor);
+			
 		case ("XClosureImpl"):
 			XClosure xClosure = new XClosure((XClosureImpl) object);
-			xClosure.accept(expressionVisitor);
-			break;
+			return xClosure.accept(expressionVisitor);
+			
 		case ("XClosureImplCustom"):
 			XClosureCustom xClosureCustom = new XClosureCustom((XClosureImplCustom) object);
-			xClosureCustom.accept(expressionVisitor);
-			break;
+			return xClosureCustom.accept(expressionVisitor);
+			
 		case ("XCollectionLiteralImpl"):
 			XCollectionLiteral xCollectionLiteral = new XCollectionLiteral((XCollectionLiteralImpl) object);
-			xCollectionLiteral.accept(expressionVisitor);
-			break;
+			return xCollectionLiteral.accept(expressionVisitor);
+			
 		case ("XConstructorCallImpl"):
 			XConstructorCall xConstructorCall = new XConstructorCall((XConstructorCallImpl) object);
-			xConstructorCall.accept(expressionVisitor);
-			break;
+			return xConstructorCall.accept(expressionVisitor);
+			
 		case ("XConstructorCallImplCustom"):
 			XConstructorCallCustom xConstructorCallCustom = new XConstructorCallCustom(
 					(XConstructorCallImplCustom) object);
-			xConstructorCallCustom.accept(expressionVisitor);
-			break;
+			return xConstructorCallCustom.accept(expressionVisitor);
+			
 		case ("XDoWhileExpressionImpl"):
 			XDoWhileExpression xDoWhileExpression = new XDoWhileExpression((XDoWhileExpressionImpl) object);
-			xDoWhileExpression.accept(expressionVisitor);
-			break;
+			return xDoWhileExpression.accept(expressionVisitor);
+			
 		case ("XExpressionImpl"):
 			ScriptXExpression xExpression = new ScriptXExpression((XExpression) object);
-			xExpression.accept(expressionVisitor);
-			break;
+			return xExpression.accept(expressionVisitor);
+			
 		case ("XFeatureCallImpl"):
 			XFeatureCall xFeatureCall = new XFeatureCall((XFeatureCallImpl) object);
-			xFeatureCall.accept(expressionVisitor);
-			break;
+			return xFeatureCall.accept(expressionVisitor);
+			
 		case ("XFeatureCallImplCustom"):
 			XFeatureCallCustom xFeatureCallCustom = new XFeatureCallCustom((XFeatureCallImplCustom) object);
-			xFeatureCallCustom.accept(expressionVisitor);
-			break;
+			return xFeatureCallCustom.accept(expressionVisitor);
+			
 		case ("XForLoopExpressionImpl"):
 			XForLoopExpression xForLoopExpression = new XForLoopExpression((XForLoopExpressionImpl) object);
-			xForLoopExpression.accept(expressionVisitor);
-			break;
+			return xForLoopExpression.accept(expressionVisitor);
+	
 		case ("XIfExpressionImpl"):
 			XIfExpression xIfExpression = new XIfExpression((XIfExpressionImpl) object);
-			xIfExpression.accept(expressionVisitor);
-			break;
+			return xIfExpression.accept(expressionVisitor);
+			
 		case ("XInstanceOfExpressionImpl"):
 			XInstanceOfExpression xInstanceOfExpression = new XInstanceOfExpression((XInstanceOfExpressionImpl) object);
-			xInstanceOfExpression.accept(expressionVisitor);
-			break;
+			return xInstanceOfExpression.accept(expressionVisitor);
+			
 		case ("XListLiteralImpl"):
 			XListLiteral xListLiteral = new XListLiteral((XListLiteralImpl) object);
-			xListLiteral.accept(expressionVisitor);
-			break;
+			return xListLiteral.accept(expressionVisitor);
+			
 		case ("XMemberFeatureCallImpl"):
 			XMemberFeatureCall xMemberFeature = new XMemberFeatureCall((XMemberFeatureCallImpl) object);
-			xMemberFeature.accept(expressionVisitor);
-			break;
+			return xMemberFeature.accept(expressionVisitor);
+			
 		case ("XMemberFeatureCallImplCustom"):
 			XMemberFeatureCallCustom xMemberFeatureCallCustom = new XMemberFeatureCallCustom(
 					(XMemberFeatureCallImplCustom) object);
-			xMemberFeatureCallCustom.accept(expressionVisitor);
-			break;
+			return xMemberFeatureCallCustom.accept(expressionVisitor);
+			
 		case ("XNullLiteralImpl"):
 			XNullLiteral xNullLiteral = new XNullLiteral((XNullLiteralImpl) object);
-			xNullLiteral.accept(expressionVisitor);
-			break;
+			return xNullLiteral.accept(expressionVisitor);
+			
 		case ("XNullLiteralImplCustom"):
 			XNullLiteralCustom xNullLiteralCustom = new XNullLiteralCustom((XNullLiteralImplCustom) object);
-			xNullLiteralCustom.accept(expressionVisitor);
-			break;
+			return xNullLiteralCustom.accept(expressionVisitor);
+	
 		case ("XNumberLiteralImpl"):
 			XNumberLiteral xNumberLiteral = new XNumberLiteral((XNumberLiteralImpl) object);
-			xNumberLiteral.accept(expressionVisitor);
-			break;
+			return xNumberLiteral.accept(expressionVisitor);
+		
 		case ("XPostfixOperationImpl"):
 			XPostfixOperation xPostfixOperation = new XPostfixOperation((XPostfixOperationImpl) object);
-			xPostfixOperation.accept(expressionVisitor);
-			break;
+			return xPostfixOperation.accept(expressionVisitor);
+			
 		case ("XReturnExpressionImpl"):
 			XReturnExpression xReturnExpression = new XReturnExpression((XReturnExpressionImpl) object);
-			xReturnExpression.accept(expressionVisitor);
-			break;
+			return xReturnExpression.accept(expressionVisitor);
+	
 		case ("XSetLiteralImpl"):
 			XSetLiteral xSetLiteral = new XSetLiteral((XSetLiteralImpl) object);
-			xSetLiteral.accept(expressionVisitor);
-			break;
+			return xSetLiteral.accept(expressionVisitor);
+		
 		case ("XStringLiteralImpl"):
 			XStringLiteral xStringLiteral = new XStringLiteral((XStringLiteralImpl) object);
-			xStringLiteral.accept(expressionVisitor);
-			break;
+			return xStringLiteral.accept(expressionVisitor);
+		
 		case ("XSwitchExpressionImpl"):
 			XSwitchExpression xSwitchExpression = new XSwitchExpression((XSwitchExpressionImpl) object);
-			xSwitchExpression.accept(expressionVisitor);
-			break;
+			return xSwitchExpression.accept(expressionVisitor);
+	
 		case ("XSynchronizedExpressionImpl"):
 			XSynchronizedExpression xSynchronizedExpression = new XSynchronizedExpression(
 					(XSynchronizedExpressionImpl) object);
-			xSynchronizedExpression.accept(expressionVisitor);
-			break;
+			return xSynchronizedExpression.accept(expressionVisitor);
+			
 		case ("XThrowExpressionImpl"):
 			XThrowExpression xThrowExpression = new XThrowExpression((XThrowExpressionImpl) object);
-			xThrowExpression.accept(expressionVisitor);
-			break;
+			return xThrowExpression.accept(expressionVisitor);
+		
 		case ("XTryCatchFinallyExpressionImpl"):
 			XTryCatchFinallyExpression xTryCatchFinallyExpression = new XTryCatchFinallyExpression(
 					(XTryCatchFinallyExpressionImpl) object);
-			xTryCatchFinallyExpression.accept(expressionVisitor);
-			break;
+			return xTryCatchFinallyExpression.accept(expressionVisitor);
+		
 		case ("XTypeLiteralImpl"):
 			XTypeLiteral xTypeLiteral = new XTypeLiteral((XTypeLiteralImpl) object);
-			xTypeLiteral.accept(expressionVisitor);
-			break;
+			return xTypeLiteral.accept(expressionVisitor);
+		
 		case ("XUnaryOperationImpl"):
 			XUnaryOperation xUnaryOperation = new XUnaryOperation((XUnaryOperationImpl) object);
-			xUnaryOperation.accept(expressionVisitor);
-			break;
+			return xUnaryOperation.accept(expressionVisitor);
+		
 		case ("XUnaryOperationImplCustom"):
 			XUnaryOperationCustom xUnaryOperationCustom = new XUnaryOperationCustom((XUnaryOperationImplCustom) object);
-			xUnaryOperationCustom.accept(expressionVisitor);
-			break;
+			return xUnaryOperationCustom.accept(expressionVisitor);
+		
 		case ("XVariableDeclarationImplCustom"):
 			XVariableDeclarationCustom xVariableDeclaration = new XVariableDeclarationCustom(
 					(XVariableDeclarationImplCustom) object);
-			xVariableDeclaration.accept(expressionVisitor);
-			break;
+			return xVariableDeclaration.accept(expressionVisitor);
+		
 		case ("XWhileExpressionImpl"):
 			XWhileExpression xWhileExpression = new XWhileExpression((XWhileExpressionImpl) object);
-			xWhileExpression.accept(expressionVisitor);
-			break;
+			return xWhileExpression.accept(expressionVisitor);
+		
 		default:
 			ConflictAvoidanceChecker.ast_writer.println("default:"+object.getClass().getSimpleName());
-			break;
-		}
-		return null;
+			return null;
+			
+		}		
+		
 	}
 
 }
