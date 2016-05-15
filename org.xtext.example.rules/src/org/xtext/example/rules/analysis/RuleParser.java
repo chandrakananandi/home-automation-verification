@@ -2,9 +2,7 @@ package org.xtext.example.rules.analysis;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,9 +14,9 @@ import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.xtext.xbase.XExpression;
 import org.xtext.example.rules.RulesStandaloneSetupGenerated;
+import org.xtext.example.rules.analysis.scriptvisitors.ExpressionVisitorImpl;
 import org.xtext.example.rules.analysis.scriptvisitors.ScriptExpressionSwitch;
 import org.xtext.example.rules.analysis.statements.BinaryCondition;
-import org.xtext.example.rules.analysis.statements.Condition;
 import org.xtext.example.rules.analysis.statements.FeatureInvocation;
 import org.xtext.example.rules.analysis.statements.IfThenElse;
 import org.xtext.example.rules.analysis.statements.MemberFeatureInvocation;
@@ -65,7 +63,7 @@ public class RuleParser {
 				ConflictAvoidanceChecker.ast_writer.println("rule end");
 			}
 		}
-
+		
 		ConflictAvoidanceChecker.ast_writer.close();
 
 		for (Rule rule : rules) {
@@ -76,14 +74,28 @@ public class RuleParser {
 					scriptContent);
 			rule_database.add(rule_information);
 			br.close();
+			System.out.println(rule_information.getTriggerParameters(rule.getEventtrigger().get(0)).values());
+			for(String st: ExpressionVisitorImpl.member_states_involved){
+				System.out.println(st);
+				if(rule_information.getTriggerParameters(rule.getEventtrigger().get(0)).values().contains(st)){
+					continue;
+				}
+				else
+				{
+					System.out.println("error");
+					break;
+				}
+			}
 		}
-
+		
+		
 	}
 
 	public void generateSimplerAST(EObject scriptNode, ScriptExpressionSwitch expressionSwitch) {
 		if (scriptNode instanceof XExpression) {
 			expressionSwitch.caseXExpression((XExpression) scriptNode);
 		}
+		
 	}
 
 	public ScriptContent analyseSimplerAST(String ruleName, BufferedReader astFileReader) throws IOException {
@@ -117,6 +129,7 @@ public class RuleParser {
 				if (script.get(i).contains("If then else:")) {
 
 					if_tracker = script.get(i).split(":")[1].trim();
+					//System.out.println("IF TRACkER: "+if_tracker);
 					i = i + 2;
 					if (script.get(i).equals("Binary operation:")) {
 						i++;
@@ -215,9 +228,11 @@ public class RuleParser {
 				i++;
 			}
 		}
+		
 		if(script.size()<1){
 			return null;
 		}
+
 
 		extractScriptInformation(binary_condition);
 		extractScriptInformation(unary_condition);
