@@ -15,3 +15,48 @@ then
 	}
 end
 
+
+rule "Timer Demo"
+when
+	Item Light_GF_Corridor_Ceiling received command
+then
+	if(receivedCommand==ON) {
+		if(timer==null) {
+			// first ON command, so create a timer to turn the light off again
+			timer = createTimer(now.plusSeconds(10)) [|
+				sendCommand(Light_GF_Corridor_Ceiling, OFF)
+			]
+		} else {
+			// subsequent ON command, so reschedule the existing timer
+			timer.reschedule(now.plusSeconds(10))
+		}
+	} else if(receivedCommand==OFF) {
+		// remove any previously scheduled timer
+		if(timer!=null) {
+			timer.cancel
+			timer = null
+		}	
+	}
+end
+
+// Creates an item that stores the last update time of this item
+rule "Records last weather update time"
+when
+  Item Weather_Temperature received update
+then
+  postUpdate(Weather_LastUpdate, new DateTimeType())
+end
+
+// This rule will be used to test Scale transformation service
+rule "Compute humidex"
+when
+        Item Weather_Temperature changed or
+	Item Weather_Humidity changed
+then
+	var Number T = Weather_Temperature.state as DecimalType
+	var Number H = Weather_Humidity.state as DecimalType	
+	var Number x = 7.5 * T/(237.7 + T)
+	var Number e = 6.112 * Math::pow(10, x.doubleValue) * H/100
+	var Number humidex = T + (new Double(5) / new Double(9)) * (e - 10)
+	postUpdate(Weather_Humidex, humidex)
+end

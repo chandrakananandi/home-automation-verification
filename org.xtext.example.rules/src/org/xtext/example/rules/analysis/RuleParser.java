@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 
 import org.eclipse.emf.common.util.TreeIterator;
@@ -14,6 +16,7 @@ import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.xtext.xbase.XExpression;
 import org.xtext.example.rules.RulesStandaloneSetupGenerated;
+import org.xtext.example.rules.analysis.constants.Constants;
 import org.xtext.example.rules.analysis.scriptvisitors.ExpressionVisitorImpl;
 import org.xtext.example.rules.analysis.scriptvisitors.ScriptExpressionSwitch;
 import org.xtext.example.rules.analysis.statements.BinaryCondition;
@@ -21,7 +24,9 @@ import org.xtext.example.rules.analysis.statements.FeatureInvocation;
 import org.xtext.example.rules.analysis.statements.IfThenElse;
 import org.xtext.example.rules.analysis.statements.MemberFeatureInvocation;
 import org.xtext.example.rules.analysis.statements.UnaryCondition;
+import org.xtext.example.rules.rules.EventTrigger;
 import org.xtext.example.rules.rules.Rule;
+import org.xtext.example.rules.rules.impl.ChangedEventTriggerImpl;
 
 /**
  * 
@@ -39,7 +44,7 @@ public class RuleParser {
 	public String getRuleFileName() {
 		return rule_file_name;
 	}
-
+	
 	public void analyseRules() throws IOException {
 
 		RulesStandaloneSetupGenerated ruleSetup = new RulesStandaloneSetupGenerated();
@@ -49,46 +54,72 @@ public class RuleParser {
 				.getResource(URI.createURI("src/org/xtext/example/rules/analysis/" + getRuleFileName()), true);
 		TreeIterator<EObject> eobjects = resource.getAllContents();
 		ArrayList<Rule> rules = new ArrayList<Rule>();
-
+		Hashtable<String,ArrayList<String>> member_features_involved = new Hashtable<String,ArrayList<String>>();
+			
 		while (eobjects.hasNext()) {
 			EObject eobj = eobjects.next();
 			if (eobj.getClass().getSimpleName().equals("RuleImpl")) {
 				Rule rule = (Rule) eobj;
+				int member_feature_start_index;
+				if(ExpressionVisitorImpl.member_states_involved.size()==0){
+					member_feature_start_index = 0;
+				}
+				else {
+					member_feature_start_index=ExpressionVisitorImpl.member_states_involved.size();
+				}
 				ScriptExpressionSwitch expressionSwitch = new ScriptExpressionSwitch();
 				rules.add(rule);
 				ConflictAvoidanceChecker.ast_writer.println("rule name: " + rule.getName());
 				for (EObject obj : rule.getScript().eContents()) {
-					generateSimplerAST(obj, expressionSwitch);
+					generateSimplerAST(obj, expressionSwitch);					
 				}
-				ConflictAvoidanceChecker.ast_writer.println("rule end");
+				int member_feature_end_index=ExpressionVisitorImpl.member_states_involved.size();
+				ArrayList<String>member_states=new ArrayList<String>();
+				for(int x=member_feature_start_index; x<member_feature_end_index;x++){
+					member_states.add(ExpressionVisitorImpl.member_states_involved.get(x));
+				}
+				member_features_involved.put(rule.getName(), member_states);				
+				ConflictAvoidanceChecker.ast_writer.println("rule end");			
 			}
 		}
 		
-		ConflictAvoidanceChecker.ast_writer.close();
-
+		ConflictAvoidanceChecker.ast_writer.close();		
+		
+		// Code for checking conflict due to too few triggers.
 		for (Rule rule : rules) {
-			BufferedReader br = new BufferedReader(
-					new FileReader("/home/cnandi/openHABworkspace/org.xtext.example.rules/ast-output.txt"));
+			BufferedReader br = new BufferedReader(new FileReader("/home/cnandi/openHABworkspace/org.xtext.example.rules/ast-output.txt"));
 			ScriptContent scriptContent = analyseSimplerAST(rule.getName(), br);
-			RuleInformation rule_information = new RuleInformation(rule.getName(), rule.getEventtrigger(),
-					scriptContent);
+			RuleInformation rule_information = new RuleInformation(rule.getName(), rule.getEventtrigger(), scriptContent);
 			rule_database.add(rule_information);
 			br.close();
-			System.out.println(rule_information.getTriggerParameters(rule.getEventtrigger().get(0)).values());
-			for(String st: ExpressionVisitorImpl.member_states_involved){
-				System.out.println(st);
-				if(rule_information.getTriggerParameters(rule.getEventtrigger().get(0)).values().contains(st)){
-					continue;
-				}
-				else
-				{
-					System.out.println("error");
-					break;
+			ArrayList<String>missing_triggers=new ArrayList<String>();
+			for(String st: member_features_involved.get(rule.getName())){
+				for(EventTrigger trigger: rule_information.getTriggers()){
+					if(trigger.getClass().getSimpleName().equals(Constants.CHANGED_EVENT)){
+						if(rule_information.getTriggerParameters((ChangedEventTriggerImpl)trigger).get("Item").equals(st)) {
+							continue;
+						}				
+						else
+						{	
+							missing_triggers.add(st);						
+						}
+					}
 				}
 			}
-		}
-		
-		
+			
+			if(missing_triggers.size()>0){
+				System.out.println("rule:" + rule.getName());
+				for(String missing_trigger: missing_triggers){
+					System.out.println("missing: "+ missing_trigger);
+				}
+				
+			}
+			else{
+				System.out.println("rule:" + rule.getName());
+				System.out.println("no missing trigger");
+			}
+			System.out.println("\n");
+		}		
 	}
 
 	public void generateSimplerAST(EObject scriptNode, ScriptExpressionSwitch expressionSwitch) {
@@ -108,8 +139,9 @@ public class RuleParser {
 				}
 			}
 		}
-		ScriptContent scriptContent = extractScriptInformation(script);
-		return scriptContent;
+		//ScriptContent scriptContent = extractScriptInformation(script);
+		//return scriptContent;
+		return null;
 	}
 
 	public ScriptContent extractScriptInformation(ArrayList<String> script) {
@@ -232,8 +264,6 @@ public class RuleParser {
 		if(script.size()<1){
 			return null;
 		}
-
-
 		extractScriptInformation(binary_condition);
 		extractScriptInformation(unary_condition);
 		extractScriptInformation(then_part);
