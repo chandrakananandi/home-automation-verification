@@ -15,10 +15,7 @@ import java.util.ArrayList;
  */
 public class ConflictAvoidanceChecker {
 
-	private ArrayList<String> statesInvolved = new ArrayList<String>();
-
 	public static PrintWriter ast_writer;
-
 	static {
 		try {
 			ast_writer = new PrintWriter("ast-output.txt");
@@ -28,14 +25,19 @@ public class ConflictAvoidanceChecker {
 	}
 
 	public static void main(String[] args) throws IOException {
-		File rule_file = new File(
-				"/home/cnandi/workspace/conflict_avoidance/src/smarthome/verification/sample_rule.rules");
-		File conflict_file = new File("src/org/xtext/example/rules/analysis/sample_conflict.conflicts");
-
+		String rule_file = "sample_rule1.rules";
+		String item_file= "sample_item1.items";
+		File conflict_file = new File("/home/cnandi/openHABworkspace/org.xtext.example.rules/src/org/xtext/example/rules/analysis/files/sample_conflict.conflicts");
+		
 		SpecificationParser specParser = new SpecificationParser();
 		specParser.parseConflicts(conflict_file);
-		RuleParser ruleParser = new RuleParser(rule_file.getName());
+		
+		ItemParser itemParser=new ItemParser(item_file);
+		itemParser.analyseItems();
+		
+		RuleParser ruleParser = new RuleParser(rule_file);
 		ruleParser.analyseRules();
+		checkConflictDueToTooFewTriggers(ruleParser, itemParser);
 		
 	}
 
@@ -59,8 +61,41 @@ public class ConflictAvoidanceChecker {
 		}
 	}
 
-	public static boolean checkConflict() {
-		
-		return true;
+	public static void checkConflictDueToTooFewTriggers(RuleParser ruleParser, ItemParser itemParser) {
+		int count=0;
+		int buggy_count=0;
+		for(RuleInformation rule_info: ruleParser.getRuleSet()) {
+			
+			ArrayList<String>missing_triggers=new ArrayList<String>();
+			for(String member_state: ruleParser.getMemeberStates().get(rule_info.getName())) {				
+				if(itemParser.getItemNames().contains(member_state)) {	
+					if(rule_info.getTriggerItemNames().contains(member_state)){
+						continue;
+					}				
+					else {	
+						missing_triggers.add(member_state);						
+					}				
+				}
+			}
+			
+			if(missing_triggers.size()>0) {
+				count++;
+				buggy_count ++;
+				System.out.println("rule:" + rule_info.getName());
+				for(String missing_trigger: missing_triggers){
+					System.out.println("missing: "+ missing_trigger);
+				}			
+			}
+			
+			else {
+				count++;
+				System.out.println("rule:" + rule_info.getName());
+				System.out.println("no missing trigger");
+			}
+			System.out.println("------------------------------");	
+			
+		}
+		System.out.println("total rules: "+count);
+		System.out.println("total buggy rules: "+ buggy_count);
 	}
 }

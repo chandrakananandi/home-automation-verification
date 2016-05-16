@@ -1,0 +1,2662 @@
+import org.openhab.core.library.types.*
+import org.openhab.core.persistence.*
+import org.openhab.model.script.actions.*
+import java.lang.Math
+import org.joda.time.*
+
+
+// Constants
+var Number startGasZaehlerWert = 2269.97
+var boolean autoChangeInProgress = false
+var DateTime letzteGasAblesungDatum = parse("2015-11-21")
+var Number letzteGasAblesungWert = 4765
+var Number letzteGasAblesungJahresverbrauch = 1087
+var Number K = 0.017453
+var Integer sleepDuration = 10
+var Integer timerDuration = 15 
+var Timer timerAway = null
+var Timer timerSleep = null
+var Number latitude = 52.347767
+var Number longitude = 13.621287
+var Integer timerDuration = 60
+var Timer timerHaustuer
+var Number changeInProgressHaustuer = 0
+var Timer timerCarport
+var Number changeInProgressCarport = 0
+var Timer timerTerasse
+var Number changeInProgressTerasse = 0
+var Timer timerSchuppen_vorne
+var Number changeInProgressSchuppen_vorne = 0
+var Timer timerSchuppen_hinten
+var Number changeInProgressSchuppen_hinten = 0
+var Boolean changeInProgressAussen_Switch = false
+var Number changeInProgressDetail_Switch = 0
+var Timer openTimer = null
+var Timer notificationTimer = null
+
+var Timer beregnungsProgressTimer
+var Timer beregnungsStepTimer
+var Number beregnungsStepEnde
+
+var DateTime letzteAblesungDatum = parse("2014-10-22")
+var Number letzteAblesungWert = 4434
+var Number letzteAblesungJahresverbrauch = 2505
+
+rule "Auto changed"
+when
+	Item Auto_Attic_Light changed
+	or
+	Item Auto_Christmas changed
+	or
+	Item Auto_Holiday changed
+	or
+	Item Auto_Rollershutter changed
+then
+	var String msg = ""
+	
+	if( Auto_Rollershutter.state == ON )
+    {
+		if( msg.length > 0 ) msg = msg + ", "
+		msg = msg + "R"
+	}
+
+	if( Auto_Holiday.state == ON )
+    {
+		if( msg.length > 0 ) msg = msg + ", "
+		msg = msg + "U"
+	}
+
+	if( Auto_Christmas.state == ON )
+    {
+		if( msg.length > 0 ) msg = msg + ", "
+		msg = msg + "W"
+	}
+	
+	if( Auto_Attic_Light.state > 1 )
+    {
+		if( msg.length > 0 ) msg = msg + ", "
+		msg = msg + "D"
+	}
+	
+	if( msg.length == 0 )
+	{
+		msg = "Inaktiv"
+	}
+	
+	if( AutoStatus.state != msg )
+	{
+		postUpdate(AutoStatus,msg)
+	}
+end
+
+ 
+rule "Attic_Light_Mode"
+when
+        Item Attic_Light_Mode changed
+        or
+        Time cron "0 1 5,8,20,23 * * ?"
+then
+	//logInfo("Light_Mode",""+Auto_Attic_Light.state)
+
+	var Number hour   = now.getHourOfDay
+	if( Auto_Attic_Light.state == 2 )
+	{
+		logInfo("Mode W",""+hour)
+		if( hour >= 5 && hour < 23 ) sendCommand(Socket_Attic, ON)
+		else sendCommand(Socket_Attic, OFF)
+	}
+	else if( Auto_Attic_Light.state == 3 )
+	{
+		logInfo("Mode B",""+hour)
+		if( hour >= 8 && hour < 20 ) sendCommand(Socket_Attic, ON)
+		else sendCommand(Socket_Attic, OFF)
+	}
+end
+
+
+rule "Christmas lamps on"
+when
+	Time cron "0 0 16 * * ?"
+	or
+	Item State_Sleeping changed from ON to OFF
+then
+	if( Auto_Christmas.state == ON && ( Socket_Livingroom.state == OFF || Socket_Floor.state == OFF ) )
+	{
+		var Number hour   = now.getHourOfDay
+		var Number minute = now.getMinuteOfHour
+
+		if( ( hour == 16 && minute == 0 ) || ( hour < 10 && State_Sleeping.state == OFF && State_Away.state == OFF ) )
+		{
+			sendCommand(Socket_Livingroom,ON)
+			sendCommand(Socket_Floor,ON)
+		}
+	}
+end
+
+rule "Christmas lamps off"
+when
+	Time cron "0 0 22 * * ?"
+	or
+	Item State_Away changed from OFF to ON
+	or
+	Item State_Sleeping changed from OFF to ON
+then
+	//logInfo("christmas1",""+Socket_Livingroom.state)
+	//logInfo("christmas2",""+Socket_Floor.state)
+	
+	if( Auto_Christmas.state == ON && ( Socket_Livingroom.state == ON || Socket_Floor.state == ON ) )
+	{
+		var Number hour   = now.getHourOfDay
+		var Number minute = now.getMinuteOfHour
+		
+		//logInfo("christmas3",""+hour)
+		//logInfo("christmas4",""+State_Away.state)
+		//logInfo("christmas5",""+State_Sleeping.state)
+	
+		if( ( State_Away.state == ON && ( ( hour > 3 && hour < 10 ) || ( hour == 22 && minute == 0 ) ) ) || State_Sleeping.state == ON ) 
+		{
+			sendCommand(Socket_Livingroom,OFF)
+			sendCommand(Socket_Floor,OFF)
+		}
+	}
+end
+
+
+
+rule "Holiday lights on at the evening"
+when
+	Time cron "0 0 19 * * ?"
+then
+	if( Auto_Holiday.state == ON )
+	{
+		sendCommand(Light_FF_Livingroom_Couch, 40)
+	}
+end
+
+rule "Holiday lights on before going sleeping"
+when
+	Time cron "0 0 22 * * ?"
+then
+	if( Auto_Holiday.state == ON )
+	{
+		sendCommand(Light_FF_Livingroom_Couch, OFF)
+		sendCommand(Light_FF_Floor_Ceiling, ON)
+	}
+end
+
+rule "Holiday lights off"
+when
+	Time cron "0 30 22 * * ?"
+then
+	if( Auto_Holiday.state == ON )
+	{
+		Lights_FF.members.forEach(kreis|{                       
+			postUpdate(kreis, OFF)
+		})
+	}
+end
+
+
+
+rule "Rollershutter auto"
+when
+	Item State_Rollershutter changed
+then
+	if( Auto_Rollershutter.state == ON && State_Away.state == ON && State_Rollershutter.state != Uninitialized )
+	{
+		if( State_Rollershutter.state == ON )
+		{
+			if( Window_FF_Livingroom_Terrace.state == CLOSED && Shutters.members.filter(s | s.state == UP).size > 0 )
+			{
+				logInfo("Rollershutter","can down")
+				sendCommand(Shutters,DOWN)
+			}
+		}
+		else
+		{
+			if( Shutters.members.filter(s | s.state == DOWN).size > 0 )
+			{
+				logInfo("Rollershutter","can up")
+				sendCommand(Shutters,UP)
+			}
+		}
+	}
+end
+
+
+rule "Door opener" 
+when
+	Item Dooropener_Timer changed
+then
+
+	if( Dooropener_Timer.state == ON )
+	{
+		postUpdate(Dooropener_FF_Floor,ON)
+		
+		if(openTimer==null) 
+		{
+			openTimer = createTimer(now.plusSeconds(3)) [|
+				openTimer=null
+				postUpdate(Dooropener_FF_Floor,OFF)
+				postUpdate(Dooropener_Timer,OFF)
+			]
+		}
+		else
+		{
+			// subsequent ON command, so reschedule the existing timer
+			openTimer.reschedule(now.plusSeconds(3))
+		}
+	}
+	else if( Dooropener_FF_Floor.state == ON )
+	{
+		if(openTimer!=null)
+		{
+			openTimer.cancel()
+			openTimer=null
+		}
+		postUpdate(Dooropener_FF_Floor,OFF)
+	}
+end
+
+
+rule "Heating_Power Message"
+when
+	Item Heating_Power changed
+	or
+	Item Heating_Circuit_Pump_Speed changed
+then
+
+	if( Heating_Power.state != Uninitialized && Heating_Circuit_Pump_Speed.state != Uninitialized )
+	{
+		var String msg = Heating_Power.state.format("%.0f") +"%, " + Heating_Circuit_Pump_Speed.state.format("%.0f") + "%"
+		if( Heating_Power_Message.state != msg )
+		{
+			postUpdate(Heating_Power_Message,msg)
+		}
+	}
+end
+
+rule "Heating_Temperature_Outdoor Message"
+when
+	Item Heating_Temperature_Outdoor changed
+	or
+	Item Heating_Temperature_Outdoor_Subdued changed
+	or
+	Item Temperature_Garden_Forecast changed
+then
+
+	if( Heating_Temperature_Outdoor.state != Uninitialized && Heating_Temperature_Outdoor_Subdued.state != Uninitialized && Temperature_Garden_Forecast.state != Uninitialized)
+	{
+		var String msg = "(" + Temperature_Garden_Forecast.state.format("%.1f") + "°C) " + Heating_Temperature_Outdoor.state.format("%.1f") +"°C, " + Heating_Temperature_Outdoor_Subdued.state.format("%.1f") + "°C"
+		if( Heating_Temperature_Outdoor_Message.state != msg )
+		{
+			postUpdate(Heating_Temperature_Outdoor_Message,msg)
+		}
+	}
+end
+
+rule "Heating_Temperature_Offset Message"
+when
+	Item Heating_Temperature_Offset changed
+	or
+	Item Heating_Temperature_Offset_Target changed
+then
+
+	if( Heating_Temperature_Offset.state != Uninitialized && Heating_Temperature_Offset_Target.state != Uninitialized )
+	{
+		var String msg = Heating_Temperature_Offset.state.format("%.1f") +"°C, " + Heating_Temperature_Offset_Target.state.format("%.1f") + "°C"
+		if( Heating_Temperature_Offset_Message.state != msg )
+		{
+			postUpdate(Heating_Temperature_Offset_Message,msg)
+		}
+	}
+end
+
+rule "Heating_Temperature_Boiler Message"
+when
+	Item Heating_Temperature_Boiler changed
+	or
+	Item Heating_Temperature_Boiler_Target changed
+then
+
+	if( Heating_Temperature_Boiler.state != Uninitialized && Heating_Temperature_Boiler_Target.state != Uninitialized )
+	{
+		var String msg = Heating_Temperature_Boiler.state.format("%.1f") +"°C, " + Heating_Temperature_Boiler_Target.state.format("%.1f") + "°C"
+		if( Heating_Temperature_Boiler_Message.state != msg )
+		{
+			postUpdate(Heating_Temperature_Boiler_Message,msg)
+		}
+	}
+end
+
+rule "Last burner starts per day"
+when
+   	Time cron "0 59 23 * * ?"
+then
+	var DecimalType start = Heating_Burner_Starts.historicState(now.toDateMidnight).state as DecimalType
+	var DecimalType aktuell = Heating_Burner_Starts.state as DecimalType
+	if( aktuell > 0 && start > 0 )
+	{
+		var DecimalType value = (aktuell - start)
+		if( Heating_Burner_Starts_Last.state != value )
+		{
+			postUpdate(Heating_Burner_Starts_Last,value)
+		}
+	}
+end
+
+rule "Burner starts"
+when
+	Time cron "15 0 0 * * ?"
+	or
+	Item Heating_Burner_Starts changed
+then
+
+	var DecimalType start = Heating_Burner_Starts.historicState(now.toDateMidnight).state as DecimalType
+	var DecimalType aktuell = Heating_Burner_Starts.state as DecimalType
+	if( start > 0 && aktuell > 0 )
+	{
+		var DecimalType differenz = new DecimalType(aktuell - start)
+		var String msg = differenz.format("%.0f") +", " + aktuell.format("%.0f")
+		if( Heating_Burner_Starts_Message.state != msg )
+		{
+			postUpdate(Heating_Burner_Starts_Message,msg)
+		}
+	}
+end
+
+rule "Last Burner Hours per day"
+when
+   	Time cron "0 59 23 * * ?"
+then
+
+	var DecimalType start = Heating_Burner_Hours.historicState(now.toDateMidnight).state as DecimalType
+	var DecimalType aktuell = Heating_Burner_Hours.state as DecimalType
+	if( start > 0 && aktuell > 0 )
+	{
+		var DecimalType value = (aktuell - start)
+		if( Heating_Burner_Hours_Last.state != value )
+		{
+			postUpdate(Heating_Burner_Hours_Last,value)
+		}
+	}
+end
+
+rule "Burner Hours"
+when
+	Time cron "15 0 0 * * ?"
+	or
+   	Item Heating_Burner_Hours changed
+then
+	
+	var DecimalType start = Heating_Burner_Hours.historicState(now.toDateMidnight).state as DecimalType
+	var DecimalType aktuell = Heating_Burner_Hours.state as DecimalType
+	if( start > 0 && aktuell > 0 )
+	{
+		var DecimalType differenz = new DecimalType( aktuell - start )
+		var String msg = differenz.format("%.0f") +" h, " + aktuell.format("%.0f")+" h"
+		if( Heating_Burner_Hours_Message.state != msg )
+		{
+			postUpdate(Heating_Burner_Hours_Message,msg)
+		}
+	}
+end
+
+rule "Heating Temperature Solar Message"
+when
+	Item Heating_Temperature_Solar_Collector changed
+	or
+	Item Heating_Temperature_Solar_Storage changed
+then
+
+	if( Heating_Temperature_Solar_Collector.state != Uninitialized && Heating_Temperature_Solar_Storage.state != Uninitialized )
+	{
+		var String msg = Heating_Temperature_Solar_Collector.state.format("%.1f") +"°C, " + Heating_Temperature_Solar_Storage.state.format("%.1f") + "°C"
+		if( Heating_Temperature_Solar_Message.state != msg )
+		{
+			postUpdate(Heating_Temperature_Solar_Message,msg)
+		}
+	}
+end
+
+rule "Heating Solar State Message"
+when
+	Item Heating_Solar_Pump_State changed
+	or
+	Item Heating_Solar_Reheating_State changed
+then
+
+	if( Heating_Solar_Pump_State.state != Uninitialized && Heating_Solar_Reheating_State.state != Uninitialized )
+	{
+		var String msg = ""
+		
+		if( Heating_Solar_Pump_State.state == 1 ) msg = msg + "an"
+		else msg = msg + "aus"
+	
+		msg = msg + ", "
+		
+		if( Heating_Solar_Reheating_State.state == 1 ) msg = msg + "an"
+		else msg = msg + "aus"
+		
+		if( Heating_Solar_State_Message.state != msg )
+		{
+			postUpdate(Heating_Solar_State_Message,msg)
+		}
+	}
+end
+
+rule "Solar Hours"
+when
+   	Time cron "15 0 0 * * ?"
+   	or
+   	Item Heating_Solar_Hours changed
+then
+
+	var DecimalType start = Heating_Solar_Hours.historicState(now.toDateMidnight).state as DecimalType
+	var DecimalType aktuell = Heating_Solar_Hours.state as DecimalType
+	if( start > 0 && aktuell > 0 )
+	{
+		var DecimalType differenz = new DecimalType( aktuell - start )
+		var String msg = differenz.format("%.0f") +" h, " + aktuell.format("%.0f")+" h"
+		if( Heating_Solar_Hours_Message.state != msg )
+		{
+			postUpdate(Heating_Solar_Hours_Message,msg)
+		}
+	}
+end
+
+rule "Last Solar Power per day"
+when
+   	Time cron "0 59 23 * * ?"
+then
+
+	var DecimalType start = Heating_Solar_Power.historicState(now.toDateMidnight).state as DecimalType
+	var DecimalType aktuell = Heating_Solar_Power.state as DecimalType
+	if( start > 0 && aktuell > 0 )
+	{
+		var DecimalType value = (aktuell - start)
+		if(Heating_Solar_Power_Last.state != value)
+		{
+			postUpdate(Heating_Solar_Power_Last,value )
+		}
+	}
+end
+
+rule "Solar Power"
+when
+   	Time cron "15 0 0 * * ?"
+   	or
+   	Item Heating_Solar_Power changed
+then
+
+	var DecimalType start = Heating_Solar_Power.historicState(now.toDateMidnight).state as DecimalType
+	var DecimalType aktuell = Heating_Solar_Power.state as DecimalType
+	if( start > 0 && aktuell > 0 )
+	{
+		var DecimalType differenz = new DecimalType( aktuell - start )
+		postUpdate(Heating_Solar_Power_Current, differenz )
+		var String msg = differenz.format("%.0f") +" KW, " + aktuell.format("%.0f") + " KW"
+		if(Heating_Solar_Power_Message.state != msg )
+		{
+			postUpdate(Heating_Solar_Power_Message, msg)
+		}
+	}
+end
+
+rule "Solar Power 5min"
+when
+   	Time cron "45 */5 * * * ?"
+then
+
+	var DecimalType start = Heating_Solar_Power.historicState(now.minusMinutes(30)).state as DecimalType
+	var DecimalType aktuell = Heating_Solar_Power.state as DecimalType
+	if( start > 0 && aktuell > 0 )
+	{
+		var DecimalType value = ((aktuell - start) / 6)
+		if( Heating_Solar_Power_Current5Min.state != value )
+		{
+			postUpdate(Heating_Solar_Power_Current5Min, value )
+		}
+	}
+end
+
+rule "Temperature Check"
+when
+	Item Temperature_Livingroom changed
+	or
+   	Item Temperature_Bedroom changed
+	or
+   	Item Temperature_Garden_Forecast changed
+	or
+	Time cron "0 0 * * * ?"
+then
+	logInfo("heizungscheck",">>>")
+	
+	var Number day    = now.getDayOfWeek
+	var Number hour   = now.getHourOfDay
+	var Number minute = now.getMinuteOfHour
+	
+	var boolean isReduced = false
+	
+	// Freitag
+	if( day == 5 )
+	{
+		if( hour < 4 || hour >= 21 ) isReduced = true
+	}
+	// Samstag
+	else if( day == 6 )
+	{
+		if( hour < 6 || hour >= 21 ) isReduced = true
+	}
+	// Sonntag
+	else if( day == 7 )
+	{
+		if( hour < 6 || hour >= 20 ) isReduced = true
+	}
+	else
+	{
+		if( hour < 4 || hour >= 20 ) isReduced = true
+	}
+
+	var DecimalType heatingTarget = (Heating_Temperature_Room_Target.state as DecimalType)
+	
+	if( isReduced )
+	{
+		heatingTarget = new DecimalType( heatingTarget - 2.0 )
+	}	
+
+	// Calculate weather forecast based reduction
+	var DecimalType forecastDiff = new DecimalType( heatingTarget - Temperature_Garden_Forecast.state )
+	if( forecastDiff < 10 )
+	{
+		if( forecastDiff <= 0 ) forecastDiff = 1;
+
+		// Flip value => Convert range 9 to 1 to range 1 to 9
+		// 1 => coldest forecast
+		// 9 => warmest forecast
+		var DecimalType forecastScale = ((forecastDiff - 10) * -1)
+		
+		var Boolean isForecastReduced = false;
+		
+		// check for a minimum heating time
+		if( Heating_Operating_Mode.state == 2 )
+		{
+			// 3 hours => on coldest forecast
+			// 0,5 hours => on warmest forecast
+			var DecimalType lastOperationModeChange = new DecimalType( 180 / forecastScale )
+			if( lastOperationModeChange > 0 && !Heating_Operating_Mode.changedSince(now.minusMinutes(lastOperationModeChange.intValue))
+			{
+				isForecastReduced = true
+			}
+		}
+		// check for the maximum heating break
+		else
+		{
+			// 0,75 hour => on coldest forecast
+			// 6,75 hours => on warmest forecast
+			var DecimalType lastOperationModeChange = new DecimalType( 45 * forecastScale )
+			if( lastOperationModeChange > 0 && Heating_Operating_Mode.changedSince(now.minusMinutes(lastOperationModeChange.intValue))
+			{
+				isForecastReduced = true
+			}
+		}
+		
+		if( isForecastReduced )
+		{
+			var DecimalType forecastBasedReduction = new DecimalType( Math::round( (forecastScale * 10 / 5).floatValue ).doubleValue / 10)
+			heatingTarget = new DecimalType( heatingTarget - forecastBasedReduction )
+		
+			logInfo("heizungscheck","Forecast based reduction: " + forecastBasedReduction.format("%.2f") +"°, forecast: "+ Temperature_Garden_Forecast.state.format("%.2f") +"°")
+		}
+	}
+	
+	var DecimalType livingroomTarget = heatingTarget
+	var DecimalType bedroomTarget = new DecimalType( heatingTarget - 3.0 )
+
+	var String msg = ""
+
+	var DecimalType livingroomMin = Temperature_Livingroom.minimumSince(now.minusMinutes(30)).state as DecimalType
+	livingroomMin = new DecimalType( Math::round( (livingroomMin * 10).floatValue ).doubleValue / 10) 
+	var DecimalType livingroomMax = Temperature_Livingroom.maximumSince(now.minusMinutes(30)).state as DecimalType
+	livingroomMax = new DecimalType( Math::round( (livingroomMax * 10).floatValue ).doubleValue / 10)
+	var DecimalType livingroomCurrent = Temperature_Livingroom.state as DecimalType
+	livingroomCurrent = new DecimalType( Math::round( (livingroomCurrent * 10).floatValue ).doubleValue / 10)
+	
+	var Boolean isTemperaturOk = true
+
+	// Temperaturanstieg: Wohnzimmer wird wärmer
+	if( livingroomMin < livingroomCurrent - 0.1 )
+	{
+		// 0.1° vorher aufhören
+		if( livingroomCurrent < livingroomTarget - 0.1 )
+		{
+			msg = "WZ is noch nicht warm genug"
+			isTemperaturOk = false
+		}
+		else
+		{
+			msg = "WZ wird zu warm"
+		}
+	}
+	// Temperaturabfall: Wohnzimmer wird kälter
+	else if( livingroomMax > livingroomCurrent + 0.1 )
+	{
+		// bei Solltemperatur wieder anfangen
+		if( livingroomCurrent <= livingroomTarget )
+		{
+			msg = "WZ wird zu kalt"
+			isTemperaturOk = false
+		}
+		else
+		{
+			msg = "WZ is noch zu warm"
+		}
+	}
+	// Kein großer Temperaturanstieg oder Temperaturabstieg
+	else
+	{
+		if( livingroomCurrent < livingroomTarget )
+		{
+			msg = "WZ ist zu kalt"
+			isTemperaturOk = false
+		}
+		else
+		{
+			msg = "WZ ist warm genug"
+		}
+	}
+
+	logInfo("heizungscheck",msg + " - " + livingroomCurrent.format("%.2f") +"° (soll: "+livingroomTarget.format("%.2f")+"°, max: "+ livingroomMax.format("%.2f") +"°, min: "+ livingroomMin.format("%.2f") +"°)")
+
+	msg = ""
+
+	var DecimalType bedroomMin = Temperature_Bedroom.minimumSince(now.minusMinutes(30)).state as DecimalType
+	bedroomMin = new DecimalType( Math::round( (bedroomMin * 10).floatValue ).doubleValue / 10)
+	var DecimalType bedroomMax = Temperature_Bedroom.maximumSince(now.minusMinutes(30)).state as DecimalType
+	bedroomMax = new DecimalType( Math::round( (bedroomMax * 10).floatValue ).doubleValue / 10)
+	var DecimalType bedroomCurrent = Temperature_Bedroom.state as DecimalType
+	bedroomCurrent = new DecimalType( Math::round( (bedroomCurrent * 10).floatValue ).doubleValue / 10)
+
+	// Temperaturanstieg: Schlafzimmer wird wärmer
+	if( bedroomMin < bedroomCurrent - 0.1 )
+	{
+		// 0.1° vorher aufhören
+		if( bedroomCurrent < bedroomTarget - 0.1 )
+		{
+			msg = "SZ is noch nicht warm genug"
+			isTemperaturOk = false
+		}
+		else
+		{
+			msg = "SZ wird zu warm"
+		}
+	}
+	// Temperaturabfall: Schlafzimmerzimmer wird kälter
+	else if( bedroomMax > bedroomCurrent + 0.1 )
+	{
+		// bei Solltemperatur wieder anfangen
+		if( bedroomCurrent <= bedroomTarget )
+		{
+		    msg = "SZ wird zu kalt"
+		    isTemperaturOk = false
+		}
+		else
+		{
+		    msg = "SZ is noch zu warm"
+		}
+	}
+	// Kein großer Temperaturanstieg oder Temperaturabstieg
+	else
+	{
+		if( bedroomCurrent < bedroomTarget )
+		{
+			msg = "SZ ist zu kalt"
+			isTemperaturOk = false
+		}
+		else
+		{
+			msg = "SZ ist warm genug"
+		}
+	}
+	logInfo("heizungscheck",msg + " - "+bedroomCurrent.format("%.2f") +"° (soll: "+bedroomTarget.format("%.2f")+"°, max: "+ bedroomMax.format("%.2f") +"°, min: "+ bedroomMin.format("%.2f") +"°)")
+
+	// Aussentemperaturkurve
+	//if( Temperature_Garden_Forecast.state < (Heating_Temperature_Room_Target.state as DecimalType) - 4 ){
+	//}
+		
+	//logInfo("heizungscheck",""+isTemperaturTooLow)
+		
+	logInfo("heizungscheck","Temp OK: "+isTemperaturOk )
+
+	if( isTemperaturOk )
+	{
+		if( Heating_Temperature_Overall_OK.state != 1 )
+		{
+			postUpdate( Heating_Temperature_Overall_OK, 1 )
+		}
+	}
+	else if( Heating_Temperature_Overall_OK.state != 0 )
+	{
+		postUpdate( Heating_Temperature_Overall_OK , 0 )
+	}
+	if( livingroomTarget != Heating_Temperature_Livingroom_Target.state )
+	{
+		postUpdate( Heating_Temperature_Livingroom_Target, livingroomTarget )
+	}
+	if( bedroomTarget != Heating_Temperature_Bedroom_Target.state )
+	{
+		postUpdate( Heating_Temperature_Bedroom_Target, bedroomTarget )
+	}
+	logInfo("heizungscheck","<<<")
+end
+
+rule "heating mode check"
+when
+	Item Heating_Auto_Mode changed
+	or
+	Time cron "30 */2 * * * ?"
+then
+
+	if( Heating_Auto_Mode.state == 1 && Heating_Operating_Mode.state != Uninitialized && Heating_Circuit_Pump_Speed.state != Uninitialized && Heating_Power.state != Uninitialized  && Heating_Burner_Starts.state != Uninitialized )
+	{
+		logInfo("heizungscheck",">>>")
+		logInfo("heizungscheck","Temp OK: "+(Heating_Temperature_Overall_OK.state == 1)+" - Temp Stabil: "+(!Heating_Temperature_Overall_OK.changedSince(now.minusMinutes(15)))+" - Betriebsart: "+Heating_Operating_Mode.state+" - Leistung: "+Heating_Power.state)
+
+		// 0 - Abschalten
+		// 1 - Nur WW
+		// 2 - Heizen mit WW
+		// 3 - Reduziert
+		// 4 - Normal
+		
+		var Integer minTempChangeMinutes = 15	// Temperaturänderung sollte mindestens 15 min stabil sein
+		var Integer minNurWWChangeMinutes = 15	// 'Nur WW' sollte mindestens 15 min aktiv sein
+		var Integer minMitWWChangeMinutes = 30	// 'Heizen mit WW' sollte mindestens 30 min aktiv sein
+
+		// Nur WW
+		if( Heating_Operating_Mode.state == 1 )
+		{
+			// Temperatur sollte seit XX min nicht OK sein und 'Nur WW' sollte mindestens XX min aktiv sein um 'flattern' zu vermeiden
+			if( Heating_Temperature_Overall_OK.state == 0 && !Heating_Temperature_Overall_OK.changedSince(now.minusMinutes(minTempChangeMinutes)) && !Heating_Operating_Mode.changedSince(now.minusMinutes(minNurWWChangeMinutes)) )
+			{
+				logInfo("heizungscheck","switch to 'Heizung mit WW' after 'Nur WW'")
+				sendCommand(Heating_Operating_Mode,2)
+				createTimer(now.plusSeconds(40)) [|
+					if( Heating_Operating_Mode.state != 2)
+					{
+						logInfo("heizungscheck","retry switch to 'Heizung mit WW' after 'Nur WW'")
+						sendCommand(Heating_Operating_Mode,2)
+					}
+				]
+				//pushover("Heizung: Heizung mit WW")
+			}
+		}
+		// Heizen mit WW
+		else if( Heating_Operating_Mode.state == 2 )
+		{
+			// Wenn Heizkreispumpe auf 0 dann ist Heizen zur Zeit komplett deaktiviert (zu warm draussen) oder Brauchwasser wird aufgeheizt
+			if( Heating_Circuit_Pump_Speed.state > 0 )
+			{	
+				// Temperatur sollte seit XX min OK sein und Brenner sollte entweder nicht laufen oder mindestens XX min am Stück gelaufen sein
+				if( Heating_Temperature_Overall_OK.state == 1 && !Heating_Temperature_Overall_OK.changedSince(now.minusMinutes(minTempChangeMinutes)) && (Heating_Power.state == 0 || !Heating_Operating_Mode.changedSince(now.minusMinutes(minMitWWChangeMinutes))) )
+				{
+					logInfo("heizungscheck","switch to 'Nur WW' after 'Heizung mit WW'")
+					sendCommand(Heating_Livingroom_Circuit,ON)
+					sendCommand(Heating_Operating_Mode,1)
+					createTimer(now.plusSeconds(40)) [|
+						if( Heating_Operating_Mode.state != 1)
+						{
+							logInfo("heizungscheck","retry switch to 'Nur WW' after 'Heizung mit WW'")
+							sendCommand(Heating_Operating_Mode,1)
+						}
+					]
+					//pushover("Heizung: Nur WW")
+				}
+				// Brenner läuft nicht
+				else if( Heating_Power.state == 0 )
+				{
+					// "Reduziert" war in den letzten 5 Minuten aktiv
+					// oder Leistung war innerhalb von 4 oder 5 Minuten ein zweites mal auf 0
+					if( 
+					    (Heating_Operating_Mode.historicState(now.minusMinutes(5)).state == 3 || Heating_Operating_Mode.maximumSince(now.minusMinutes(5)).state == 3)
+					    ||
+					    (Heating_Operating_Mode.historicState(now.minusMinutes(4)).state == 2 && Heating_Power.historicState(now.minusMinutes(4)).state == 0)
+					    ||
+					    (Heating_Operating_Mode.historicState(now.minusMinutes(5)).state == 2 && Heating_Power.historicState(now.minusMinutes(5)).state == 0)
+					)
+					{
+						logInfo("heizungscheck","switch to 'Reduziert' after 'Heizung mit WW'")
+						sendCommand(Heating_Livingroom_Circuit,ON)
+						sendCommand(Heating_Operating_Mode,3)
+						createTimer(now.plusSeconds(40)) [|
+							if( Heating_Operating_Mode.state != 3)
+							{
+								logInfo("heizungscheck","retry switch to 'Reduziert' after 'Heizung mit WW'")
+								sendCommand(Heating_Operating_Mode,3)
+							}
+						]		
+						//pushover("Heizung: Reduziert")
+					}
+				}
+				else if( !Heating_Temperature_Overall_OK.changedSince(now.minusMinutes(minTempChangeMinutes)) )
+				{
+					// Wenn Kreis an... Überprüfe ob es im WZ zu warm ist
+					if( Heating_Livingroom_Circuit.state == ON )
+					{
+						if( 
+							Temperature_Livingroom.state > (Heating_Temperature_Room_Target.state as DecimalType) + 0.2
+							&&
+							!Heating_Operating_Mode.changedSince(now.minusMinutes(10)))
+						{
+							logInfo("heizungscheck",">>>>switch Wohnzimmerkreis OFF")
+							sendCommand(Heating_Livingroom_Circuit,OFF)
+							//pushover("Heizung: Wohnzimmer Kreis Aus")
+						}
+					}
+					// Wenn Kreis aus... überprüfe ob es im WZ zu kalt ist
+					else if( Temperature_Livingroom.state < (Heating_Temperature_Room_Target.state as DecimalType) + 0.2 )
+					{
+						logInfo("heizungscheck",">>>>switch Wohnzimmerkreis ON")
+						sendCommand(Heating_Livingroom_Circuit,ON)
+						//pushover("Heizung: Wohnzimmer Kreis An")
+					}
+				}
+			}
+		}
+		// Reduziert
+		else if( Heating_Operating_Mode.state == 3 )
+		{
+			// Wenn Temperatur seit XX min OK ist und der brenner sowieso aus ist kann gleich in 'Nur WW' gewechselt werden
+			if( Heating_Temperature_Overall_OK.state == 1 && !Heating_Temperature_Overall_OK.changedSince(now.minusMinutes(minTempChangeMinutes)) )
+			{
+				logInfo("heizungscheck","switch to 'Nur WW' after 'Reduziert'. Temperature reached max value")
+				sendCommand(Heating_Operating_Mode,1)
+				createTimer(now.plusSeconds(40)) [|
+					if( Heating_Operating_Mode.state != 1) 
+					{
+						logInfo("heizungscheck","retry switch to 'Reduziert' after 'Heizung mit WW'")
+						sendCommand(Heating_Operating_Mode,1)
+					}
+				]
+				//pushover("Heizung: Nur WW")
+			}
+			else
+			{
+				// 'timeInterval' ist zwischen 10 und 60 min, je nach Aussentemperatur
+				
+				var Integer timeInterval = 10
+				if( Temperature_Garden_Forecast.state > 0 )
+				{
+					timeInterval = Math::floor( (( (Temperature_Garden_Forecast.state as DecimalType) * 50 / 20 ) + 10).doubleValue ).intValue
+					if( timeInterval > 60 ) timeInterval = 60
+				}
+				
+				// Dauernd reduziert läuft seit mindestens XX Minuten
+				if( !Heating_Operating_Mode.changedSince(now.minusMinutes(timeInterval)) )
+				{
+					logInfo("heizungscheck","switch to 'Heizung mit WW' after "+timeInterval+" minutes 'Reduziert'")
+					sendCommand(Heating_Operating_Mode,2)
+					createTimer(now.plusSeconds(40)) [|
+						if( Heating_Operating_Mode.state != 2)
+						{
+							logInfo("heizungscheck","retry switch to 'Heizung mit WW' after 'Reduziert'")
+							sendCommand(Heating_Operating_Mode,2)
+						}
+					]
+					//pushover("Heizung: Heizung mit WW")
+				}
+			}
+		}
+
+		logInfo("heizungscheck","<<<")
+	}
+end
+
+
+rule "Hue brightness changed"
+when
+	Item Light_FF_Livingroom_Brightness_Standard changed
+then
+	if( 
+		Light_FF_Livingroom_Brightness_Standard.state != Light_FF_Livingroom_Brightness_Standard1.state 
+		&&
+		Light_FF_Livingroom_Brightness_Standard.state != Light_FF_Livingroom_Brightness_Standard2.state
+		&&
+		Light_FF_Livingroom_Brightness_Standard.state != Light_FF_Livingroom_Brightness_Standard3.state
+	)
+	{
+		sendCommand(Light_FF_Livingroom_Brightness_Standard1,Light_FF_Livingroom_Brightness_Standard.state as DecimalType )
+		sendCommand(Light_FF_Livingroom_Brightness_Standard2,Light_FF_Livingroom_Brightness_Standard.state as DecimalType )
+		sendCommand(Light_FF_Livingroom_Brightness_Standard3,Light_FF_Livingroom_Brightness_Standard.state as DecimalType )
+	}
+end
+
+rule "Hue color changed"
+when
+	Item Light_FF_Livingroom_Color_Standard changed
+then
+	var HSBType color = Light_FF_Livingroom_Color_Standard.state as HSBType
+	sendCommand(Light_FF_Livingroom_Color_Standard1,color )
+	sendCommand(Light_FF_Livingroom_Color_Standard2,color )
+	sendCommand(Light_FF_Livingroom_Color_Standard3,color )
+end
+
+rule "Hue brightness changed backward"
+when
+	Item Light_FF_Livingroom_Brightness_Standard1 changed
+	or
+	Item Light_FF_Livingroom_Brightness_Standard2 changed
+	or
+	Item Light_FF_Livingroom_Brightness_Standard3 changed
+then
+	if( 
+		Light_FF_Livingroom_Brightness_Standard.state != Light_FF_Livingroom_Brightness_Standard1.state 
+		&&
+		Light_FF_Livingroom_Brightness_Standard.state != Light_FF_Livingroom_Brightness_Standard2.state
+		&&
+		Light_FF_Livingroom_Brightness_Standard.state != Light_FF_Livingroom_Brightness_Standard3.state
+	)
+	{
+		var Number brightness = Light_FF_Livingroom_Brightness_Standard1.state
+		if( brightness < Light_FF_Livingroom_Brightness_Standard2.state ) brightness = Light_FF_Livingroom_Brightness_Standard2.state
+		if( brightness < Light_FF_Livingroom_Brightness_Standard3.state ) brightness = Light_FF_Livingroom_Brightness_Standard3.state
+		
+		//logInfo("test1",""+(Light_FF_Livingroom_Brightness_Standard.state as DecimalType != brightness)
+		
+		if( Light_FF_Livingroom_Brightness_Standard.state as DecimalType != brightness )
+		{
+			//logInfo("test2",""+Light_FF_Livingroom_Brightness_Standard.state)
+			//logInfo("test3",""+brightness)
+			
+			sendCommand(Light_FF_Livingroom_Brightness_Standard,brightness)
+		}
+	}
+	//else
+	//{
+	//	logInfo("test4","XXXXX")
+	//}
+end
+
+
+rule "Motiondetector_Outdoor_Switch"
+when
+	Item Motiondetector_Outdoor_Switch changed
+then
+	if( changeInProgressAussen_Switch )
+	{
+		changeInProgressAussen_Switch = false
+	}
+	else
+	{
+		if( Motiondetector_Outdoor_Garage_Streetside_Switch.state != Motiondetector_Outdoor_Switch.state)
+		{
+			changeInProgressDetail_Switch = changeInProgressDetail_Switch + 1
+			postUpdate(Motiondetector_Outdoor_Garage_Streetside_Switch,Motiondetector_Outdoor_Switch.state)
+		}
+		if( Motiondetector_Outdoor_Frontdoor_Switch.state != Motiondetector_Outdoor_Switch.state)
+		{
+			changeInProgressDetail_Switch = changeInProgressDetail_Switch + 1
+			postUpdate(Motiondetector_Outdoor_Frontdoor_Switch,Motiondetector_Outdoor_Switch.state)
+		}
+		if( Motiondetector_Outdoor_Carport_Switch.state != Motiondetector_Outdoor_Switch.state)
+		{
+			changeInProgressDetail_Switch = changeInProgressDetail_Switch + 1
+			postUpdate(Motiondetector_Outdoor_Carport_Switch,Motiondetector_Outdoor_Switch.state)
+		}
+		if( Motiondetector_Outdoor_Terrace_Switch.state != Motiondetector_Outdoor_Switch.state)
+		{
+			changeInProgressDetail_Switch = changeInProgressDetail_Switch + 1
+			postUpdate(Motiondetector_Outdoor_Terrace_Switch,Motiondetector_Outdoor_Switch.state)
+		}
+		if( Motiondetector_Outdoor_Garage_Gardenside_Switch.state != Motiondetector_Outdoor_Switch.state)
+		{
+			changeInProgressDetail_Switch = changeInProgressDetail_Switch + 1
+			postUpdate(Motiondetector_Outdoor_Garage_Gardenside_Switch,Motiondetector_Outdoor_Switch.state)
+		}
+	}
+end
+
+rule "Motiondetector_Outdoor_Detail_Switch"
+when
+	Item Motiondetector_Outdoor_Garage_Streetside_Switch changed
+	or
+	Item Motiondetector_Outdoor_Frontdoor_Switch changed
+	or
+	Item Motiondetector_Outdoor_Carport_Switch changed
+	or
+	Item Motiondetector_Outdoor_Terrace_Switch changed
+	or
+	Item Motiondetector_Outdoor_Garage_Gardenside_Switch changed
+then
+	if( changeInProgressDetail_Switch > 0 )
+	{
+		changeInProgressDetail_Switch = changeInProgressDetail_Switch - 1
+	}
+	else{
+
+		if(
+			Motiondetector_Outdoor_Garage_Streetside_Switch.state == OFF
+			||
+			Motiondetector_Outdoor_Frontdoor_Switch.state == OFF
+			||
+			Motiondetector_Outdoor_Carport_Switch.state == OFF
+			||
+			Motiondetector_Outdoor_Terrace_Switch.state == OFF
+			||
+			Motiondetector_Outdoor_Garage_Gardenside_Switch.state == OFF
+		)
+		{
+			if( Motiondetector_Outdoor_Switch.state != OFF )
+			{
+				changeInProgressAussen_Switch = true
+				sendCommand(Motiondetector_Outdoor_Switch,OFF)
+			}
+		}
+		else
+		{
+			if( Motiondetector_Outdoor_Switch.state != ON )
+			{
+				changeInProgressAussen_Switch = true
+				sendCommand(Motiondetector_Outdoor_Switch,ON)
+			}
+		}
+	}
+end
+
+rule "Front door light"
+when
+	Item Light_Outdoor_Frontdoor changed
+then
+
+	if( changeInProgressHaustuer > 0 )
+	{
+		changeInProgressHaustuer = changeInProgressHaustuer - 1
+	}
+	else
+	{
+		postUpdate(Light_Outdoor_Frontdoor_Manual,Light_Outdoor_Frontdoor.state as OnOffType)
+	}
+end
+
+rule "Front door manual"
+when
+	Item Light_Outdoor_Frontdoor_Manual changed
+then
+	if(timerHaustuer!=null) 
+	{
+		timerHaustuer.cancel
+		timerHaustuer = null
+	}
+	if( Light_Outdoor_Frontdoor.state != Light_Outdoor_Frontdoor_Manual.state )
+	{
+		changeInProgressHaustuer = changeInProgressHaustuer + 1
+		sendCommand(Light_Outdoor_Frontdoor,Light_Outdoor_Frontdoor_Manual.state as OnOffType)
+	}
+end
+
+rule "Front door motion detector"
+when
+	Item Motiondetector_Outdoor_Frontdoor changed
+then
+	if( State_Outdoorlights.state == ON && Motiondetector_Outdoor_Frontdoor_Switch.state == ON && Light_Outdoor_Frontdoor_Manual.state != ON && Motiondetector_Outdoor_Frontdoor.state == OPEN )
+	{
+		if(timerHaustuer!=null) 
+		{
+			timerHaustuer.cancel
+			timerHaustuer = null
+		}
+		if(Light_Outdoor_Frontdoor.state!=ON)
+		{
+			changeInProgressHaustuer = changeInProgressHaustuer + 1
+			sendCommand(Light_Outdoor_Frontdoor,ON)
+		}
+		timerHaustuer = createTimer(now.plusSeconds(timerDuration)) [|
+			if(Light_Outdoor_Frontdoor_Manual.state != ON)
+			{
+				if(Motiondetector_Outdoor_Frontdoor.state == OPEN)
+				{
+					timerHaustuer.reschedule(now.plusSeconds(timerDuration))
+				}
+				else
+				{
+					if(Light_Outdoor_Frontdoor.state!=OFF)
+					{
+						changeInProgressHaustuer = changeInProgressHaustuer + 1
+						sendCommand(Light_Outdoor_Frontdoor,OFF)
+					}
+					timerHaustuer = null
+				}
+			}
+		]
+	}
+end
+ 
+rule "Carpot light"
+when
+	Item Light_Outdoor_Carport changed
+then
+
+	if( changeInProgressCarport > 0 )
+	{
+		changeInProgressCarport = changeInProgressCarport - 1
+	}
+	else
+	{
+		postUpdate(Light_Outdoor_Carport_Manual,Light_Outdoor_Carport.state as OnOffType)
+	}
+end
+
+rule "Carport manual"
+when
+	Item Light_Outdoor_Carport_Manual changed
+then
+	if(timerCarport!=null)
+	{
+		timerCarport.cancel
+		timerCarport = null
+	}
+	if( Light_Outdoor_Carport.state != Light_Outdoor_Carport_Manual.state )
+	{
+		changeInProgressCarport = changeInProgressCarport + 1
+		sendCommand(Light_Outdoor_Carport,Light_Outdoor_Carport_Manual.state as OnOffType)
+	}
+end
+
+rule "Carport motion detector"
+when
+	Item Motiondetector_Outdoor_Carport changed
+then
+	if( State_Outdoorlights.state == ON && Motiondetector_Outdoor_Carport_Switch.state == ON && Light_Outdoor_Carport_Manual.state != ON && Motiondetector_Outdoor_Carport.state == OPEN )
+	{
+		if(timerCarport!=null)
+		{
+			timerCarport.cancel
+			timerCarport = null
+		}
+		if(Light_Outdoor_Carport.state!=ON)
+		{
+			changeInProgressCarport = changeInProgressCarport + 1
+			sendCommand(Light_Outdoor_Carport,ON)
+		}
+		timerCarport = createTimer(now.plusSeconds(timerDuration)) [|
+			if(Light_Outdoor_Carport_Manual.state != ON)
+			{
+				if(Motiondetector_Outdoor_Carport.state == OPEN)
+				{
+					timerCarport.reschedule(now.plusSeconds(timerDuration))
+				}
+				else
+				{
+					if(Light_Outdoor_Carport.state!=OFF)
+					{
+						changeInProgressCarport = changeInProgressCarport + 1
+						sendCommand(Light_Outdoor_Carport,OFF)
+					}
+					timerCarport = null
+				}
+			}
+		]
+	}
+end
+
+rule "Terrace light"
+when
+	Item Light_Outdoor_Terrace changed
+then
+	if( changeInProgressTerasse > 0 )
+	{
+		changeInProgressTerasse = changeInProgressTerasse - 1
+	}
+	else if(Light_Outdoor_Terrace_Manual.state!=Light_Outdoor_Terrace.state)
+	{
+		postUpdate(Light_Outdoor_Terrace_Manual,Light_Outdoor_Terrace.state)
+	}
+end
+
+rule "Terrace manual"
+when
+	Item Light_Outdoor_Terrace_Manual changed
+then
+	if(timerTerasse!=null) 
+	{
+		timerTerasse.cancel
+		timerTerasse = null
+	}
+	if(Light_Outdoor_Terrace.state!=Light_Outdoor_Terrace_Manual.state)
+	{
+		if(Light_Outdoor_Terrace.state==0) changeInProgressTerasse = changeInProgressTerasse + 1
+		changeInProgressTerasse = changeInProgressTerasse + 1
+		sendCommand(Light_Outdoor_Terrace,Light_Outdoor_Terrace_Manual.state)
+	}
+end
+
+rule "terrace motion detector"
+when
+	Item Motiondetector_Outdoor_Terrace1 changed
+	or
+	Item Motiondetector_Outdoor_Terrace2 changed
+then
+	if( State_Outdoorlights.state == ON && Motiondetector_Outdoor_Terrace_Switch.state == ON && (!(Light_Outdoor_Terrace_Manual.state instanceof DecimalType) || Light_Outdoor_Terrace_Manual.state == 0) && (Motiondetector_Outdoor_Terrace1.state == OPEN || Motiondetector_Outdoor_Terrace2.state == OPEN))
+	{
+		if(timerTerasse!=null)
+		{
+			timerTerasse.cancel
+			timerTerasse = null
+		}
+		if(Light_Outdoor_Terrace.state!=ON)
+		{
+			changeInProgressTerasse = changeInProgressTerasse + 1
+			sendCommand(Light_Outdoor_Terrace,ON)
+		}
+		timerTerasse = createTimer(now.plusSeconds(timerDuration)) [|
+		
+			if(!(Light_Outdoor_Terrace_Manual.state instanceof DecimalType) || Light_Outdoor_Terrace_Manual.state == 0)
+			{
+				if(Motiondetector_Outdoor_Terrace1.state == OPEN || Motiondetector_Outdoor_Terrace2.state == OPEN)
+				{
+					timerTerasse.reschedule(now.plusSeconds(timerDuration))
+				}
+				else
+				{
+					if(Light_Outdoor_Terrace.state!=OFF)
+					{
+						changeInProgressTerasse = changeInProgressTerasse + 1
+						sendCommand(Light_Outdoor_Terrace,OFF)
+					}
+					timerTerasse = null
+				}
+			}
+		]
+	}
+end
+
+rule "Garage streetside light"
+when
+	Item Light_Outdoor_Garage_Streedside changed
+then
+
+	if( changeInProgressSchuppen_vorne > 0 )
+	{
+		changeInProgressSchuppen_vorne = changeInProgressSchuppen_vorne - 1
+	}
+	else
+	{
+		postUpdate(Light_Outdoor_Garage_Streedside_Manual,Light_Outdoor_Garage_Streedside.state as OnOffType)
+	}
+end
+
+rule "Garage streetside manual"
+when
+	Item Light_Outdoor_Garage_Streedside_Manual changed
+then
+	if(timerSchuppen_vorne!=null) 
+	{
+		timerSchuppen_vorne.cancel
+		timerSchuppen_vorne = null
+	}
+	if( Light_Outdoor_Garage_Streedside.state != Light_Outdoor_Garage_Streedside_Manual.state )
+	{
+		changeInProgressSchuppen_vorne = changeInProgressSchuppen_vorne + 1
+		sendCommand(Light_Outdoor_Garage_Streedside,Light_Outdoor_Garage_Streedside_Manual.state as OnOffType)
+	}
+end
+
+rule "Garage streetside motion detector"
+when
+	Item Motiondetector_Outdoor_Garage_Streetside changed
+then
+	if( State_Outdoorlights.state == ON && Motiondetector_Outdoor_Garage_Streetside_Switch.state == ON && Light_Outdoor_Garage_Streedside_Manual.state != ON && Motiondetector_Outdoor_Garage_Streetside.state == OPEN )
+	{
+		if(timerSchuppen_vorne!=null) 
+		{
+			timerSchuppen_vorne.cancel
+			timerSchuppen_vorne = null
+		}
+		if(Light_Outdoor_Garage_Streedside.state!=ON)
+		{
+			changeInProgressSchuppen_vorne = changeInProgressSchuppen_vorne + 1
+			sendCommand(Light_Outdoor_Garage_Streedside,ON)
+		}
+		timerSchuppen_vorne = createTimer(now.plusSeconds(timerDuration)) [|
+			if(Light_Outdoor_Garage_Streedside_Manual.state != ON)
+			{
+				if(Motiondetector_Outdoor_Garage_Streetside.state == OPEN)
+				{
+					timerSchuppen_vorne.reschedule(now.plusSeconds(timerDuration))
+				}
+				else
+				{
+					if(Light_Outdoor_Garage_Streedside.state!=OFF)
+					{
+						changeInProgressSchuppen_vorne = changeInProgressSchuppen_vorne + 1
+						sendCommand(Light_Outdoor_Garage_Streedside,OFF)
+					}
+					timerSchuppen_vorne = null
+				}
+			}
+		]
+	}
+end
+
+rule "Garage gardenside light"
+when
+	Item Light_Outdoor_Garage_Gardenside changed
+then
+
+	if( changeInProgressSchuppen_hinten > 0 )
+	{
+		changeInProgressSchuppen_hinten = changeInProgressSchuppen_hinten - 1
+	}
+	else
+	{
+		postUpdate(Light_Outdoor_Garage_Gardenside_Manual,Light_Outdoor_Garage_Gardenside.state as OnOffType)
+	}
+end
+
+rule "Garage gardenside manual"
+when
+	Item Light_Outdoor_Garage_Gardenside_Manual changed
+then
+	if(timerSchuppen_hinten!=null) 
+	{
+		timerSchuppen_hinten.cancel
+		timerSchuppen_hinten = null
+	}
+	if( Light_Outdoor_Garage_Gardenside.state != Light_Outdoor_Garage_Gardenside_Manual.state )
+	{
+		changeInProgressSchuppen_hinten = changeInProgressSchuppen_hinten + 1
+		sendCommand(Light_Outdoor_Garage_Gardenside,Light_Outdoor_Garage_Gardenside_Manual.state as OnOffType)
+	}
+end
+
+rule "Garage gardenside motion detector"
+when
+	Item Motiondetector_Outdoor_Garage_Gardenside changed
+then
+	if( State_Outdoorlights.state == ON && Motiondetector_Outdoor_Garage_Gardenside_Switch.state == ON && Light_Outdoor_Garage_Gardenside_Manual.state != ON && Motiondetector_Outdoor_Garage_Gardenside.state == OPEN )
+	{
+		if(timerSchuppen_hinten!=null) 
+		{
+			timerSchuppen_hinten.cancel
+			timerSchuppen_hinten = null
+		}
+		if(Light_Outdoor_Garage_Gardenside.state!=ON)
+		{
+			changeInProgressSchuppen_hinten = changeInProgressSchuppen_hinten + 1
+			sendCommand(Light_Outdoor_Garage_Gardenside,ON)
+		}
+		timerSchuppen_hinten = createTimer(now.plusSeconds(timerDuration)) [|
+			if(Light_Outdoor_Garage_Gardenside_Manual.state != ON)
+			{
+				if(Motiondetector_Outdoor_Garage_Gardenside.state == OPEN)
+				{
+					timerSchuppen_hinten.reschedule(now.plusSeconds(timerDuration))
+				}
+				else
+				{
+					if(Light_Outdoor_Garage_Gardenside.state!=OFF)
+					{
+						changeInProgressSchuppen_hinten = changeInProgressSchuppen_hinten + 1
+						sendCommand(Light_Outdoor_Garage_Gardenside,OFF)
+					}
+					timerSchuppen_hinten = null
+				}
+			}
+		]
+	}
+end
+
+
+rule "Filterruntime"
+when
+	Item Ventilation_Filter_Runtime changed
+then
+	var Number laufzeit = Ventilation_Filter_Runtime.state as DecimalType
+
+	var Number weeks = Math::floor( (laufzeit/168).doubleValue )
+	var Number days = Math::floor( ((laufzeit-(weeks*168))/24).doubleValue)
+
+	var String msg = ""
+
+	if( weeks > 0 )
+	{
+		if( weeks == 1 ) msg = weeks.intValue + " Woche"
+		else msg = weeks.intValue + " Wochen"
+	}
+
+	if( days > 0 )
+	{
+		if( msg.length > 0 ) msg = msg + ", "
+
+		if( days == 1 ) msg = msg + days.intValue + " Tag"
+		else msg = msg + days.intValue + " Tage"
+	}
+
+	if( Ventilation_Filter_Runtime_Message.state != msg )
+	{
+		postUpdate(Ventilation_Filter_Runtime_Message,msg)
+	}
+end
+
+rule "Filter State Message"
+when
+	Item Ventilation_Error_Message changed
+	or
+	Item Ventilation_Filter_Error_I changed
+	or
+	Item Ventilation_Filter_Error_E changed
+then
+	if( Ventilation_Error_Message.state != Uninitialized && Ventilation_Filter_Error_I.state != Uninitialized && Ventilation_Filter_Error_E.state != Uninitialized )
+	{
+		var String msg = ""
+	
+		if( Ventilation_Filter_Error_I.state == 1 || Ventilation_Filter_Error_E.state == 1 )
+		{
+			if( msg.length > 0 ) msg = msg + ", "
+			msg = msg + "Filter: "
+			if( Ventilation_Filter_Error_I.state == 1 ) msg = msg + "I"
+			if( Ventilation_Filter_Error_I.state == 1 && Ventilation_Filter_Error_E.state == 1) msg = msg + " & "
+			if( Ventilation_Filter_Error_E.state == 1 ) msg = msg + "E"
+		}
+
+		if( Ventilation_Error_Message.state != "Ok" )
+		{
+			if( msg.length > 0 ) msg = msg + ", "
+			msg = msg + "Error: " + Ventilation_Error_Message.state
+		}
+	
+		if( msg.length == 0 )
+		{
+			msg = "Alles in Ordnung"
+		}
+
+		if(Ventilation_State_Message.state != msg)
+		{
+			postUpdate(Ventilation_State_Message,msg)
+		}
+	}
+end
+
+rule "Filter Outdoor Temperature Message"
+when
+	Item Ventilation_Outdoor_Incoming_Temperature changed
+	or
+	Item Ventilation_Outdoor_Outgoing_Temperature changed
+then
+	if( Ventilation_Outdoor_Incoming_Temperature.state != Uninitialized && Ventilation_Outdoor_Outgoing_Temperature.state != Uninitialized )
+	{
+		var String msg = "→ " + Ventilation_Outdoor_Incoming_Temperature.state.format("%.1f") +"°C, ← " + Ventilation_Outdoor_Outgoing_Temperature.state.format("%.1f") + "°C"
+		if( Ventilation_Outdoor_Temperature_Message.state != msg )
+		{
+			postUpdate(Ventilation_Outdoor_Temperature_Message,msg)
+		}
+	}
+end
+
+rule "Filter Indoor Temperature Message"
+when
+	Item Ventilation_Indoor_Incoming_Temperature changed
+	or
+	Item Ventilation_Indoor_Outgoing_Temperature changed
+then
+	if( Ventilation_Indoor_Incoming_Temperature.state != Uninitialized && Ventilation_Indoor_Outgoing_Temperature.state != Uninitialized )
+	{
+		var String msg = "→ " + Ventilation_Indoor_Incoming_Temperature.state.format("%.1f") +"°C, ← " + Ventilation_Indoor_Outgoing_Temperature.state.format("%.1f") + "°C"
+		if( Ventilation_Indoor_Temperature_Message.state != msg )
+		{
+			postUpdate(Ventilation_Indoor_Temperature_Message,msg)
+		}
+	}
+end
+
+rule "Filter Ventilation Message"
+when
+	Item Ventilation_Incoming changed
+	or
+	Item Ventilation_Outgoing changed
+then
+	if( Ventilation_Incoming.state != Uninitialized && Ventilation_Outgoing.state != Uninitialized )
+	{
+		var String msg = "→ " + Ventilation_Incoming.state +"%, ← " + Ventilation_Outgoing.state + "%"
+		if( Ventilation_Fan_Message.state != msg )
+		{
+			postUpdate(Ventilation_Fan_Message,msg)
+		}
+	}
+end
+
+rule "Filter Manual Action"
+when
+	Item Ventilation_Fan_Level changed
+then
+	if( autoChangeInProgress )
+	{
+		//logInfo("switch","1")
+		autoChangeInProgress = false
+	}
+	else if( previousState == Uninitialized )
+	{
+		postUpdate(Ventilation_Auto_Mode,1)
+	}
+	else
+	{
+		//logInfo("switch","2")
+		postUpdate(Ventilation_Auto_Mode,0)
+	}
+end
+
+rule "Filter Fan Level"
+when
+    Item Ventilation_Auto_Mode changed
+    or
+    Time cron "0 */1 * * * ?"
+then
+	//logInfo("switch","" + Ventilation_Auto_Mode.state)
+	//logInfo("switch","" + Ventilation_Fan_Level.state)
+	//logInfo("switch","" + Ventilation_Indoor_Outgoing_Temperature.state)
+	//logInfo("switch","" + Ventilation_Comfort_Temperature.state)
+	//logInfo("switch","" + Window_SF_Bedroom.state)
+	//logInfo("switch","" + Window_SF_Dressingroom.state)
+
+	if( 
+	    Ventilation_Auto_Mode.state != Uninitialized && Ventilation_Fan_Level.state != Uninitialized
+	    &&
+	    Ventilation_Indoor_Outgoing_Temperature.state != Uninitialized && Ventilation_Outdoor_Incoming_Temperature.state != Uninitialized && Ventilation_Comfort_Temperature.state != Uninitialized
+	    &&
+	    Window_SF_Bedroom.state != Uninitialized && Window_SF_Dressingroom.state != Uninitialized
+	)
+	{
+		if( Ventilation_Auto_Mode.state == 1 )
+		{
+			var Number day    = now.getDayOfWeek
+			var Number hour   = now.getHourOfDay
+			var Number minute = now.getMinuteOfHour
+
+			var Number currentLevel = Ventilation_Fan_Level.state as DecimalType
+			var Number newLevel = 3
+			
+			var Number waitBeforeChange = 1
+			
+			//logInfo("switch","" + State_Sleeping.state)
+
+			if( State_Sleeping.state == OFF )
+			{
+				var Number raumTemperatur = Ventilation_Indoor_Outgoing_Temperature.state as DecimalType
+				var Number aussenTemperatur = Ventilation_Outdoor_Incoming_Temperature.state as DecimalType
+				var Number zielTemperatur = Ventilation_Comfort_Temperature.state as DecimalType
+				
+				var boolean skipPresenceCheck = false;
+				
+				// Raumtemperatur ist zu warm
+				if( raumTemperatur >= zielTemperatur )
+				{
+					// aussentemperatur ist zu warm
+					if( aussenTemperatur >= raumTemperatur )
+					{
+						newLevel = 1
+						skipPresenceCheck = true;
+					}
+					// Raumtemperatur ist viel zu warm und kann mit Aussenluft gekühlt werden
+					// Lüftung sollte also nicht in den Sparmodus geschickt werden auch wenn man abwesend ist
+					else if( raumTemperatur >= zielTemperatur + 1 && aussenTemperatur < raumTemperatur )
+					{
+						skipPresenceCheck = true;
+					}
+				}
+				
+				//logInfo("test","" + newLevel)
+				
+				// Wenn der aktuelle Level Stufe 'A' (also 1) ist, sollte vor einem erneuten umschalten gewartet werden damit ein 
+				// hin und herschalten vermieden wird. z.B. bei kurzzeitigen Temperaturschwankungen
+				if( currentLevel == 1 ) waitBeforeChange = 15
+				
+				//logInfo("test","" + newLevel)
+
+				if( !skipPresenceCheck && State_Away.state == ON && !State_Away.changedSince(now.minusMinutes(60)) )
+				{
+					newLevel = 2
+				}
+				//logInfo("test","" + newLevel)
+			}
+			else
+			{
+				newLevel = 2
+			}
+
+			if( newLevel != currentLevel )
+			{
+				if( !Ventilation_Fan_Level.changedSince(now.minusMinutes(waitBeforeChange.intValue)) )
+				{
+					autoChangeInProgress=true
+					sendCommand(Ventilation_Fan_Level,newLevel)
+				}
+			}
+		}
+	}
+end
+
+
+rule "Switch off Bassbox"
+when
+	Item State_Sleeping changed from OFF to ON
+then
+    Socket_Bassbox.postUpdate(OFF)
+end
+
+
+rule "Periodically check presence"
+when
+	Time cron "0 */5 * * * ?"
+then
+	if (Device_Present.state == ON)
+	{
+		if(Phones.members.filter(s | s.state == ON).size == 0) 
+		{
+			logInfo("PresenceCheck", "No phone within reach, checking for flapping")
+			if(Phones.members.filter(s | s.changedSince(now.minusMinutes(5))).size == 0) 
+			{
+				sendCommand(Device_Present, OFF)
+			}
+		}
+	}
+	else
+	{
+		//For initialisation. If Presence is undefined or off, although it should be on.
+		if(Phones.members.filter(s | s.state == ON).size > 0) 
+		{
+			sendCommand(Device_Present, ON)
+		}
+		else if (Device_Present.state == Undefined || Device_Present.state == Uninitialized) 
+		{
+			sendCommand(Device_Present, OFF)
+		}
+	}
+end
+
+rule "Phone changing"
+when
+	Item Phones changed
+then
+	if (Device_Present.state != ON) 
+	{
+		if(Phones.members.filter(s | s.state == ON).size > 0) 
+		{
+			sendCommand(Device_Present, ON)
+		}
+	}
+end
+
+rule "Presence changing"
+when
+	Item Device_Present changed
+then
+	if( Device_Present.state == ON )
+	{
+		logInfo("PresenceCheck", "Jemand ist zu Hause")
+	}
+	else
+	{
+		logInfo("PresenceCheck", "Niemand zu Hause")
+	}
+end
+
+rule "Away check"
+when
+	Item Door_FF_Floor received update CLOSED
+then
+	//or
+	//Time cron "0 */1 * * * ?"
+	if( Window_FF_Livingroom_Terrace.state == CLOSED )
+	{
+		if( timerAway != null )
+		{
+			timerAway.cancel
+			timerAway = null
+		}
+		timerAway = createTimer(now.plusSeconds(timerDuration)) [|
+			
+			timerAway = null
+			
+			var isPresent = Motiondetector_FF_Floor.state == OPEN
+			if( !isPresent )
+			{
+				var doorUpdated = Door_FF_Floor.lastUpdate
+				//logInfo("test","test" + doorUpdated)
+				//logInfo("test","test" + (new DateTime(doorUpdated).plusSeconds(5)))
+
+				// OPEN event until 3 seconds after door close and the following CLOSE event 2 seconds later should be ignored
+				// CLOSE event after that or a new OPEN event is a sign for in house activity
+				isPresent = new DateTime(Motiondetector_FF_Floor.lastUpdate).isAfter( new DateTime(doorUpdated).plusSeconds(5) )
+				
+				if( !isPresent )
+				{
+					isPresent = Motiondetector_FF_Livingroom.lastUpdate.after( doorUpdated )
+				}
+			}
+			
+			// motion is still present or was after door closed
+			if( isPresent )
+			{
+				//logInfo("AwayCheck", "OFF")
+				if( State_Away.state != OFF )
+				{
+					//logInfo("AwayCheck", "OFF PUSH")
+					postUpdate(State_Away, OFF)
+				}
+			}
+			else
+			{
+				//logInfo("AwayCheck", "ON")
+				if( State_Away.state != ON )
+				{
+					//logInfo("AwayCheck", "ON PUSH")
+					postUpdate(State_Away, ON)
+				}
+			}
+		]
+	}
+end
+
+rule "Motion check"
+when
+	Item Motiondetector_FF_Livingroom received update OPEN //people moving around.
+	or
+	Item Motiondetector_FF_Floor received update OPEN
+then
+	if( State_Away.state != OFF )
+	{
+		//logInfo("MotionCheck", "NOT AWAY")
+		postUpdate(State_Away, OFF) 
+	}
+	
+	if( State_Sleeping.state != OFF )
+	{
+		//logInfo("MotionCheck", "WAKEUP")
+		postUpdate(State_Sleeping, OFF)
+	}
+end
+
+rule "Away rule"
+when
+	Item State_Away changed 
+	// @cnandi-fix: or Item State_Sleeping changed
+then
+	if( State_Away.state == ON )
+	{
+		if( State_Sleeping.state != OFF )
+		{
+			postUpdate(State_Sleeping, OFF)
+		}
+		if( State_Notify.state != ON )
+		{
+			postUpdate(State_Notify, ON)
+		}
+	}
+end
+
+rule "Sleeping SF check"
+when
+	Item Lights_SF received update OFF
+	or
+	Item Light_FF_Floor_Ceiling received update OFF
+then
+	if( State_Sleeping.state != ON )
+	{
+		var Number hour   = now.getHourOfDay
+		if( ( hour <= 4 || hour >= 21 ) && !Motiondetector_FF_Floor.changedSince(now.minusSeconds(sleepDuration)) && Lights_Indoor.members.filter(s | s.state == ON).size == 0 )
+		{
+			if( timerAway == null )
+			{
+				if( State_Away.state == OFF)
+				{
+					postUpdate(State_Sleeping, ON)
+				}
+			}
+			else
+			{
+				if( timerSleep != null )
+				{
+					timerSleep.cancel
+					timerSleep = null
+				}
+				timerSleep = createTimer(now.plusSeconds(timerDuration)) [|
+
+					timerSleep = null
+
+					if( State_Away.state == OFF )
+					{
+						postUpdate(State_Sleeping, ON)
+					}
+				]
+			}
+		}
+	}
+end
+
+rule "Startup init"
+when
+	System started
+then
+
+	logInfo("Startup","Value Initialization")
+
+	postUpdate(Ventilation_Auto_Mode,1)
+	postUpdate(Heating_Auto_Mode,1)
+
+	postUpdate(Motiondetector_Outdoor_Switch,ON)
+	postUpdate(Motiondetector_Outdoor_Garage_Streetside_Switch,ON)
+	postUpdate(Motiondetector_Outdoor_Frontdoor_Switch,ON)
+	postUpdate(Motiondetector_Outdoor_Carport_Switch,ON)
+	postUpdate(Motiondetector_Outdoor_Terrace_Switch,ON)
+	postUpdate(Motiondetector_Outdoor_Garage_Gardenside_Switch,ON)
+	
+	postUpdate(Lights_Outdoor,OFF)
+	postUpdate(Light_Outdoor_Terrace_Manual,OFF)
+	postUpdate(Light_Outdoor_Terrace_Manual,0)
+
+	postUpdate(Auto_Attic_Light,1)
+end
+
+rule "Bell State" 
+when
+	Item Bell changed
+then
+
+	if( Bell.state == OPEN )
+	{
+		Bell_Last_Change.postUpdate( now.toString() )
+
+		if(notificationTimer==null)
+		{
+			notificationTimer = createTimer(now.plusSeconds(30)) [|
+				notificationTimer=null
+			]
+			pushover("Klingel: Es klingelt")
+			sendMail("holger.hees@gmail.com","Es klingelt","Es klingelt jemand an der Tür","http://192.168.0.50/cameraStrasse")
+		}
+	}
+end
+
+rule "Window_FF_GuestWC"
+when
+	Item Window_FF_GuestWC changed
+then
+	if( State_Notify.state == ON ) pushover("Fenster: GästeWC " + Window_FF_GuestWC.state )
+end
+
+rule "Window_FF_Kitchen"
+when
+	Item Window_FF_Kitchen changed
+then
+	if( State_Notify.state == ON ) pushover("Fenster: Küche " + Window_FF_Kitchen.state )
+end
+
+rule "Window_FF_Livingroom_Terrace"
+when
+	Item Window_FF_Livingroom_Terrace changed
+then
+	if( State_Notify.state == ON ) pushover("Fenster: Terasse " + Window_FF_Livingroom_Terrace.state )
+end
+
+rule "Window_FF_Livingroom_Couch"
+when
+	Item Window_FF_Livingroom_Couch changed
+then
+	if( State_Notify.state == ON ) pushover("Fenster: Couch " + Window_FF_Livingroom_Couch.state )
+end
+
+rule "Window_FF_Guestroom"
+when
+	Item Window_FF_Guestroom changed
+then
+	if( State_Notify.state == ON ) pushover("Fenster: Gästezimmer " + Window_FF_Guestroom.state )
+end
+
+rule "Door_FF_Floor"
+when
+	Item Door_FF_Floor changed
+then
+	if( State_Notify.state == ON ) pushover("Tür: Haustür " + Door_FF_Floor.state )
+end
+
+rule "Door_FF_Garage1"
+when
+	Item Door_FF_Garage1 changed
+then
+	if( State_Notify.state == ON ) pushover("Tür: Schuppen.Strasse " + Door_FF_Garage1.state )
+end
+
+rule "Door_FF_Garage2"
+when
+	Item Door_FF_Garage2 changed
+then
+	if( State_Notify.state == ON ) pushover("Tür: Schuppen.Garten " + Door_FF_Garage2.state )
+end
+
+rule "Door_FF_Garage2"
+when
+	Item Window_FF_Garage changed
+then
+	if( State_Notify.state == ON ) pushover("Fenster: Schuppen " + Window_FF_Garage.state )
+end
+
+rule "Window_SF_Bathroom"
+when
+	Item Window_SF_Bathroom changed
+then
+	if( State_Notify.state == ON ) pushover("Fenster: Badezimmer " + Window_SF_Bathroom.state )
+end
+
+rule "Window_SF_Dressingroom"
+when
+	Item Window_SF_Dressingroom changed
+then
+	if( State_Notify.state == ON ) pushover("Fenster: Ankleide " + Window_SF_Dressingroom.state )
+end
+
+rule "Window_SF_Bedroom"
+when
+	Item Window_SF_Bedroom changed
+then
+	if( State_Notify.state == ON ) pushover("Fenster: Schlafzimmer " + Window_SF_Bedroom.state )
+end
+
+rule "Window_SF_Child1"
+when
+	Item Window_SF_Child1 changed
+then
+	if( State_Notify.state == ON ) pushover("Fenster: Kind1 " + Window_SF_Child1.state )
+end
+
+rule "Window_SF_Child2"
+when
+	Item Window_SF_Child2 changed
+then
+	if( State_Notify.state == ON ) pushover("Fenster: Kind2 " + Window_SF_Child2.state )
+end
+
+rule "Window_SF_Attic"
+when
+	Item Window_SF_Attic changed
+then
+	if( State_Notify.state == ON ) pushover("Fenster: Dachboden " + Window_SF_Attic.state )
+end
+
+rule "Scene 1"
+when
+	Item Scene1 changed
+then
+	if( Scene1.state == ON )
+	{
+		Lights_FF.members.forEach(kreis|{
+			if(kreis.state!=OFF && kreis.state!=0 && kreis!=Light_FF_Kitchen_Cupboard && kreis!=Light_FF_Kitchen_Bar && kreis!=Socket_Livingroom1)
+			{
+				sendCommand(kreis, OFF)
+			}
+		})
+		Lights_SF.members.forEach(kreis|{
+			if(kreis.state!=OFF && kreis.state!=0)
+			{
+				sendCommand(kreis, OFF)
+			}
+		})
+		sendCommand(Light_FF_Kitchen_Cupboard, ON)
+		sendCommand(Light_FF_Kitchen_Bar, ON)
+		sendCommand(Socket_Livingroom1, ON)
+		postUpdate(Scene1, OFF)
+	}
+end
+
+rule "Scene 2"
+when
+	Item Scene2 changed
+then
+
+	if( Scene2.state == ON )
+	{
+		sendCommand(Light_FF_Floor_Ceiling, ON)
+		sendCommand(Light_SF_Bathroom_Ceiling, ON)
+		sendCommand(Light_SF_Bathroom_Mirror, ON)
+		sendCommand(Light_SF_Bedroom_Ceiling, ON)
+		postUpdate(Scene2, OFF)
+	}
+end
+
+rule "Scene 3"
+when
+	Item Scene3 changed
+then
+	if( Scene3.state == ON )
+	{
+		Lights_FF.members.forEach(kreis|{
+			if(kreis.state!=OFF && kreis.state!=0 && kreis!=Light_FF_Floor_Ceiling)
+			{
+				sendCommand(kreis, OFF)
+			}
+		})
+		Lights_SF.members.forEach(kreis|{
+			if(kreis.state!=OFF && kreis.state!=0 && kreis!=Light_SF_Bathroom_Mirror && kreis!=Light_SF_Bedroom_Right)
+			{
+				sendCommand(kreis, OFF)
+			}
+		})
+		sendCommand(Light_FF_Floor_Ceiling, ON)
+		sendCommand(Light_SF_Bathroom_Mirror, ON)
+		sendCommand(Light_SF_Bedroom_Right, ON)
+		sendCommand(Socket_Bassbox, OFF)
+		postUpdate(Scene3, OFF)
+	}
+end
+
+rule "Init wathering" 
+when
+	System started
+then
+	postUpdate(Watering_Program_Duration,20)
+	postUpdate(Watering_Program_State,"läuft nicht" )
+	postUpdate(Watering_Program_Start,OFF)
+	beregnungsStepTimer = null
+end
+
+rule "Wathering program" 
+when
+	Item Watering_Program_Start changed
+then
+
+	if(beregnungsStepTimer!=null) 
+	{
+		beregnungsStepTimer.cancel
+		beregnungsStepTimer = null
+		Watering_Circuits.members.forEach(kreis|
+			postUpdate(kreis, OFF)
+		)
+		postUpdate(Watering_Program_State,"läuft nicht" )
+	}
+	
+	if( Watering_Program_Start.state == ON )
+	{
+		var ende = now
+		beregnungsStepEnde = 0
+		beregnungsStepTimer = createTimer(ende) [|
+		
+			if(beregnungsStepEnde==0)
+			{
+				sendCommand(Watering_Gardenside_Lawn_left,ON)
+				ende = now.plusMinutes((Watering_Program_Duration.state as DecimalType).intValue())
+			}
+			else if( Watering_Gardenside_Lawn_left.state == ON )
+			{
+				sendCommand(Watering_Gardenside_Lawn_right,ON)
+				sendCommand(Watering_Gardenside_Lawn_left,OFF)
+				ende = now.plusMinutes((Watering_Program_Duration.state as DecimalType).intValue())
+			}
+			else if( Watering_Gardenside_Lawn_right.state == ON )
+			{
+				sendCommand(Watering_Streetside_Lawn,ON)
+				sendCommand(Watering_Gardenside_Lawn_right,OFF)
+				ende = now.plusMinutes((Watering_Program_Duration.state as DecimalType).intValue() / 3 * 2)
+			}
+			else if( Watering_Streetside_Lawn.state == ON )
+			{
+				sendCommand(Watering_Streetside_Lawn,OFF)
+			}
+			
+			if( ende != null )
+			{
+				beregnungsStepEnde = ende.millis
+				beregnungsStepTimer.reschedule(ende)
+				ende = null
+			}
+			else
+			{
+				beregnungsStepTimer = null
+				beregnungsProgressTimer = null
+				postUpdate(Watering_Program_Start,OFF)
+				postUpdate(Watering_Program_State,"läuft nicht" )
+				Watering_Circuits.members.forEach(kreis|
+					postUpdate(kreis, OFF)
+				)
+			}
+		]
+		
+		beregnungsProgressTimer = createTimer(now.plusMinutes(1)) [|
+
+			var String msg = ""
+	
+			if( Watering_Gardenside_Lawn_left.state == ON ) msg = "Garten links "
+			else if( Watering_Gardenside_Lawn_right.state == ON ) msg = "Garten rechts "
+			else if( Watering_Streetside_Lawn.state == ON ) msg = "Strasse "
+		
+			var Number diffInMinutes = Math::floor(((beregnungsStepEnde - now.millis) / 1000 / 60).doubleValue)
+		
+			if( diffInMinutes > 0 )
+			{
+				msg = msg + "noch " + diffInMinutes.intValue + " min"
+			}
+			else
+			{
+				msg = msg + "gleich fertig"
+			}
+			
+			if( beregnungsStepTimer != null )
+			{
+				postUpdate(Watering_Program_State,msg )
+				beregnungsProgressTimer.reschedule(now.plusMinutes(1))
+			}
+		]
+	}
+end
+
+rule "Last daily electricity consumption"
+when
+   	Time cron "0 59 23 * * ?"
+then
+	var Number value = (Electricity_Meter.state as DecimalType) - (Electricity_Meter.historicState(now.toDateMidnight).state as DecimalType)
+	if( Electricity_Last_Daily_Consumption.state != value )
+	{
+		postUpdate(Electricity_Last_Daily_Consumption, value )
+	}
+end
+
+rule "Stromverbrauch"
+when
+	Item Electricity_Meter received update
+then
+//	logInfo("strom","start1")
+//	Electricity_Meter.state
+//	logInfo("strom","start2")
+//	Electricity_Meter.historicState(now).state
+//	logInfo("strom","start3")
+//	Electricity_Meter.historicState(now.toDateMidnight).state
+//	logInfo("strom","start4")
+	
+	var Number Aktuell_Zaehler = Electricity_Meter.state as DecimalType
+
+	// Jahresverbrauch
+	var Number aktuellerJahresverbrauch = Aktuell_Zaehler - letzteAblesungWert
+	if( Electricity_Annual_Consumption.state != aktuellerJahresverbrauch )
+	{
+		postUpdate( Electricity_Annual_Consumption, aktuellerJahresverbrauch )
+	}
+	
+	// Hochrechnung
+	var Number aktuellesJahrMillis = now.getMillis - letzteAblesungDatum.getMillis
+	var Number ganzesJahrMillis = 31536000000l
+	var Number hochrechnungVerbrauch = Math::round((ganzesJahrMillis * aktuellerJahresverbrauch / aktuellesJahrMillis).doubleValue)
+	var String msg = hochrechnungVerbrauch + " KWh, " + letzteAblesungJahresverbrauch + " KWh"
+	if( Electricity_Forecast.state != msg )
+	{
+		postUpdate( Electricity_Forecast, msg )
+	}
+	
+	// Aktueller Verbrauch
+        // durch 3 teilen weil die Berechnungsbasis 5 ist und nicht 15
+	var Number Letzter_Zaehler = Electricity_Meter.historicState(now.minusMinutes(15)).state as DecimalType
+	var Number Aktuell = Math::round((( ( Aktuell_Zaehler - Letzter_Zaehler ) / 3 ) * 12 * 1000).doubleValue)
+	if( Electricity_Current_Consumption.state != Aktuell )
+	{
+		postUpdate(Electricity_Current_Consumption, Aktuell )
+	}
+	
+	// Tagesverbrauch
+	var Number dailyConsumption = Aktuell_Zaehler - Electricity_Meter.historicState(now.toDateMidnight).state as DecimalType
+	if( Electricity_Current_Daily_Consumption.state != dailyConsumption )
+	{
+		postUpdate(Electricity_Current_Daily_Consumption, dailyConsumption )
+	}
+end
+
+rule "Last daily gas consumption"
+when
+   	Time cron "0 59 23 * * ?"
+then
+	var Number value = (Gas_Current_Count.state as DecimalType) - (Gas_Current_Count.historicState(now.toDateMidnight).state as DecimalType)
+	if( Gas_Last_Daily_Consumption.state != value )
+	{
+		postUpdate(Gas_Last_Daily_Consumption,value )
+	}
+end
+
+rule "Gas consumption"
+when
+   	Time cron "0 */5 * * * ?"
+then
+
+	if( Gas_Pulse_Counter.state != Uninitialized )
+	{
+		var Number Aktuell_End = Gas_Pulse_Counter.state as DecimalType
+
+		/* Aktueller Verbrauch */
+		var Number Start_5Min = Gas_Pulse_Counter.historicState(now.minusMinutes(5)).state as DecimalType
+		var Number Aktuell_5Min = (Aktuell_End - Start_5Min) * 0.01
+		if( Aktuell_5Min < 0 ) Aktuell_5Min = 0;
+
+		if( Gas_Current_Consumption.state != Aktuell_5Min )
+		{
+			postUpdate(Gas_Current_Consumption, Aktuell_5Min )
+		}
+
+		var zaehlerStand = startGasZaehlerWert + (Aktuell_End * 0.01)
+		if( zaehlerStand != Gas_Current_Count.state )
+		{
+			postUpdate( Gas_Current_Count, zaehlerStand )
+		}
+
+		// Jahresverbrauch
+		var jahresVerbrauch = zaehlerStand - letzteGasAblesungWert
+		if( jahresVerbrauch != Gas_Annual_Consumption.state )
+		{
+			postUpdate( Gas_Annual_Consumption, jahresVerbrauch )	
+
+			// Hochrechnung
+			var Number aktuellesJahrMillis = now.getMillis - letzteGasAblesungDatum.getMillis
+			var Number ganzesJahrMillis = 31536000000l
+			var hochrechnungVerbrauch = Math::round((ganzesJahrMillis * jahresVerbrauch / aktuellesJahrMillis).doubleValue)
+			postUpdate( Gas_Forecast, hochrechnungVerbrauch + " m³, " + letzteGasAblesungJahresverbrauch + " m³" )
+		}
+		
+		// Aktueller Tagesverbrauch
+		var Number Start = Gas_Pulse_Counter.historicState(now.toDateMidnight).state as DecimalType
+		var Number Aktuell = (Aktuell_End - Start) * 0.01
+		if( Aktuell < 0 ) Aktuell = 0;
+
+		if( Gas_Current_Daily_Consumption.state != Aktuell )
+		{
+			postUpdate(Gas_Current_Daily_Consumption, Aktuell )
+		}
+	}
+end
+
+rule "Is night detection"
+when
+	Time cron "0 * * * * ?"
+then
+	if( Dawn_Time.state != Uninitialized && Dusk_Time.state != Uninitialized && Sunrise_Time.state != Uninitialized && Sunset_Time.state != Uninitialized)
+	{
+		//logInfo("test",""+now)
+		//logInfo("test",""+Sunset_Time.state)
+		//logInfo("test",""+Sunrise_Time.state)
+	
+		if ( ( now.isAfter((Sunset_Time.state as DateTimeType).calendar.timeInMillis) || now.isBefore((Sunrise_Time.state as DateTimeType).calendar.timeInMillis) ) )
+		{
+			if( State_Outdoorlights.state != ON )
+			{
+				postUpdate(State_Outdoorlights,ON)
+			}
+		}
+		else
+		{
+			if( State_Outdoorlights.state != OFF )
+			{
+				postUpdate(State_Outdoorlights,OFF)
+			}
+		}
+
+		if ( ( now.isAfter((Dusk_Time.state as DateTimeType).calendar.timeInMillis) || now.isBefore((Sunrise_Time.state as DateTimeType).calendar.timeInMillis) ) )
+		{
+			if( State_Rollershutter.state != ON )
+			{
+				postUpdate(State_Rollershutter,ON)
+			}
+		}
+		else
+		{
+			if( State_Rollershutter.state != OFF )
+			{
+				postUpdate(State_Rollershutter,OFF)
+			}
+		}
+	}
+end
+
+rule "Check Roommessages"
+when
+	Time cron "0 */5 * * * ?"
+	or
+	Item Sensor_Doors_FF changed
+	or
+	Item Sensor_Window_FF changed
+	or
+	Item Sensor_Window_SF changed
+then
+	var String msg = ""
+	var int doorCount = Sensor_Doors_FF.members.filter(s | s.state == OPEN).size
+	
+	if( doorCount > 0 )
+	{
+		if( doorCount == 1 ) msg = "1 Tür"
+		else msg = doorCount + " Türen"
+	}
+	
+	var int windowCount = Sensor_Window_FF.members.filter(s | s.state == OPEN).size + Sensor_Window_SF.members.filter(s | s.state == OPEN).size
+
+	if( windowCount > 0 )
+	{
+		if( msg.length > 0 ) msg = msg + " und "
+		msg = msg + windowCount + " Fenster"
+	}
+
+	if( msg.length > 0 ) msg = msg + " offen"
+	else msg = "Alles geschlossen"
+	
+	if( RoomStatus.state != msg )
+	{
+		postUpdate(RoomStatus,msg)
+	}
+end
+
+rule "Check Errormessages"
+when
+	Time cron "0 */5 * * * ?"
+	or
+	Item Ventilation_Filter_Error_I changed
+	or
+	Item Ventilation_Filter_Error_E changed
+	or
+	Item Ventilation_Error_Message changed
+	or
+	Item Heating_Common_Fault changed
+then
+	var String type = "Fehler"
+	var String priority = "1"
+	var String msg = ""
+
+	if( Ventilation_Filter_Error_I.state > 0
+	    || Ventilation_Filter_Error_E.state > 0
+	    || Ventilation_Error_Message.state != "Ok"
+	)
+	{
+		if( msg.length > 0 ) msg = msg + ", "
+		msg = msg + "Lüftung"
+	}
+    
+	if( Heating_Common_Fault.state > 0 )
+	{
+	    if( msg.length > 0 ) msg = msg + ", "
+	    msg = msg + "Heizung"
+	}
+	
+	if( CPUTemp.state > 60
+	    || SystemTemp.state > 60
+	    || FanSpeed.state < 1000
+	    || Mountpoint0_Percent.state > 70
+	    || Mountpoint1_Percent.state > 60
+	    || Mountpoint2_Percent.state > 60
+	    || HardDisk0_Temp.state > 45
+	    || HardDisk0_Status.state != "ok"
+	    || HardDisk1_Temp.state > 40
+	    || HardDisk1_Status.state != "ok"
+	    || HardDisk2_Temp.state > 45
+	    || HardDisk2_Status.state != "ok"
+	    || MemoryUsage_Percent.state > 50
+	    || LoadAvg_15min.state > 0.5
+	)
+	{
+        if( msg.length > 0 ) msg = msg + ", "
+	    msg = msg + "Hardware"
+	}
+	
+	if( msg.length == 0 )
+	{
+	    msg = "Alles in Ordnung"
+	    type = "Info"
+	    priority = "0"
+	}
+	
+	if( MainStatus.state != msg )
+	{
+		pushover(type+": "+msg)
+		postUpdate(MainStatus,msg)
+	}
+end
+
+rule "Security State Sensor"
+when
+	Item Openingcontacts changed
+	or
+	Item Sensor_Indoor changed
+then
+	//logInfo("test",""+Security_Last_Change)
+	//logInfo("test",""+now)
+	Security_Last_Change.postUpdate(now.toString())
+end
+
+rule "Air livingroom"
+when
+	Item Temperature_Livingroom changed
+	or
+	Item Humidity_Livingroom changed
+	or
+	Item Heating_Temperature_Livingroom_Target changed
+then
+	if( Heating_Temperature_Livingroom_Target.state != Uninitialized && Temperature_Livingroom.state != Uninitialized && Humidity_Livingroom.state != Uninitialized )
+	{
+		var String msg = "(" + Heating_Temperature_Livingroom_Target.state.format("%.1f") + "°C) " + Temperature_Livingroom.state.format("%.1f") +"°C, " + Humidity_Livingroom.state.format("%.1f") + "%"
+		if( Air_Livingroom_Message.state != msg )
+		{
+			postUpdate(Air_Livingroom_Message,msg)
+		}
+	}
+end
+
+rule "Air bedroom"
+when
+	Item Temperature_Bedroom changed
+	or
+	Item Humidity_Bedroom changed
+	or
+	Item Heating_Temperature_Bedroom_Target changed
+then
+	if( Heating_Temperature_Bedroom_Target.state != Uninitialized && Temperature_Bedroom.state != Uninitialized && Humidity_Bedroom.state != Uninitialized )
+	{
+		var String msg = "(" + Heating_Temperature_Bedroom_Target.state.format("%.1f") + "°C) " + Temperature_Bedroom.state.format("%.1f") + "°C, " + Humidity_Bedroom.state.format("%.1f") + "%"
+		if( Air_Bedroom_Message.state != msg )
+		{
+			postUpdate(Air_Bedroom_Message,msg)
+		}
+	}
+end
+
+rule "Air floor"
+when
+	Item Temperature_Floor changed
+	or
+	Item Humidity_Floor changed
+then
+	if( Temperature_Floor.state != Uninitialized && Humidity_Floor.state != Uninitialized )
+	{
+		var String msg = Temperature_Floor.state.format("%.1f") +"°C, " + Humidity_Floor.state.format("%.1f") + "%"
+		if( Air_Floor_Message.state != msg )
+		{
+			postUpdate(Air_Floor_Message,msg)
+		}
+	}
+end
+
+rule "Air attic"
+when
+	Item Temperature_Attic changed
+	or
+	Item Humidity_Attic changed
+then
+	if( Temperature_Attic.state != Uninitialized && Humidity_Attic.state != Uninitialized )
+	{
+		var String msg = Temperature_Attic.state.format("%.1f") +"°C, " + Humidity_Attic.state.format("%.1f") + "%"
+		if( Air_Attic_Message.state != msg )
+		{
+			postUpdate(Air_Attic_Message,msg)
+		}
+	}
+end
+
+rule "Air garage"
+when
+	Item Temperature_Garage changed
+	or
+	Item Humidity_Garage changed
+then
+	if( Temperature_Garage.state != Uninitialized && Humidity_Garage.state != Uninitialized )
+	{
+		var String msg = Temperature_Garage.state.format("%.1f") +"°C, " + Humidity_Garage.state.format("%.1f") + "%"
+		if( Air_Garage_Message.state != msg )
+		{
+			postUpdate(Air_Garage_Message,msg)
+		}
+	}
+end
+
+rule "Air garden"
+when
+	Item Temperature_Garden changed
+	or
+	Item Humidity_Garden changed
+then
+	if( Temperature_Garden.state != Uninitialized && Humidity_Garden.state != Uninitialized )
+	{
+		var String msg = Temperature_Garden.state.format("%.1f") +"°C, " + Humidity_Garden.state.format("%.1f") + "%"
+		if( Air_Garden_Message.state != msg )
+		{
+			postUpdate(Air_Garden_Message,msg)
+		}
+	}
+end
+
+rule "Update garden min max"
+when
+	Time cron "0 5 0 * * ?" 
+	or
+	Item Temperature_Garden changed 
+then	
+	var String msg = Temperature_Garden.minimumSince(now.toDateMidnight).state.format("%.1f") +"°C / " + Temperature_Garden.maximumSince(now.toDateMidnight).state.format("%.1f") + " °C"
+	if( Temperature_Garden_Message.state != msg )
+	{
+		postUpdate(Temperature_Garden_Message,msg)
+	}
+end
+
+rule "Update rain today"
+when
+	Time cron "0 5 0 * * ?"
+	or
+	Item Rain_Garden_Counter changed 
+	or
+	Item Regen_State_Garden changed
+then	
+	if( Rain_Garden_Counter.state != Uninitialized )
+	{
+		var Number zaehlerNeu = Rain_Garden_Counter.state as DecimalType
+		var Number zaehlerAlt = Rain_Garden_Counter.historicState(now.toDateMidnight).state as DecimalType
+		var Number differenz
+		var Number todayRain
+
+		if( zaehlerAlt != zaehlerNeu )
+		{
+			differenz = zaehlerNeu - zaehlerAlt
+			if( differenz < 0 ) differenz = zaehlerNeu
+
+			todayRain = differenz * 295 / 1000
+		}
+		else
+		{
+			todayRain = 0
+		}
+
+		var String msg = new Double((Math::round((todayRain*10).doubleValue).doubleValue/10).doubleValue).toString;
+
+		if( Regen_State_Garden.state != Uninitialized && Regen_State_Garden.state == 1 )
+		{
+			msg = "(Regen) " + msg +" mm"
+		}
+		else
+		{
+			msg = msg +" mm"
+		}
+
+		if( Rain_Garden_Message.state != msg )
+		{
+			postUpdate(Rain_Garden_Message, msg)
+		}
+	}
+end
+
+rule "Update rain last hour"
+when
+	Time cron "0 0 * * * ?"
+then
+	if( Rain_Garden_Counter.state != Uninitialized )
+	{
+		var Number zaehlerNeu = Rain_Garden_Counter.state as DecimalType
+		var Number zaehlerAlt = Rain_Garden_Counter.historicState(now.minusHours(1)).state as DecimalType
+		var Number differenz
+		var Number lastHourRain
+
+		if( zaehlerAlt != zaehlerNeu )
+		{
+			differenz = zaehlerNeu - zaehlerAlt
+			if( differenz < 0 ) differenz = zaehlerNeu
+			lastHourRain = differenz * 295 / 1000
+		}
+		else
+		{
+			lastHourRain = 0
+		}
+		if( Rain_Garden_Current.state != lastHourRain )
+		{
+			postUpdate(Rain_Garden_Current, lastHourRain)
+		}
+	}
+end
+
+rule "Rain convert"
+when
+	Item Wind_Garden changed 
+then
+	if( Wind_Garden.state != Uninitialized )
+	{
+		var Number msg = Math::round(((Wind_Garden.state as DecimalType) * 3.6).doubleValue)
+		if( Wind_Garden_Converted.state != msg )
+		{
+			postUpdate(Wind_Garden_Converted,msg)
+		}
+	}
+end
+
+rule "Update wind last 15 minutes"
+when
+	Time cron "0 */15 * * * ?"
+then
+	if( Wind_Garden_Converted.state != Uninitialized )
+	{
+		var Number msg = Wind_Garden_Converted.maximumSince(now.minusMinutes(15)).state
+		if( Wind_Garden_Current.state != msg )
+		{
+			postUpdate(Wind_Garden_Current,msg)
+		}
+	}
+end
+
+rule "Wind"
+when
+	Item Wind_Garden_Converted changed
+	or
+	Item Wind_Direction changed
+then
+	if( Wind_Garden_Converted.state != Uninitialized && Wind_Direction.state != Uninitialized )
+	{
+		var String msg = ""
+		if(Wind_Garden_Converted.state == 0 )
+		{
+			msg = "Ruhig"
+		}
+		else
+		{
+			msg = Wind_Garden_Converted.state.format("%.1f") +" km/h, " + Wind_Direction.state
+		}
+		if( Wind_Message.state != msg )
+		{
+			postUpdate(Wind_Message,msg)
+		}
+	}
+end
+
+
+

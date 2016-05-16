@@ -68,6 +68,22 @@ public class RuleInformation {
 		return parameters;
 	}
 
+	public ArrayList<String>getTriggerItemNames(){
+		ArrayList<String>item_names=new ArrayList<String>();
+		for(EventTrigger trigger: this.getTriggers()){
+			if(trigger instanceof ChangedEventTriggerImpl){
+				item_names.add(((ChangedEventTriggerImpl)trigger).getItem());
+			}
+			if(trigger instanceof CommandEventTriggerImpl){
+				item_names.add(((CommandEventTriggerImpl)trigger).getItem());
+			}
+			if(trigger instanceof UpdateEventTriggerImpl){
+				item_names.add(((UpdateEventTriggerImpl)trigger).getItem());
+			}
+		}
+		return item_names;
+	}
+	
 	public String getName() {
 		return name;
 	}
