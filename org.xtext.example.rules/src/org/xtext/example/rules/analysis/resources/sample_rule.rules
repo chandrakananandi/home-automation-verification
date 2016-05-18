@@ -1,0 +1,21 @@
+rule "Attic_Light_Mode"
+when
+        Item Attic_Light_Mode changed
+        or
+        Time cron "0 1 5,8,20,23 * * ?"
+then
+	var Number hour   = now.getHourOfDay
+	if( Auto_Attic_Light.state == 2 )
+	{
+		logInfo("Mode W",""+hour)
+		if( hour >= 5 && hour < 23 ) sendCommand(Socket_Attic, ON)
+		else sendCommand(Socket_Attic, OFF)
+	}
+	else if( Auto_Attic_Light.state == 3 )
+	{
+		logInfo("Mode B",""+hour)
+		if( hour >= 8 && hour < 20 ) sendCommand(Socket_Attic, ON)
+		else sendCommand(Socket_Attic, OFF)
+	}
+end
+

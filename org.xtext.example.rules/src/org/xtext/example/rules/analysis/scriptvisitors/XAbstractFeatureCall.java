@@ -20,7 +20,7 @@ public class XAbstractFeatureCall extends org.eclipse.xtext.xbase.impl.XAbstract
 	}
 
 	@Override
-	public <R>R accept(ExpressionVisitor<R> expressionVisitor) {
+	public <R> R accept(ExpressionVisitor<R> expressionVisitor) {
 		return expressionVisitor.visit(this);
 	}
 }

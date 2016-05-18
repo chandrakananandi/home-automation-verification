@@ -5,7 +5,7 @@ package org.xtext.example.rules.analysis.scriptvisitors;
  * @author cnandi
  *
  */
-public interface ExpressionVisitor<R> {
+public interface ExpressionVisitor <R> {
 
 	public R visit(XIfExpression xIfExpression);
 

@@ -32,8 +32,8 @@ public class MemberFeatureInvocation {
 		return arguments;
 	}
 	
-	public void setMemberName(String methodName) {
-		this.memberFeatureName = methodName;
+	public void setMemberName(String memberName) {
+		this.memberFeatureName = memberName;
 	}
 
 

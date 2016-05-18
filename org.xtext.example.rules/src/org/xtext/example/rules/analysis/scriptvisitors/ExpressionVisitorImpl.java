@@ -1,6 +1,8 @@
 package org.xtext.example.rules.analysis.scriptvisitors;
 
 import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.xbase.XExpression;
 import org.xtext.example.rules.analysis.ConflictAvoidanceChecker;
@@ -15,13 +17,21 @@ import org.xtext.example.rules.analysis.statements.UnaryCondition;
  * @author cnandi
  *
  */
+@SuppressWarnings("rawtypes")
 public class ExpressionVisitorImpl implements ExpressionVisitor {	
 
+	public static List<FeatureInvocation> feature_invocations=new ArrayList<FeatureInvocation>();
+	public static List<MemberFeatureInvocation> member_feature_invocations=new ArrayList<MemberFeatureInvocation>();
+	
 	public static ArrayList<String> member_states_involved=new ArrayList<String>();
-	private ScriptExpressionSwitch expressionSwitch = new ScriptExpressionSwitch ();
+	private ScriptExpressionSwitch<?> expressionSwitch;
 	private static int if_counter = 0;
 	private static int feature_counter = 0;
 	private static int member_feature_counter = 0;
+	
+	public ExpressionVisitorImpl(ScriptExpressionSwitch<?> scriptSwitch) {
+		expressionSwitch=scriptSwitch;
+	}
 
 	@Override
 	public IfThenElse visit(XIfExpression xIfExpression) {
@@ -58,8 +68,7 @@ public class ExpressionVisitorImpl implements ExpressionVisitor {
 		ConflictAvoidanceChecker.ast_writer.println("Feature:"+feature_counter);
 		ConflictAvoidanceChecker.ast_writer.println("Feature name:" + feature_counter);
 		featureInvocation.setMethodName(xFeatureCallImplCustom.getExpression().getConcreteSyntaxFeatureName());
-		ConflictAvoidanceChecker.ast_writer
-				.println(xFeatureCallImplCustom.getExpression().getConcreteSyntaxFeatureName());
+		ConflictAvoidanceChecker.ast_writer.println(featureInvocation.getMethodName());
 
 		if (xFeatureCallImplCustom.getExpression().getActualReceiver() != null) {
 			ConflictAvoidanceChecker.ast_writer.println("Target:" + feature_counter);
@@ -75,13 +84,14 @@ public class ExpressionVisitorImpl implements ExpressionVisitor {
 			ConflictAvoidanceChecker.ast_writer.println("Arguments:" + old_feature_counter);
 			ArrayList<String>args=new ArrayList<String>();
 			for (XExpression argument : xFeatureCallImplCustom.getExpression().getActualArguments()) {
-				if(expressionSwitch.caseXExpression(argument) instanceof String){
-					args.add((String) expressionSwitch.caseXExpression(argument));	
-				}
+				//if(expressionSwitch.caseXExpression(argument) instanceof String){
+					String st= (String) expressionSwitch.caseXExpression(argument);
+					args.add(st);	
+				//}
 				
 			}
 			featureInvocation.setArgument(args);
-			
+			feature_invocations.add(featureInvocation);			
 		}
 
 		ConflictAvoidanceChecker.ast_writer.println("Feature ends:" + old_feature_counter);
@@ -99,14 +109,14 @@ public class ExpressionVisitorImpl implements ExpressionVisitor {
 
 		if (xMemberFeatureCallImplCustom.getExpression().getActualReceiver() != null) {
 			ConflictAvoidanceChecker.ast_writer.println("Member target:" + member_feature_counter);
-			if(expressionSwitch.caseXExpression(xMemberFeatureCallImplCustom.getExpression().getMemberCallTarget()) instanceof String){
-				memberFeatureInvocation.setFeatureName((String)expressionSwitch.caseXExpression(xMemberFeatureCallImplCustom.getExpression().getMemberCallTarget()));
-					member_states_involved.add((String)expressionSwitch.caseXExpression(xMemberFeatureCallImplCustom.getExpression().getMemberCallTarget()));
-			}			
+			
+			//if(expressionSwitch.caseXExpression(xMemberFeatureCallImplCustom.getExpression().getMemberCallTarget()) instanceof String){
+				memberFeatureInvocation.setFeatureName((String)expressionSwitch.caseXExpression(xMemberFeatureCallImplCustom.getExpression().getMemberCallTarget()));				
+				member_states_involved.add(memberFeatureInvocation.getFeatureName());
+			//}			
 		}
 		ConflictAvoidanceChecker.ast_writer.println("Member feature name:" + member_feature_counter);
-		ConflictAvoidanceChecker.ast_writer
-		.println(xMemberFeatureCallImplCustom.getExpression().getConcreteSyntaxFeatureName());
+		ConflictAvoidanceChecker.ast_writer.println(xMemberFeatureCallImplCustom.getExpression().getConcreteSyntaxFeatureName());
 		memberFeatureInvocation.setMemberName(xMemberFeatureCallImplCustom.getExpression().getConcreteSyntaxFeatureName());
 		
 		if (xMemberFeatureCallImplCustom.getExpression().getActualArguments().size() != 0) {
@@ -118,6 +128,7 @@ public class ExpressionVisitorImpl implements ExpressionVisitor {
 				args.add(st);
 			}
 			memberFeatureInvocation.setArgument(args);
+			member_feature_invocations.add(memberFeatureInvocation);
 		}
 		ConflictAvoidanceChecker.ast_writer.println("Member feature ends:" + old_member_feature_counter);
 		return memberFeatureInvocation.getMemberName();
@@ -128,6 +139,7 @@ public class ExpressionVisitorImpl implements ExpressionVisitor {
 		ConflictAvoidanceChecker.ast_writer.println("Variable declaration:");
 		ConflictAvoidanceChecker.ast_writer
 				.println("var name: " + xVariableDeclaration.getExpression().getSimpleName());
+		ConflictAvoidanceChecker.ast_writer.println("RHS:");
 		if (xVariableDeclaration.getExpression().getRight() instanceof XExpression) {
 			expressionSwitch.caseXExpression((XExpression) xVariableDeclaration.getExpression().getRight());
 		}

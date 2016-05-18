@@ -45,10 +45,16 @@ import org.eclipse.xtext.xbase.impl.XNullLiteralImpl;
 import org.eclipse.xtext.xbase.impl.XNullLiteralImplCustom;
 import org.eclipse.xtext.xbase.impl.XTypeLiteralImpl;
 
-public class ScriptExpressionSwitch<R> extends ScriptSwitch<Object> {
+public class ScriptExpressionSwitch<R> extends ScriptSwitch<R> {
+	
 	public R caseXExpression(XExpression object) {
-		ExpressionVisitor<R> expressionVisitor = new ExpressionVisitorImpl();
+		
+
+		@SuppressWarnings("unchecked")
+		ExpressionVisitor<R> expressionVisitor=new ExpressionVisitorImpl(this);
+		
 		switch (object.getClass().getSimpleName()) {
+		
 		case ("XAbstractFeatureCallImpl"):
 			XAbstractFeatureCall abstractFeatureCall = new XAbstractFeatureCall((XAbstractFeatureCallImpl) object);
 			return abstractFeatureCall.accept(expressionVisitor);
@@ -238,10 +244,7 @@ public class ScriptExpressionSwitch<R> extends ScriptSwitch<Object> {
 		
 		default:
 			ConflictAvoidanceChecker.ast_writer.println("default:"+object.getClass().getSimpleName());
-			return null;
-			
-		}		
-		
+			return null;			
+		}				
 	}
-
 }

@@ -73,17 +73,23 @@ public class RuleParser {
 				else {
 					member_feature_start_index=ExpressionVisitorImpl.member_states_involved.size();
 				}
-				ScriptExpressionSwitch expressionSwitch = new ScriptExpressionSwitch();
+				
+				ScriptExpressionSwitch<EObject> expressionSwitch = new ScriptExpressionSwitch<EObject>();
+				
 				rules.add(rule);
 				ConflictAvoidanceChecker.ast_writer.println("rule name: " + rule.getName());
+				
 				for (EObject obj : rule.getScript().eContents()) {
 					generateSimplerAST(obj, expressionSwitch);					
 				}
+				
 				int member_feature_end_index=ExpressionVisitorImpl.member_states_involved.size();
 				ArrayList<String>member_states=new ArrayList<String>();
+				
 				for(int x=member_feature_start_index; x<member_feature_end_index;x++){
 					member_states.add(ExpressionVisitorImpl.member_states_involved.get(x));
-				}				
+				}
+				
 				member_features_involved.put(rule.getName(), member_states);				
 				ConflictAvoidanceChecker.ast_writer.println("rule end");			
 			}
@@ -100,7 +106,7 @@ public class RuleParser {
 		}		
 	}
 
-	public void generateSimplerAST(EObject scriptNode, ScriptExpressionSwitch expressionSwitch) {
+	public void generateSimplerAST(EObject scriptNode, ScriptExpressionSwitch<EObject> expressionSwitch) {
 		if (scriptNode instanceof XExpression) {
 			expressionSwitch.caseXExpression((XExpression) scriptNode);
 		}		
@@ -172,7 +178,7 @@ public class RuleParser {
 								i = m;
 							}
 						}
-						BinaryCondition binaryCondition = manipulateBinaryCondition(binary_condition);
+						//BinaryCondition binaryCondition = manipulateBinaryCondition(binary_condition);
 					} else if (script.get(i).equals("Unary operation:")) {
 						i++;
 						int k = i;
@@ -201,7 +207,7 @@ public class RuleParser {
 								k = m;
 								i = m;
 							}
-							UnaryCondition unaryCondition = manipulateUnaryCondition(unary_condition);
+							//UnaryCondition unaryCondition = manipulateUnaryCondition(unary_condition);
 						}
 					}
 				}
