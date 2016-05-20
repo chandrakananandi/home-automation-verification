@@ -1,21 +1,110 @@
-rule "Attic_Light_Mode"
+rule "Sleeping SF check"
 when
-        Item Attic_Light_Mode changed
-        or
-        Time cron "0 1 5,8,20,23 * * ?"
+	Item Lights_SF received update OFF
+	or
+	Item Light_FF_Floor_Ceiling received update OFF
 then
-	var Number hour   = now.getHourOfDay
-	if( Auto_Attic_Light.state == 2 )
+	if( State_Sleeping.state != ON )
 	{
-		logInfo("Mode W",""+hour)
-		if( hour >= 5 && hour < 23 ) sendCommand(Socket_Attic, ON)
-		else sendCommand(Socket_Attic, OFF)
-	}
-	else if( Auto_Attic_Light.state == 3 )
-	{
-		logInfo("Mode B",""+hour)
-		if( hour >= 8 && hour < 20 ) sendCommand(Socket_Attic, ON)
-		else sendCommand(Socket_Attic, OFF)
+		var Number hour   = now.getHourOfDay
+		if( ( hour <= 4 || hour >= 21 ) && !Motiondetector_FF_Floor.changedSince(now.minusSeconds(sleepDuration)) && Lights_Indoor.members.filter(s | s.state == ON).size == 0 )
+		{
+			if( timerAway == null )
+			{
+				if( State_Away.state == OFF)
+				{
+					postUpdate(State_Sleeping, ON)
+				}
+			}
+			else
+			{
+				if( timerSleep != null )
+				{
+					timerSleep.cancel
+					timerSleep = null
+				}
+				timerSleep = createTimer(now.plusSeconds(timerDuration)) [|
+
+					timerSleep = null
+
+					if( State_Away.state == OFF )
+					{
+						postUpdate(State_Sleeping, ON)
+					}
+				]
+			}
+		}
 	}
 end
 
+rule "Startup init"
+when
+	System started
+then
+
+	logInfo("Startup","Value Initialization")
+
+	postUpdate(Ventilation_Auto_Mode,1)
+	postUpdate(Heating_Auto_Mode,1)
+
+	postUpdate(Motiondetector_Outdoor_Switch,ON)
+	postUpdate(Motiondetector_Outdoor_Garage_Streetside_Switch,ON)
+	postUpdate(Motiondetector_Outdoor_Frontdoor_Switch,ON)
+	postUpdate(Motiondetector_Outdoor_Carport_Switch,ON)
+	postUpdate(Motiondetector_Outdoor_Terrace_Switch,ON)
+	postUpdate(Motiondetector_Outdoor_Garage_Gardenside_Switch,ON)
+	Light_Outdoor_Terrace_Manual=ON;
+	postUpdate(Lights_Outdoor,OFF)
+	postUpdate(Light_Outdoor_Terrace_Manual,OFF)
+	postUpdate(Light_Outdoor_Terrace_Manual,0)
+
+	postUpdate(Auto_Attic_Light,1)
+end
+
+rule "Bell State" 
+when
+	Item Bell changed
+then
+
+	if( Bell.state == OPEN )
+	{
+		Bell_Last_Change.postUpdate( now.toString() )
+
+		if(notificationTimer==null)
+		{
+			notificationTimer = createTimer(now.plusSeconds(30)) [|
+				notificationTimer=null
+			]
+			pushover("Klingel: Es klingelt")
+			sendMail("holger.hees@gmail.com","Es klingelt","Es klingelt jemand an der Tür","http://192.168.0.50/cameraStrasse")
+		}
+	}
+end
+
+rule "Window_FF_GuestWC"
+when
+	Item Window_FF_GuestWC changed
+then
+	if( State_Notify.state == ON ) pushover("Fenster: GästeWC " + Window_FF_GuestWC.state )
+end
+
+rule "Window_FF_Kitchen"
+when
+	Item Window_FF_Kitchen changed
+then
+	if( State_Notify.state == ON ) pushover("Fenster: Küche " + Window_FF_Kitchen.state )
+end
+
+rule "Window_FF_Livingroom_Terrace"
+when
+	Item Window_FF_Livingroom_Terrace changed
+then
+	if( State_Notify.state == ON ) pushover("Fenster: Terasse " + Window_FF_Livingroom_Terrace.state )
+end
+
+rule "Window_FF_Livingroom_Couch"
+when
+	Item Window_FF_Livingroom_Couch changed
+then
+	if( State_Notify.state == ON ) pushover("Fenster: Couch " + Window_FF_Livingroom_Couch.state )
+end
