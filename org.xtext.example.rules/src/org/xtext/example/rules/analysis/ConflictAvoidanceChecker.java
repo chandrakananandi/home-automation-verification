@@ -9,11 +9,8 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.xtext.example.rules.analysis.scriptvisitors.ExpressionVisitorImpl;
 import org.xtext.example.rules.analysis.statements.FeatureInvocation;
@@ -39,7 +36,7 @@ public class ConflictAvoidanceChecker {
 	
 	
 	public static void main(String[] args) throws IOException {
-		String rule_file = "sample_rule1.rules";
+		String rule_file = "sample_rule.rules";
 		String item_file= "sample_item1.items";
 		File conflict_file = new File("./src/org/xtext/example/rules/analysis/resources/sample_conflict.conflicts");
 		File config_file= new File("./src/org/xtext/example/rules/analysis/resources/sample_config1.homecfg");
@@ -55,6 +52,9 @@ public class ConflictAvoidanceChecker {
 		RuleParser ruleParser = new RuleParser(rule_file);
 		ruleParser.analyseRules();
 		
+		generateTriggers(ruleParser, itemParser);
+		System.out.println("------------------------------");
+		System.out.println("------------------------------");
 		checkConflictDueToTooFewTriggers(ruleParser, itemParser);
 		
 	}
@@ -102,13 +102,43 @@ public class ConflictAvoidanceChecker {
 		}
 	}
 	
+	public static void generateTriggers(RuleParser ruleParser, ItemParser itemParser){
+		for(RuleInformation rule_info: ruleParser.getRuleSet()) {	
+			Set<String>suggested_triggers=new HashSet<String>();
+			String redundant_trigger_suggestion=null;
+			for(String member_state: ruleParser.getMemeberStates().get(rule_info.getName())) {				
+				if(itemParser.getItemNames().contains(member_state)) {	
+					suggested_triggers.add(member_state);											
+					redundant_trigger_suggestion=eliminateRedundantTriggers(member_state);
+				}
+				if(redundant_trigger_suggestion!=null){
+					suggested_triggers.remove(redundant_trigger_suggestion);
+				}
+			}	
+			
+			if(suggested_triggers.size()>0) {				
+				System.out.println("rule:" + rule_info.getName());
+				for(String suggested_trigger: suggested_triggers){
+					System.out.println("suggested trigger: "+ suggested_trigger);
+				}			
+			}
+			
+			else {
+				
+				System.out.println("rule:" + rule_info.getName());
+				System.out.println("no suggested triggers");
+			}
+			System.out.println("------------------------------");		
+		}
+	}
+	
 	public static void checkConflictDueToTooFewTriggers(RuleParser ruleParser, ItemParser itemParser) {
 		int count=0;
 		int buggy_count=0;
 		for(RuleInformation rule_info: ruleParser.getRuleSet()) {	
 			count++;
 			Set<String>missing_triggers=new HashSet<String>();
-			String redundant_trigger_suggestion=new String();
+			String redundant_trigger_suggestion=null;
 			for(String member_state: ruleParser.getMemeberStates().get(rule_info.getName())) {				
 				if(itemParser.getItemNames().contains(member_state)) {	
 					if(rule_info.getTriggerItemNames().contains(member_state)){
@@ -119,10 +149,11 @@ public class ConflictAvoidanceChecker {
 					}		
 					redundant_trigger_suggestion=eliminateRedundantTriggers(member_state);
 				}
+				if(redundant_trigger_suggestion!=null){
+					missing_triggers.remove(redundant_trigger_suggestion);
+				}
 			}	
-			if(redundant_trigger_suggestion!=null){
-				missing_triggers.remove(redundant_trigger_suggestion);
-			}
+			
 			if(missing_triggers.size()>0) {				
 				buggy_count ++;
 				System.out.println("rule:" + rule_info.getName());
@@ -146,16 +177,26 @@ public class ConflictAvoidanceChecker {
 	
 	// if member state is an argument of an output action (those in the homecfg file), it is not needed to be a trigger.
 	public static String eliminateRedundantTriggers(String member_state) {
-		String eliminate_member=new String();
+		String eliminate_member=null;
+		int side_effect_free_occurences=0;
+		int all_occurence=0;
+		for(FeatureInvocation feature: ExpressionVisitorImpl.feature_invocations) {
+			if (feature.getArguments().contains(member_state)) {
+				all_occurence++;
+			}
+		}
 		for(FeatureInvocation feature: ExpressionVisitorImpl.feature_invocations) {
 			if(side_effect_free_actions.contains(feature.getMethodName())) {
 				if(feature.getArguments().contains(member_state)) {
-					eliminate_member =member_state;					
+					side_effect_free_occurences++;								
 				}
 				else {
 					continue;
 				}	
 			}			
+		}
+		if(all_occurence <=side_effect_free_occurences) {
+			eliminate_member = member_state;		
 		}
 		return eliminate_member;
 	}
