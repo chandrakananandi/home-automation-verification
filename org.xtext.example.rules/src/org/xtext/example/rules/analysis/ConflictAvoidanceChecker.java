@@ -23,8 +23,8 @@ import org.xtext.example.rules.analysis.statements.FeatureInvocation;
 public class ConflictAvoidanceChecker {
 
 	Map<String, ArrayList<String>> suggested_triggers=new HashMap<String,ArrayList<String>>();
-	static Set<String>side_effect_free_actions=new HashSet<>();
-	
+	static Set<String>side_effect_free_actions_output_states=new HashSet<String>();
+		
 	public static PrintWriter ast_writer;
 	static {
 		try {
@@ -89,7 +89,7 @@ public class ConflictAvoidanceChecker {
 					continue;
 				}
 				else if(!line.isEmpty()){					
-					side_effect_free_actions.add(line);
+					side_effect_free_actions_output_states.add(line);
 				}
 			}
 			bufferedReader.close();
@@ -106,16 +106,19 @@ public class ConflictAvoidanceChecker {
 		for(RuleInformation rule_info: ruleParser.getRuleSet()) {	
 			Set<String>suggested_triggers=new HashSet<String>();
 			String redundant_trigger_suggestion=null;
-			for(String member_state: ruleParser.getMemeberStates().get(rule_info.getName())) {				
+			for(String member_state: ruleParser.getMemberStates().get(rule_info.getName())) {
+				
 				if(itemParser.getItemNames().contains(member_state)) {	
+					
 					suggested_triggers.add(member_state);											
 					redundant_trigger_suggestion=eliminateRedundantTriggers(member_state);
 				}
 				if(redundant_trigger_suggestion!=null){
 					suggested_triggers.remove(redundant_trigger_suggestion);
 				}
-			}	
+			}
 			
+				
 			if(suggested_triggers.size()>0) {				
 				System.out.println("rule:" + rule_info.getName());
 				for(String suggested_trigger: suggested_triggers){
@@ -133,14 +136,16 @@ public class ConflictAvoidanceChecker {
 	}
 	
 	public static void checkConflictDueToTooFewTriggers(RuleParser ruleParser, ItemParser itemParser) {
+		
 		int count=0;
 		int buggy_count=0;
 		for(RuleInformation rule_info: ruleParser.getRuleSet()) {	
+			
 			count++;
 			Set<String>missing_triggers=new HashSet<String>();
 			String redundant_trigger_suggestion=null;
-			for(String member_state: ruleParser.getMemeberStates().get(rule_info.getName())) {				
-				if(itemParser.getItemNames().contains(member_state)) {	
+			for(String member_state: ruleParser.getMemberStates().get(rule_info.getName())) {				
+				if(itemParser.getItemNames().contains(member_state)) {						
 					if(rule_info.getTriggerItemNames().contains(member_state)){
 						continue;
 					}				
@@ -186,7 +191,7 @@ public class ConflictAvoidanceChecker {
 			}
 		}
 		for(FeatureInvocation feature: ExpressionVisitorImpl.feature_invocations) {
-			if(side_effect_free_actions.contains(feature.getMethodName())) {
+			if(side_effect_free_actions_output_states.contains(feature.getMethodName())) {
 				if(feature.getArguments().contains(member_state)) {
 					side_effect_free_occurences++;								
 				}
@@ -195,9 +200,13 @@ public class ConflictAvoidanceChecker {
 				}	
 			}			
 		}
-		if(all_occurence <=side_effect_free_occurences) {
+		if(all_occurence ==side_effect_free_occurences && all_occurence!=0) {
 			eliminate_member = member_state;		
 		}
+		if(side_effect_free_actions_output_states.contains(member_state)){
+			eliminate_member = member_state;
+		}
+		
 		return eliminate_member;
 	}
 }

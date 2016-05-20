@@ -4,7 +4,10 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Set;
+
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
@@ -31,7 +34,8 @@ public class RuleParser {
 	String rule_file_name;
 	ArrayList<RuleInformation> rule_database = new ArrayList<RuleInformation>();
 	ArrayList<Rule> rules = new ArrayList<Rule>();
-	Hashtable<String,ArrayList<String>> member_features_involved = new Hashtable<String,ArrayList<String>>();
+	Hashtable<String,Set<String>> member_features_involved = new Hashtable<String,Set<String>>();
+	Hashtable<String, ArrayList<String>> features_involved=new Hashtable<String,ArrayList<String>>();
 	
 	public RuleParser(String file_name) {
 		rule_file_name = file_name;
@@ -50,10 +54,13 @@ public class RuleParser {
 		return rule_database;
 	}
 	
-	public Hashtable<String,ArrayList<String>> getMemeberStates(){
+	public Hashtable<String,Set<String>> getMemberStates(){
 		return member_features_involved;
 	}
 	
+	public Hashtable<String,ArrayList<String>> getFeatures() {
+		return features_involved;
+	}
 	
 	public void analyseRules() throws IOException {
 		RulesStandaloneSetupGenerated ruleSetup = new RulesStandaloneSetupGenerated();
@@ -62,35 +69,78 @@ public class RuleParser {
 		Resource resource = resourceSet.getResource(URI.createURI("src/org/xtext/example/rules/analysis/resources/" + getRuleFileName()), true);
 		TreeIterator<EObject> eobjects = resource.getAllContents();	
 			
+		
 		while (eobjects.hasNext()) {
 			EObject eobj = eobjects.next();
 			if (eobj.getClass().getSimpleName().equals("RuleImpl")) {
 				Rule rule = (Rule) eobj;
-				int member_feature_start_index;
+				int member_feature_start_index=0;
+				int member_invocation_start_index=0;
+				int feature_invocation_start_index=0;;
 				if(ExpressionVisitorImpl.member_states_involved.size()==0){
 					member_feature_start_index = 0;
 				}
-				else {
+				if(ExpressionVisitorImpl.feature_invocations.size()==0) {
+					feature_invocation_start_index=0;
+				}
+				if(ExpressionVisitorImpl.member_feature_invocations.size()==0) {
+					member_feature_start_index=0;
+				}
+				if(ExpressionVisitorImpl.member_states_involved.size()>0){
 					member_feature_start_index=ExpressionVisitorImpl.member_states_involved.size();
+				}
+				
+				if(ExpressionVisitorImpl.feature_invocations.size()>0){
+					feature_invocation_start_index=ExpressionVisitorImpl.feature_invocations.size();
+				}
+				
+				if(ExpressionVisitorImpl.member_feature_invocations.size()>0){
+					member_invocation_start_index=ExpressionVisitorImpl.member_feature_invocations.size();
 				}
 				
 				ScriptExpressionSwitch<EObject> expressionSwitch = new ScriptExpressionSwitch<EObject>();
 				
 				rules.add(rule);
 				ConflictAvoidanceChecker.ast_writer.println("rule name: " + rule.getName());
-				
+								
 				for (EObject obj : rule.getScript().eContents()) {
 					generateSimplerAST(obj, expressionSwitch);					
 				}
 				
 				int member_feature_end_index=ExpressionVisitorImpl.member_states_involved.size();
-				ArrayList<String>member_states=new ArrayList<String>();
+				int feature_invocation_end_index=ExpressionVisitorImpl.feature_invocations.size();
+				int member_invocation_end_index=ExpressionVisitorImpl.member_feature_invocations.size();
+				Set<String>member_states=new HashSet<String>();
 				
 				for(int x=member_feature_start_index; x<member_feature_end_index;x++){
 					member_states.add(ExpressionVisitorImpl.member_states_involved.get(x));
 				}
 				
-				member_features_involved.put(rule.getName(), member_states);				
+				for(int x=feature_invocation_start_index; x<feature_invocation_end_index;x++){
+					member_states.add(ExpressionVisitorImpl.feature_invocations.get(x).getMethodName());
+					if(ExpressionVisitorImpl.feature_invocations.get(x).getTarget()!=null) {
+						member_states.add(ExpressionVisitorImpl.feature_invocations.get(x).getTarget());
+					}
+					if(ExpressionVisitorImpl.feature_invocations.get(x).getArguments().size()!=0) {
+						for(String argument: ExpressionVisitorImpl.feature_invocations.get(x).getArguments()) {
+							member_states.add(argument);
+						}
+					}
+				}
+				
+				for(int x=member_invocation_start_index; x<member_invocation_end_index;x++){
+					member_states.add(ExpressionVisitorImpl.member_feature_invocations.get(x).getMemberName());
+					if(ExpressionVisitorImpl.member_feature_invocations.get(x).getFeatureName()!=null) {
+						member_states.add(ExpressionVisitorImpl.member_feature_invocations.get(x).getFeatureName());
+					}
+					if(ExpressionVisitorImpl.member_feature_invocations.get(x).getArguments().size()!=0) {
+						for(String argument: ExpressionVisitorImpl.member_feature_invocations.get(x).getArguments()) {
+							member_states.add(argument);
+						}
+					}
+				}				
+				
+				member_features_involved.put(rule.getName(), member_states);							
 				ConflictAvoidanceChecker.ast_writer.println("rule end");			
 			}
 		}
@@ -104,6 +154,30 @@ public class RuleParser {
 			rule_database.add(rule_information);
 			br.close();			
 		}		
+		
+		//for(String s: ExpressionVisitorImpl.member_states_involved) {
+			//System.out.println(s);
+		//}
+		
+		/*for(MemberFeatureInvocation m: ExpressionVisitorImpl.member_feature_invocations) {
+			System.out.println("member name: " + m.getMemberName());
+			System.out.println("member feature name: "+m.getFeatureName());
+			if(m.getArguments().size()>0) {
+				for(String s: m.getArguments()){
+					System.out.println("member argument: " +s);
+				}
+			}
+		}
+		for(FeatureInvocation m: ExpressionVisitorImpl.feature_invocations) {
+			System.out.println("feature name: " + m.getMethodName());
+			System.out.println("feature taregt name: "+m.getTarget());
+			if(m.getArguments().size()>0) {
+				for(String s: m.getArguments()){
+					System.out.println("feature argument: " +s);
+				}
+			}
+		}		*/
+		
 	}
 
 	public void generateSimplerAST(EObject scriptNode, ScriptExpressionSwitch<EObject> expressionSwitch) {

@@ -16,4 +16,11 @@ public class Assignment {
 	public String getRhs() {
 		return rhs;
 	}
+	
+	public void setLhs(){
+		
+	}
+	public void setRhs(){
+		
+	}
 }

@@ -6,6 +6,7 @@ import java.util.List;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.xbase.XExpression;
 import org.xtext.example.rules.analysis.ConflictAvoidanceChecker;
+import org.xtext.example.rules.analysis.statements.Assignment;
 import org.xtext.example.rules.analysis.statements.BinaryCondition;
 import org.xtext.example.rules.analysis.statements.FeatureInvocation;
 import org.xtext.example.rules.analysis.statements.IfThenElse;
@@ -22,7 +23,7 @@ public class ExpressionVisitorImpl implements ExpressionVisitor {
 
 	public static List<FeatureInvocation> feature_invocations=new ArrayList<FeatureInvocation>();
 	public static List<MemberFeatureInvocation> member_feature_invocations=new ArrayList<MemberFeatureInvocation>();
-	
+	public static List<Assignment> assignments=new ArrayList<Assignment>();
 	public static ArrayList<String> member_states_involved=new ArrayList<String>();
 	private ScriptExpressionSwitch<?> expressionSwitch;
 	private static int if_counter = 0;
