@@ -26,7 +26,7 @@ import org.xtext.example.rules.analysis.statements.FeatureInvocation;
 public class ConflictAvoidanceChecker {
 
 	Map<String, ArrayList<String>> suggested_triggers=new HashMap<String,ArrayList<String>>();
-	static Set<String>output_member_states=new HashSet<>();
+	static Set<String>side_effect_free_actions=new HashSet<>();
 	
 	public static PrintWriter ast_writer;
 	static {
@@ -89,7 +89,7 @@ public class ConflictAvoidanceChecker {
 					continue;
 				}
 				else if(!line.isEmpty()){					
-					output_member_states.add(line);
+					side_effect_free_actions.add(line);
 				}
 			}
 			bufferedReader.close();
@@ -148,7 +148,7 @@ public class ConflictAvoidanceChecker {
 	public static String eliminateRedundantTriggers(String member_state) {
 		String eliminate_member=new String();
 		for(FeatureInvocation feature: ExpressionVisitorImpl.feature_invocations) {
-			if(output_member_states.contains(feature.getMethodName())) {
+			if(side_effect_free_actions.contains(feature.getMethodName())) {
 				if(feature.getArguments().contains(member_state)) {
 					eliminate_member =member_state;					
 				}

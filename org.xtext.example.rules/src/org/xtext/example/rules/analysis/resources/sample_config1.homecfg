@@ -1,7 +1,6 @@
 # List of actions whose argument items that do not need to be triggers. This currently contains all the side effect free actions belonging to the core runtime of openHAB. 
 # If someone develops more actions, they need to update this file with the new side effect free actions. Purpose of this file: by doing a static analysis of the rules,  I look for all items 
 # involved in these side-effect free actions such as logging and postUpdate and filtering them out from the suggested triggers. 
-postUpdate
 logDebug
 logInfo
 logWarn
