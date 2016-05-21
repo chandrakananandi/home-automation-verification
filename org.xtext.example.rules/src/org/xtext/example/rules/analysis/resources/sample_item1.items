@@ -109,7 +109,7 @@ Group:Contact:OR(OPEN, CLOSED)	Openingcontacts	"Öffnungssensoren [%d]"					<shi
 
 DateTime Security_Last_Change					"Sicherheit [%1$tH:%1$tM:%1$tS, %1$td.%1$tm]"	<selfCalendar>	(Security)
 
-//Switch State_Notify								"Notify"						<selfShield> 	(Security) 							{ knx="<0/4/1" }
+Switch State_Notify								"Notify"						<selfShield> 	(Security) 							{ knx="<0/4/1" }
 Switch State_Holiday							"Urlaubsmodus" 							<selfShield> 	(Security) 							{ knx="<0/4/8" }
 
 Switch Motiondetector_Outdoor_Switch 			"Gartenlicht autom."					<selfLightMotion>	(Security)						{ knx="<2/0/30" }

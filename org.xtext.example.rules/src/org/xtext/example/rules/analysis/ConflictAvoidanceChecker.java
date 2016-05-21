@@ -36,10 +36,10 @@ public class ConflictAvoidanceChecker {
 	
 	
 	public static void main(String[] args) throws IOException {
-		String rule_file = "sample_rule1.rules";
-		String item_file= "sample_item1.items";
+		String rule_file = "sample_rule2.rules";
+		String item_file= "sample_item2.items";
 		File conflict_file = new File("./src/org/xtext/example/rules/analysis/resources/sample_conflict.conflicts");
-		File config_file= new File("./src/org/xtext/example/rules/analysis/resources/sample_config1.homecfg");
+		File config_file= new File("./src/org/xtext/example/rules/analysis/resources/sample_config2.homecfg");
 		
 		parseConfiguration(config_file);
 		
@@ -180,7 +180,7 @@ public class ConflictAvoidanceChecker {
 	}
 	
 	
-	// if member state is an argument of an output action (those in the homecfg file), it is not needed to be a trigger.
+	// if member state is an argument of an output action (those in the homecfg file) only, it is not needed to be a trigger.
 	public static String eliminateRedundantTriggers(String member_state) {
 		String eliminate_member=null;
 		int side_effect_free_occurences=0;
@@ -205,6 +205,7 @@ public class ConflictAvoidanceChecker {
 		}
 		if(side_effect_free_actions_output_states.contains(member_state)){
 			eliminate_member = member_state;
+			return eliminate_member;
 		}
 		
 		return eliminate_member;

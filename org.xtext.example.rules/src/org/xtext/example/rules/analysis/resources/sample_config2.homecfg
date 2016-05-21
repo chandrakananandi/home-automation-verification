@@ -7,10 +7,3 @@ logInfo
 logWarn
 logError
 # states
-State_Notify
-AutoStatus
-MainStatus
-RoomStatus
-Heating_Common_Fault
-Ventilation_State_Message
-Watering_Program_State

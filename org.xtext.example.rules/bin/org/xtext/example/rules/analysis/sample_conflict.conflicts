@@ -1,5 +1,0 @@
-# This file stores a list of states that may not be both set (may not be in true state) at the same time. 
-# Each line contains one list. 
-# The syntax is: {state1 state2 conflicting_state_value other_state_value*}*
-
-{ State_Away State_Sleeping ON OFF }
