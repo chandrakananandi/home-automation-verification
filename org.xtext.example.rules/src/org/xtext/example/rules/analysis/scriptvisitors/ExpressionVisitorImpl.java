@@ -7,11 +7,11 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.xbase.XExpression;
 import org.xtext.example.rules.analysis.ConflictAvoidanceChecker;
 import org.xtext.example.rules.analysis.statements.Assignment;
-import org.xtext.example.rules.analysis.statements.BinaryCondition;
+import org.xtext.example.rules.analysis.statements.BinaryOperation;
 import org.xtext.example.rules.analysis.statements.FeatureInvocation;
 import org.xtext.example.rules.analysis.statements.IfThenElse;
 import org.xtext.example.rules.analysis.statements.MemberFeatureInvocation;
-import org.xtext.example.rules.analysis.statements.UnaryCondition;
+import org.xtext.example.rules.analysis.statements.UnaryOperation;
 
 /**
  * 
@@ -148,7 +148,7 @@ public class ExpressionVisitorImpl implements ExpressionVisitor {
 	}
 
 	@Override
-	public BinaryCondition visit(XBinaryOperationCustom xBinaryOperationImplCustom) {
+	public String visit(XBinaryOperationCustom xBinaryOperationImplCustom) {
 		ConflictAvoidanceChecker.ast_writer.println("Binary operation:");
 		
 		ConflictAvoidanceChecker.ast_writer.println("Left operand:");
@@ -159,7 +159,7 @@ public class ExpressionVisitorImpl implements ExpressionVisitor {
 			
 		ConflictAvoidanceChecker.ast_writer
 				.println("operator: " + xBinaryOperationImplCustom.getExpression().getConcreteSyntaxFeatureName());
-		return null;
+		return xBinaryOperationImplCustom.getExpression().getConcreteSyntaxFeatureName();
 	}
 
 	@Override
@@ -185,7 +185,7 @@ public class ExpressionVisitorImpl implements ExpressionVisitor {
 	}
 
 	@Override
-	public UnaryCondition visit(XUnaryOperationCustom xUnaryOperationCustom) {
+	public UnaryOperation visit(XUnaryOperationCustom xUnaryOperationCustom) {
 		ConflictAvoidanceChecker.ast_writer.println("Unary operation:");
 		ConflictAvoidanceChecker.ast_writer.println("Operand:");
 		expressionSwitch.caseXExpression((XExpression) xUnaryOperationCustom.getExpression().getOperand());

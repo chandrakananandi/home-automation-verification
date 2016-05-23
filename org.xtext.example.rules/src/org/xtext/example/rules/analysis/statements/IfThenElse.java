@@ -3,17 +3,17 @@ package org.xtext.example.rules.analysis.statements;
 import java.util.ArrayList;
 
 public class IfThenElse {
-	private Condition condition;
+	private Operation condition;
 	private Then then_part;
 	private Else else_part;
 
-	public IfThenElse(Condition c, Then then_part, Else else_part) {
+	public IfThenElse(Operation c, Then then_part, Else else_part) {
 		this.condition = c;
 		this.then_part = then_part;
 		this.else_part = else_part;
 	}
 
-	public Condition getCondition() {
+	public Operation getCondition() {
 		return condition;
 	}
 

@@ -1,16 +1,17 @@
 package org.xtext.example.rules.analysis.statements;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class FeatureInvocation {
 	private String target;
 	private String methodName;
-	private ArrayList<String> arguments;
+	private List<String> arguments=new ArrayList<String>();
 
 	public FeatureInvocation(){
 		
 	}
-	public FeatureInvocation(String target, String methodName, ArrayList<String> arguments) {
+	public FeatureInvocation(String target, String methodName, List<String> arguments) {
 		this.target = target;
 		this.methodName = methodName;
 		this.arguments = arguments;
@@ -24,7 +25,7 @@ public class FeatureInvocation {
 		return target;
 	}
 
-	public ArrayList<String> getArguments() {
+	public List<String> getArguments() {
 		return arguments;
 	}
 	

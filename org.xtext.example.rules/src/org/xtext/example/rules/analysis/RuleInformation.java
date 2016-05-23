@@ -2,6 +2,7 @@ package org.xtext.example.rules.analysis;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.eclipse.emf.common.util.EList;
 import org.xtext.example.rules.analysis.constants.Constants;
@@ -20,9 +21,10 @@ public class RuleInformation {
 
 	private String name;
 	private EList<EventTrigger> triggers;
-	private ScriptContent action;
-
-	public RuleInformation(String name, EList<EventTrigger> triggers, ScriptContent script) {
+	//private ScriptContent action;
+	private List<String> action=new ArrayList<String>();
+	
+	public RuleInformation(String name, EList<EventTrigger> triggers, List<String> script) {
 		this.name = name;
 		this.triggers = triggers;
 		this.action = script;
@@ -88,7 +90,7 @@ public class RuleInformation {
 		return name;
 	}
 
-	public ScriptContent getAction() {
+	public List<String> getAction() {
 		return action;
 	}
 }

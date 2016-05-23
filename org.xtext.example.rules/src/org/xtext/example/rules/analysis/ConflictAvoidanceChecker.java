@@ -15,6 +15,8 @@ import java.util.Set;
 import org.xtext.example.rules.analysis.scriptvisitors.ExpressionVisitorImpl;
 import org.xtext.example.rules.analysis.statements.FeatureInvocation;
 
+import org.xtext.example.rules.analysis.constants.Constants;
+
 /**
  * 
  * @author cnandi
@@ -106,15 +108,18 @@ public class ConflictAvoidanceChecker {
 		for(RuleInformation rule_info: ruleParser.getRuleSet()) {	
 			Set<String>suggested_triggers=new HashSet<String>();
 			String redundant_trigger_suggestion=null;
-			for(String member_state: ruleParser.getMemberStates().get(rule_info.getName())) {
-				
-				if(itemParser.getItemNames().contains(member_state)) {	
-					
-					suggested_triggers.add(member_state);											
+			String dependent_trigger_suggestion=null;
+			for(String member_state: ruleParser.getMemberStates().get(rule_info.getName())) {				
+				if(itemParser.getItemNames().contains(member_state)) {						
+					suggested_triggers.add(member_state);				
+					dependent_trigger_suggestion=eliminateDependentTriggers(member_state, rule_info, ruleParser);
 					redundant_trigger_suggestion=eliminateRedundantTriggers(member_state);
 				}
 				if(redundant_trigger_suggestion!=null){
 					suggested_triggers.remove(redundant_trigger_suggestion);
+				}
+				if(dependent_trigger_suggestion !=null){
+					suggested_triggers.remove(dependent_trigger_suggestion);
 				}
 			}
 			
@@ -140,24 +145,37 @@ public class ConflictAvoidanceChecker {
 		int count=0;
 		int buggy_count=0;
 		for(RuleInformation rule_info: ruleParser.getRuleSet()) {	
-			
 			count++;
 			Set<String>missing_triggers=new HashSet<String>();
 			String redundant_trigger_suggestion=null;
+			String dependent_trigger_suggestion=null;
 			for(String member_state: ruleParser.getMemberStates().get(rule_info.getName())) {				
 				if(itemParser.getItemNames().contains(member_state)) {						
 					if(rule_info.getTriggerItemNames().contains(member_state)){
 						continue;
 					}				
 					else {	
-						missing_triggers.add(member_state);						
-					}		
+						missing_triggers.add(member_state);			
+						
+					}	
+					dependent_trigger_suggestion=eliminateDependentTriggers(member_state, rule_info, ruleParser);
 					redundant_trigger_suggestion=eliminateRedundantTriggers(member_state);
 				}
 				if(redundant_trigger_suggestion!=null){
 					missing_triggers.remove(redundant_trigger_suggestion);
 				}
+				if(dependent_trigger_suggestion !=null){
+					missing_triggers.remove(dependent_trigger_suggestion);
+				}
 			}	
+			
+			if(rule_info.getTriggers().size()==1) {
+				if (rule_info.getTriggers().get(0).getClass().getSimpleName().equals(Constants.SYSTEM_SHUTDOWN) 
+					|| rule_info.getTriggers().get(0).getClass().getSimpleName().equals(Constants.SYSTEM_STARTUP)
+					|| rule_info.getTriggers().get(0).getClass().getSimpleName().equals(Constants.TIMER_EVENT)) {
+						missing_triggers.clear();
+				}
+			}
 			
 			if(missing_triggers.size()>0) {				
 				buggy_count ++;
@@ -167,8 +185,7 @@ public class ConflictAvoidanceChecker {
 				}			
 			}
 			
-			else {
-				
+			else {				
 				System.out.println("rule:" + rule_info.getName());
 				System.out.println("no missing trigger");
 			}
@@ -200,14 +217,37 @@ public class ConflictAvoidanceChecker {
 				}	
 			}			
 		}
-		if(all_occurence ==side_effect_free_occurences && all_occurence!=0) {
+		if(all_occurence == side_effect_free_occurences && all_occurence != 0) {
 			eliminate_member = member_state;		
 		}
 		if(side_effect_free_actions_output_states.contains(member_state)){
 			eliminate_member = member_state;
 			return eliminate_member;
-		}
-		
+		}		
 		return eliminate_member;
 	}
+	
+	public static String eliminateDependentTriggers(String member_state, RuleInformation rule_info, RuleParser ruleParser) {
+		String dependent_trigger=null;
+		if(!isDependent(member_state, rule_info)) {
+			dependent_trigger=null;
+		} else {
+			for(RuleInformation rule: ruleParser.getRuleSet()) {
+				if(!rule.equals(rule_info)) {
+					if(ruleParser.getMemberStates().get(rule.getName()).contains(member_state)) {
+						dependent_trigger=null;
+					}
+					else {
+						dependent_trigger=member_state;
+					}
+				}
+			}
+		}
+		return dependent_trigger;
+	}
+	
+	public static boolean isDependent(String member_state, RuleInformation rule_info) {
+		return false;
+	}
+	
 }
