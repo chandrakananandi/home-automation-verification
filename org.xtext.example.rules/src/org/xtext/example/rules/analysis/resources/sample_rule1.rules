@@ -1931,8 +1931,8 @@ when
 then
 	if( State_Notify.state == ON ) pushover("Tür: Schuppen.Garten " + Door_FF_Garage2.state )
 end
-
-rule "Door_FF_Garage2"
+//@cnandi fix: rule name was same as the rule above. Changed Door to Window.
+rule "Window_FF_Garage2"
 when
 	Item Window_FF_Garage changed
 then
@@ -2415,8 +2415,6 @@ when
 	or
 	Item Sensor_Indoor changed
 then
-	//logInfo("test",""+Security_Last_Change)
-	//logInfo("test",""+now)
 	Security_Last_Change.postUpdate(now.toString())
 end
 
@@ -2539,21 +2537,21 @@ when
 	or
 	Item Rain_Garden_Counter changed 
 	or
-	Item Regen_State_Garden changed
+	Item Rain_State_Garden changed
 then	
 	if( Rain_Garden_Counter.state != Uninitialized )
 	{
-		var Number zaehlerNeu = Rain_Garden_Counter.state as DecimalType
-		var Number zaehlerAlt = Rain_Garden_Counter.historicState(now.toDateMidnight).state as DecimalType
-		var Number differenz
+		var Number new_counter = Rain_Garden_Counter.state as DecimalType
+		var Number old_counter = Rain_Garden_Counter.historicState(now.toDateMidnight).state as DecimalType
+		var Number difference
 		var Number todayRain
 
-		if( zaehlerAlt != zaehlerNeu )
+		if( old_counter != new_counter )
 		{
-			differenz = zaehlerNeu - zaehlerAlt
-			if( differenz < 0 ) differenz = zaehlerNeu
+			difference = new_counter - old_counter
+			if( difference < 0 ) difference = new_counter
 
-			todayRain = differenz * 295 / 1000
+			todayRain = difference * 295 / 1000
 		}
 		else
 		{
@@ -2562,9 +2560,9 @@ then
 
 		var String msg = new Double((Math::round((todayRain*10).doubleValue).doubleValue/10).doubleValue).toString;
 
-		if( Regen_State_Garden.state != Uninitialized && Regen_State_Garden.state == 1 )
+		if( Rain_State_Garden.state != Uninitialized && Rain_State_Garden.state == 1 )
 		{
-			msg = "(Regen) " + msg +" mm"
+			msg = "(Rain) " + msg +" mm"
 		}
 		else
 		{
@@ -2584,16 +2582,16 @@ when
 then
 	if( Rain_Garden_Counter.state != Uninitialized )
 	{
-		var Number zaehlerNeu = Rain_Garden_Counter.state as DecimalType
-		var Number zaehlerAlt = Rain_Garden_Counter.historicState(now.minusHours(1)).state as DecimalType
-		var Number differenz
+		var Number new_counter = Rain_Garden_Counter.state as DecimalType
+		var Number old_counter = Rain_Garden_Counter.historicState(now.minusHours(1)).state as DecimalType
+		var Number difference
 		var Number lastHourRain
 
-		if( zaehlerAlt != zaehlerNeu )
+		if( old_counter != new_counter )
 		{
-			differenz = zaehlerNeu - zaehlerAlt
-			if( differenz < 0 ) differenz = zaehlerNeu
-			lastHourRain = differenz * 295 / 1000
+			difference = new_counter - old_counter
+			if( difference < 0 ) difference = new_counter
+			lastHourRain = difference * 295 / 1000
 		}
 		else
 		{

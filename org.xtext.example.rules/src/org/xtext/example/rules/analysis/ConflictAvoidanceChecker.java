@@ -36,12 +36,11 @@ public class ConflictAvoidanceChecker {
 		}
 	}
 	
-	
 	public static void main(String[] args) throws IOException {
-		String rule_file = "sample_rule2.rules";
-		String item_file= "sample_item2.items";
+		String rule_file = "sample_rule1.rules";
+		String item_file= "sample_item1.items";
 		File conflict_file = new File("./src/org/xtext/example/rules/analysis/resources/sample_conflict.conflicts");
-		File config_file= new File("./src/org/xtext/example/rules/analysis/resources/sample_config2.homecfg");
+		File config_file= new File("./src/org/xtext/example/rules/analysis/resources/sample_config1.homecfg");
 		
 		parseConfiguration(config_file);
 		
@@ -112,7 +111,7 @@ public class ConflictAvoidanceChecker {
 			for(String member_state: ruleParser.getMemberStates().get(rule_info.getName())) {				
 				if(itemParser.getItemNames().contains(member_state)) {						
 					suggested_triggers.add(member_state);				
-					dependent_trigger_suggestion=eliminateDependentTriggers(member_state, rule_info, ruleParser);
+					dependent_trigger_suggestion=eliminateIsolatedDependentTriggers(member_state, rule_info, ruleParser);
 					redundant_trigger_suggestion=eliminateRedundantTriggers(member_state);
 				}
 				if(redundant_trigger_suggestion!=null){
@@ -158,7 +157,7 @@ public class ConflictAvoidanceChecker {
 						missing_triggers.add(member_state);			
 						
 					}	
-					dependent_trigger_suggestion=eliminateDependentTriggers(member_state, rule_info, ruleParser);
+					dependent_trigger_suggestion=eliminateIsolatedDependentTriggers(member_state, rule_info, ruleParser);
 					redundant_trigger_suggestion=eliminateRedundantTriggers(member_state);
 				}
 				if(redundant_trigger_suggestion!=null){
@@ -195,8 +194,7 @@ public class ConflictAvoidanceChecker {
 		System.out.println("total rules: "+count);
 		System.out.println("total potential buggy rules: "+ buggy_count);
 	}
-	
-	
+		
 	// if member state is an argument of an output action (those in the homecfg file) only, it is not needed to be a trigger.
 	public static String eliminateRedundantTriggers(String member_state) {
 		String eliminate_member=null;
@@ -227,16 +225,18 @@ public class ConflictAvoidanceChecker {
 		return eliminate_member;
 	}
 	
-	public static String eliminateDependentTriggers(String member_state, RuleInformation rule_info, RuleParser ruleParser) {
+	public static String eliminateIsolatedDependentTriggers(String member_state, RuleInformation rule_info, RuleParser ruleParser) {
 		String dependent_trigger=null;
+		// not dependent
 		if(!isDependent(member_state, rule_info)) {
 			dependent_trigger=null;
 		} else {
 			for(RuleInformation rule: ruleParser.getRuleSet()) {
 				if(!rule.equals(rule_info)) {
+					// dependent but not isolated
 					if(ruleParser.getMemberStates().get(rule.getName()).contains(member_state)) {
 						dependent_trigger=null;
-					}
+					} // dependent and isolated
 					else {
 						dependent_trigger=member_state;
 					}
@@ -247,7 +247,7 @@ public class ConflictAvoidanceChecker {
 	}
 	
 	public static boolean isDependent(String member_state, RuleInformation rule_info) {
+		//System.out.println(rule_info.getName()+" : "+rule_info.getAction().size());
 		return false;
-	}
-	
+	}	
 }

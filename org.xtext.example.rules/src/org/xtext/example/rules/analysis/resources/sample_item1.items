@@ -247,7 +247,7 @@ String Wind_Direction							"Windrichtung [%s]"				<selfWind>			(PersistentCurre
 String Wind_Message								"Wind [%s]"						<selfWind>			(PersistentCurrent)
 
 Number Rain_Garden_Counter 						"Regen Zähler [%d]"				<chart>				(PersistentHistory)				{s300th="address=ks300;datapoint=RAIN"}
-Number Regen_State_Garden 						"Regen Status [%d]"				<chart>												{s300th="address=ks300;datapoint=IS_RAINING"}
+Number Rain_State_Garden 						"Regen Status [%d]"				<chart>												{s300th="address=ks300;datapoint=IS_RAINING"}
 Number Rain_Garden_Current 						"Regen [%.1f]"					<chart>				(PersistentChart)
 
 String Air_Livingroom_Message 					"Wohnzimmer [%s]"				<selfTemperature>	(PersistentCurrent)
