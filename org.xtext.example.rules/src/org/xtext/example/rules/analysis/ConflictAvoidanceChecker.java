@@ -15,6 +15,8 @@ import java.util.Set;
 import org.xtext.example.rules.analysis.scriptvisitors.ExpressionVisitorImpl;
 import org.xtext.example.rules.analysis.statements.FeatureInvocation;
 
+import com.sun.javafx.css.Rule;
+
 import org.xtext.example.rules.analysis.constants.Constants;
 
 /**
@@ -22,6 +24,8 @@ import org.xtext.example.rules.analysis.constants.Constants;
  * @author cnandi
  *
  */
+
+// NOTE: rules with loops are not handled right now
 public class ConflictAvoidanceChecker {
 
 	Map<String, ArrayList<String>> suggested_triggers=new HashMap<String,ArrayList<String>>();
@@ -67,7 +71,7 @@ public class ConflictAvoidanceChecker {
 			BufferedReader bufferedReader = new BufferedReader(fileReader);
 			while ((line = bufferedReader.readLine()) != null) {
 				if (line.contains(".state")) {
-
+					//TODO: nothing happens. This method is useless but keeping for now in case I need it in future.
 				}
 			}
 			bufferedReader.close();
@@ -111,7 +115,7 @@ public class ConflictAvoidanceChecker {
 			for(String member_state: ruleParser.getMemberStates().get(rule_info.getName())) {				
 				if(itemParser.getItemNames().contains(member_state)) {						
 					suggested_triggers.add(member_state);				
-					dependent_trigger_suggestion=eliminateIsolatedDependentTriggers(member_state, rule_info, ruleParser);
+					//dependent_trigger_suggestion=eliminateIsolatedDependentTriggers(member_state, rule_info, ruleParser);
 					redundant_trigger_suggestion=eliminateRedundantTriggers(member_state);
 				}
 				if(redundant_trigger_suggestion!=null){
@@ -121,8 +125,7 @@ public class ConflictAvoidanceChecker {
 					suggested_triggers.remove(dependent_trigger_suggestion);
 				}
 			}
-			
-				
+						
 			if(suggested_triggers.size()>0) {				
 				System.out.println("rule:" + rule_info.getName());
 				for(String suggested_trigger: suggested_triggers){
@@ -130,8 +133,7 @@ public class ConflictAvoidanceChecker {
 				}			
 			}
 			
-			else {
-				
+			else {				
 				System.out.println("rule:" + rule_info.getName());
 				System.out.println("no suggested triggers");
 			}
@@ -140,7 +142,6 @@ public class ConflictAvoidanceChecker {
 	}
 	
 	public static void checkConflictDueToTooFewTriggers(RuleParser ruleParser, ItemParser itemParser) {
-		
 		int count=0;
 		int buggy_count=0;
 		for(RuleInformation rule_info: ruleParser.getRuleSet()) {	
@@ -148,18 +149,16 @@ public class ConflictAvoidanceChecker {
 			Set<String>missing_triggers=new HashSet<String>();
 			String redundant_trigger_suggestion=null;
 			String dependent_trigger_suggestion=null;
-			for(String member_state: ruleParser.getMemberStates().get(rule_info.getName())) {				
-				if(itemParser.getItemNames().contains(member_state)) {						
-					if(rule_info.getTriggerItemNames().contains(member_state)){
-						continue;
-					}				
-					else {	
-						missing_triggers.add(member_state);			
-						
-					}	
-					dependent_trigger_suggestion=eliminateIsolatedDependentTriggers(member_state, rule_info, ruleParser);
+			for(String member_state: ruleParser.getMemberStates().get(rule_info.getName())) {	
+				
+				if(itemParser.getItemNames().contains(member_state)) {				
+					if(!rule_info.getTriggerItemNames().contains(member_state)){
+						missing_triggers.add(member_state);	
+					}					
+					//dependent_trigger_suggestion=eliminateDependentTriggers(member_state, rule_info, ruleParser);					
 					redundant_trigger_suggestion=eliminateRedundantTriggers(member_state);
 				}
+		
 				if(redundant_trigger_suggestion!=null){
 					missing_triggers.remove(redundant_trigger_suggestion);
 				}
@@ -168,14 +167,23 @@ public class ConflictAvoidanceChecker {
 				}
 			}	
 			
-			if(rule_info.getTriggers().size()==1) {
-				if (rule_info.getTriggers().get(0).getClass().getSimpleName().equals(Constants.SYSTEM_SHUTDOWN) 
-					|| rule_info.getTriggers().get(0).getClass().getSimpleName().equals(Constants.SYSTEM_STARTUP)
-					|| rule_info.getTriggers().get(0).getClass().getSimpleName().equals(Constants.TIMER_EVENT)) {
-						missing_triggers.clear();
+			int event_based_trigger_counter=0;
+			for(String trigger_type: rule_info.getTriggerTypes()) {
+				if (trigger_type.equals(Constants.SYSTEM_SHUTDOWN)) {
+					continue;
+				} else if (trigger_type.equals(Constants.SYSTEM_STARTUP)) {
+					continue;
+				} else if (trigger_type.equals(Constants.TIMER_EVENT)) {
+					continue;
+				} else {
+					event_based_trigger_counter++;
 				}
 			}
 			
+			if (event_based_trigger_counter ==0) {
+				missing_triggers.clear();
+			}
+				
 			if(missing_triggers.size()>0) {				
 				buggy_count ++;
 				System.out.println("rule:" + rule_info.getName());
@@ -209,8 +217,7 @@ public class ConflictAvoidanceChecker {
 			if(side_effect_free_actions_output_states.contains(feature.getMethodName())) {
 				if(feature.getArguments().contains(member_state)) {
 					side_effect_free_occurences++;								
-				}
-				else {
+				} else {
 					continue;
 				}	
 			}			
@@ -225,13 +232,15 @@ public class ConflictAvoidanceChecker {
 		return eliminate_member;
 	}
 	
-	public static String eliminateIsolatedDependentTriggers(String member_state, RuleInformation rule_info, RuleParser ruleParser) {
+	public static String eliminateDependentTriggers(String member_state, RuleInformation rule_info, RuleParser ruleParser) {
+		
 		String dependent_trigger=null;
+		boolean dependent=isDependent(member_state, rule_info, ruleParser);
 		// not dependent
-		if(!isDependent(member_state, rule_info)) {
+		if(!dependent) {
 			dependent_trigger=null;
-		} else {
-			for(RuleInformation rule: ruleParser.getRuleSet()) {
+		} if(dependent) {
+			/*for(RuleInformation rule: ruleParser.getRuleSet()) {
 				if(!rule.equals(rule_info)) {
 					// dependent but not isolated
 					if(ruleParser.getMemberStates().get(rule.getName()).contains(member_state)) {
@@ -241,13 +250,17 @@ public class ConflictAvoidanceChecker {
 						dependent_trigger=member_state;
 					}
 				}
-			}
+			}*/
+			dependent_trigger=member_state;
 		}
 		return dependent_trigger;
 	}
 	
-	public static boolean isDependent(String member_state, RuleInformation rule_info) {
-		//System.out.println(rule_info.getName()+" : "+rule_info.getAction().size());
-		return false;
+	public static boolean isDependent(String member_state, RuleInformation rule_info, RuleParser ruleParser) {
+	   if(ruleParser.getPostUpdateFirstArguments().get(rule_info.getName()).contains(member_state)) {			    	
+		   return true;
+		} else {
+			return false;
+		}
 	}	
 }

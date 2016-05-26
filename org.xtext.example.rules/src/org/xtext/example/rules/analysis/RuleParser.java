@@ -34,24 +34,16 @@ public class RuleParser {
 	ArrayList<Rule> rules = new ArrayList<Rule>();
 	Hashtable<String,Set<String>> member_features_involved = new Hashtable<String,Set<String>>();
 	Hashtable<String, ArrayList<String>> features_involved=new Hashtable<String,ArrayList<String>>();
+	Hashtable<String, ArrayList<String>> postupdates_involved=new Hashtable<String,ArrayList<String>>();
+	Hashtable<String, Set<String>> assignment_left_hand_sides=new Hashtable<String, Set<String>>();
 	
-	public boolean equals(RuleInformation rule1, RuleInformation rule2){
-		if(rule1.getName().equals(rule2.getName())) {
-			return true;
-		}
-		else {
-			return false;
-		}
-	}
-		
 	public RuleParser(String file_name) {
 		rule_file_name = file_name;
 	}
 
 	public String getRuleFileName() {
 		return rule_file_name;
-	}
-	
+	}	
 	
 	public ArrayList<Rule> getRules(){
 		return rules;
@@ -69,6 +61,14 @@ public class RuleParser {
 		return features_involved;
 	}
 	
+	public Hashtable<String,ArrayList<String>> getPostUpdateFirstArguments() {
+		return postupdates_involved;
+	}
+	
+	public Hashtable<String, Set<String>> getMemberStatesInAssignmentLHSs() {
+		return assignment_left_hand_sides;
+	}
+	
 	public void analyseRules() throws IOException {
 		RulesStandaloneSetupGenerated ruleSetup = new RulesStandaloneSetupGenerated();
 		ruleSetup.createInjectorAndDoEMFRegistration();
@@ -76,14 +76,16 @@ public class RuleParser {
 		Resource resource = resourceSet.getResource(URI.createURI("src/org/xtext/example/rules/analysis/resources/" + getRuleFileName()), true);
 		TreeIterator<EObject> eobjects = resource.getAllContents();	
 			
-		
 		while (eobjects.hasNext()) {
 			EObject eobj = eobjects.next();
 			if (eobj.getClass().getSimpleName().equals("RuleImpl")) {
 				Rule rule = (Rule) eobj;
 				int member_feature_start_index=0;
 				int member_invocation_start_index=0;
-				int feature_invocation_start_index=0;;
+				int feature_invocation_start_index=0;
+				int postupdate_first_argument_start_index=0;
+				int assignments_start_index=0;
+			
 				if(ExpressionVisitorImpl.member_states_involved.size()==0){
 					member_feature_start_index = 0;
 				}
@@ -93,6 +95,15 @@ public class RuleParser {
 				if(ExpressionVisitorImpl.member_feature_invocations.size()==0) {
 					member_feature_start_index=0;
 				}
+				
+				if(ExpressionVisitorImpl.first_arguments_of_postUpdate.size() == 0){
+					postupdate_first_argument_start_index=0;
+				}
+				
+				if(ExpressionVisitorImpl.assignments_lhs.size()==0) {
+					assignments_start_index = 0;
+				}
+				
 				if(ExpressionVisitorImpl.member_states_involved.size()>0){
 					member_feature_start_index=ExpressionVisitorImpl.member_states_involved.size();
 				}
@@ -103,6 +114,14 @@ public class RuleParser {
 				
 				if(ExpressionVisitorImpl.member_feature_invocations.size()>0){
 					member_invocation_start_index=ExpressionVisitorImpl.member_feature_invocations.size();
+				}
+				
+				if(ExpressionVisitorImpl.first_arguments_of_postUpdate.size()>0){
+					postupdate_first_argument_start_index=ExpressionVisitorImpl.first_arguments_of_postUpdate.size();
+				}
+				
+				if(ExpressionVisitorImpl.assignments_lhs.size()>0) {
+					assignments_start_index=ExpressionVisitorImpl.assignments_lhs.size();
 				}
 				
 				ScriptExpressionSwitch<EObject> expressionSwitch = new ScriptExpressionSwitch<EObject>();
@@ -117,12 +136,14 @@ public class RuleParser {
 				int member_feature_end_index=ExpressionVisitorImpl.member_states_involved.size();
 				int feature_invocation_end_index=ExpressionVisitorImpl.feature_invocations.size();
 				int member_invocation_end_index=ExpressionVisitorImpl.member_feature_invocations.size();
-				Set<String>member_states=new HashSet<String>();
+				int postupdate_first_argument_end_index=ExpressionVisitorImpl.first_arguments_of_postUpdate.size();
+				int assignments_stop_index=ExpressionVisitorImpl.assignments_lhs.size();
 				
+				Set<String>member_states=new HashSet<String>();
 				for(int x=member_feature_start_index; x<member_feature_end_index;x++){
 					member_states.add(ExpressionVisitorImpl.member_states_involved.get(x));
 				}
-				
+								
 				for(int x=feature_invocation_start_index; x<feature_invocation_end_index;x++){
 					member_states.add(ExpressionVisitorImpl.feature_invocations.get(x).getMethodName());
 					if(ExpressionVisitorImpl.feature_invocations.get(x).getTarget()!=null) {
@@ -135,7 +156,7 @@ public class RuleParser {
 					}
 				}
 				
-				for(int x=member_invocation_start_index; x<member_invocation_end_index;x++){
+				for(int x=member_invocation_start_index; x<member_invocation_end_index;x++) {
 					member_states.add(ExpressionVisitorImpl.member_feature_invocations.get(x).getMemberName());
 					if(ExpressionVisitorImpl.member_feature_invocations.get(x).getFeatureName()!=null) {
 						member_states.add(ExpressionVisitorImpl.member_feature_invocations.get(x).getFeatureName());
@@ -145,15 +166,26 @@ public class RuleParser {
 							member_states.add(argument);
 						}
 					}
-				}				
+				}
 				
-				member_features_involved.put(rule.getName(), member_states);							
+				ArrayList<String> post_update_first_argument=new ArrayList<String>();
+				for(int x=postupdate_first_argument_start_index; x<postupdate_first_argument_end_index;x++) {
+					post_update_first_argument.add(ExpressionVisitorImpl.first_arguments_of_postUpdate.get(x));
+				}
+				
+				Set<String>member_states_in_assignment_lhs=new HashSet<String>();
+				for(int x=assignments_start_index;x<assignments_stop_index;x++) {
+					member_states_in_assignment_lhs.add(ExpressionVisitorImpl.assignments_lhs.get(x));
+				}
+				
+				member_features_involved.put(rule.getName(), member_states);		
+				postupdates_involved.put(rule.getName(), post_update_first_argument);
+				assignment_left_hand_sides.put(rule.getName(), member_states_in_assignment_lhs);
 				ConflictAvoidanceChecker.ast_writer.println(rule.getName()+" :rule end");			
-			}
+			}			
 		}
 		
 		ConflictAvoidanceChecker.ast_writer.close();		
-		
 		for (Rule rule : rules) {
 			BufferedReader br = new BufferedReader(new FileReader("/home/cnandi/openHABworkspace/org.xtext.example.rules/ast-output.txt"));
 			List<String> scriptContent = analyseSimplerAST(rule.getName(), br);

@@ -42,6 +42,24 @@ public class RuleInformation {
 		return trigger_types;
 	}
 
+	@Override
+	public boolean equals(Object rule1){
+		if(rule1 instanceof RuleInformation) {
+			if(this.getName().equals(((RuleInformation) rule1).getName())) {
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+		return false;
+	}
+	
+	@Override
+	public int hashCode(){ 
+		return this.getName().hashCode();
+	}
+		
 	public HashMap<String, String> getTriggerParameters(EventTrigger trigger) {
 		HashMap<String, String> parameters = new HashMap<String, String>();
 		if (trigger.getClass().getSimpleName().equals(Constants.CHANGED_EVENT)) {

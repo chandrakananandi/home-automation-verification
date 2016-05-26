@@ -32,5 +32,4 @@ Export-Package: org.xtext.example.rules.rules,
  org.xtext.example.rules.parser.antlr.internal
 Import-Package: org.apache.log4j,
  org.eclipse.emf.ecore.util,
- org.eclipse.ui.internal,
- org.xtext.example.sitemap.sitemap
+ org.eclipse.ui.internal

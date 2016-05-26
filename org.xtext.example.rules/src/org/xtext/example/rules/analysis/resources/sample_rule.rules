@@ -1,19 +1,23 @@
-rule "Away rule"
+rule "Wind"
 when
-	Item State_Away changed 
-	// @cnandi-fix: or Item State_Sleeping changed
+	Item Wind_Garden_Converted changed
+	or
+	Item Wind_Direction changed
 then
-	if( State_Away.state == ON )
+	if( Wind_Garden_Converted.state != Uninitialized && Wind_Direction.state != Uninitialized )
 	{
-	
-		if( State_Sleeping.state != OFF )
+		var String msg = ""
+		if(Wind_Garden_Converted.state == 0 )
 		{
-			postUpdate(State_Sleeping, OFF)
+			msg = "Ruhig"
 		}
-		if( State_Notify.state != ON )
+		else
 		{
-			postUpdate(State_Notify, ON)
+			msg = Wind_Garden_Converted.state.format("%.1f") +" km/h, " + Wind_Direction.state
+		}
+		if( Wind_Message.state != msg )
+		{
+			postUpdate(Wind_Message,msg)
 		}
 	}
 end
-
