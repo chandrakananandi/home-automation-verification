@@ -41,10 +41,10 @@ public class ConflictAvoidanceChecker {
 	}
 	
 	public static void main(String[] args) throws IOException {
-		String rule_file = "sample_rule1.rules";
-		String item_file= "sample_item1.items";
+		String rule_file = "sample_rule.rules";
+		String item_file= "sample_item2.items";
 		File conflict_file = new File("./src/org/xtext/example/rules/analysis/resources/sample_conflict.conflicts");
-		File config_file= new File("./src/org/xtext/example/rules/analysis/resources/sample_config1.homecfg");
+		File config_file= new File("./src/org/xtext/example/rules/analysis/resources/sample_config2.homecfg");
 		
 		parseConfiguration(config_file);
 		
@@ -240,17 +240,6 @@ public class ConflictAvoidanceChecker {
 		if(!dependent) {
 			dependent_trigger=null;
 		} if(dependent) {
-			/*for(RuleInformation rule: ruleParser.getRuleSet()) {
-				if(!rule.equals(rule_info)) {
-					// dependent but not isolated
-					if(ruleParser.getMemberStates().get(rule.getName()).contains(member_state)) {
-						dependent_trigger=null;
-					} // dependent and isolated
-					else {
-						dependent_trigger=member_state;
-					}
-				}
-			}*/
 			dependent_trigger=member_state;
 		}
 		return dependent_trigger;

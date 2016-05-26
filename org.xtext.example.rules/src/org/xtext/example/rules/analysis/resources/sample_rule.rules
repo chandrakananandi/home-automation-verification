@@ -1,10 +1,10 @@
-rule "Compute humidex"
+rule "Test rule"
 when
         Item Weather_Temperature changed or
 		Item Weather_Humidity changed
 then
  	if (Weather_Temp_Max > 0) {
-		Weather_Temp_Max = g(Weather_Temp_Min, Weather_Humidity)
+		Weather_Temp_Max = g(Weather_Temp_Min, Weather_Humidex)
 		Weather_Humidex = f(Weather_Temp_Max)
 		Temperature_Setpoint =  Weather_Temperature 
 	}	
