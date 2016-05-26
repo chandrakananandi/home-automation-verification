@@ -19,6 +19,7 @@ import org.eclipse.xtext.xbase.XExpression;
 import org.xtext.example.rules.RulesStandaloneSetupGenerated;
 import org.xtext.example.rules.analysis.scriptvisitors.ExpressionVisitorImpl;
 import org.xtext.example.rules.analysis.scriptvisitors.ScriptExpressionSwitch;
+import org.xtext.example.rules.analysis.statements.Assignment;
 import org.xtext.example.rules.rules.Rule;
 
 import com.google.common.hash.HashCode;
@@ -100,7 +101,7 @@ public class RuleParser {
 					postupdate_first_argument_start_index=0;
 				}
 				
-				if(ExpressionVisitorImpl.assignments_lhs.size()==0) {
+				if(ExpressionVisitorImpl.assignments_and_variable_declarations.size()==0) {
 					assignments_start_index = 0;
 				}
 				
@@ -120,8 +121,8 @@ public class RuleParser {
 					postupdate_first_argument_start_index=ExpressionVisitorImpl.first_arguments_of_postUpdate.size();
 				}
 				
-				if(ExpressionVisitorImpl.assignments_lhs.size()>0) {
-					assignments_start_index=ExpressionVisitorImpl.assignments_lhs.size();
+				if(ExpressionVisitorImpl.assignments_and_variable_declarations.size()>0) {
+					assignments_start_index=ExpressionVisitorImpl.assignments_and_variable_declarations.size();
 				}
 				
 				ScriptExpressionSwitch<EObject> expressionSwitch = new ScriptExpressionSwitch<EObject>();
@@ -137,7 +138,7 @@ public class RuleParser {
 				int feature_invocation_end_index=ExpressionVisitorImpl.feature_invocations.size();
 				int member_invocation_end_index=ExpressionVisitorImpl.member_feature_invocations.size();
 				int postupdate_first_argument_end_index=ExpressionVisitorImpl.first_arguments_of_postUpdate.size();
-				int assignments_stop_index=ExpressionVisitorImpl.assignments_lhs.size();
+				int assignments_stop_index=ExpressionVisitorImpl.assignments_and_variable_declarations.size();
 				
 				Set<String>member_states=new HashSet<String>();
 				for(int x=member_feature_start_index; x<member_feature_end_index;x++){
@@ -173,15 +174,35 @@ public class RuleParser {
 					post_update_first_argument.add(ExpressionVisitorImpl.first_arguments_of_postUpdate.get(x));
 				}
 				
-				Set<String>member_states_in_assignment_lhs=new HashSet<String>();
-				for(int x=assignments_start_index;x<assignments_stop_index;x++) {
-					member_states_in_assignment_lhs.add(ExpressionVisitorImpl.assignments_lhs.get(x));
+				Set<String>discardable_member_states_in_assignments=new HashSet<String>();
+				Set<String>keepable_member_states_in_assignments=new HashSet<String>();
+				
+				// remove member_states that appear in an LHS first and then in an RHS: this means they are written to before reading from.
+				for(int y=assignments_start_index+1;y<assignments_stop_index;y++) {
+					for(int x=assignments_start_index;x<y;x++) {
+						for(String rhs: ExpressionVisitorImpl.assignments_and_variable_declarations.get(y).getRhs()) {
+							if(ExpressionVisitorImpl.assignments_and_variable_declarations.get(x).getLhs().equals(rhs)) {
+								discardable_member_states_in_assignments.add(rhs);
+							}
+						}
+					}
 				}
+				
+				for(int y=assignments_start_index;y<assignments_stop_index;y++) {
+					for(String rhs:ExpressionVisitorImpl.assignments_and_variable_declarations.get(y).getRhs()) {
+						if(!discardable_member_states_in_assignments.contains(rhs)) {
+							keepable_member_states_in_assignments.add(rhs);
+						}
+					}
+				}
+				member_states.addAll(keepable_member_states_in_assignments);
+				
 				
 				member_features_involved.put(rule.getName(), member_states);		
 				postupdates_involved.put(rule.getName(), post_update_first_argument);
-				assignment_left_hand_sides.put(rule.getName(), member_states_in_assignment_lhs);
+				assignment_left_hand_sides.put(rule.getName(), discardable_member_states_in_assignments);
 				ConflictAvoidanceChecker.ast_writer.println(rule.getName()+" :rule end");			
+				
 			}			
 		}
 		

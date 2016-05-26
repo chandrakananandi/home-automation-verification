@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.xbase.XExpression;
+import org.eclipse.xtext.xbase.impl.XFeatureCallImplCustom;
 import org.xtext.example.rules.analysis.ConflictAvoidanceChecker;
 import org.xtext.example.rules.analysis.statements.Assignment;
 import org.xtext.example.rules.analysis.statements.BinaryOperation;
@@ -23,7 +24,7 @@ public class ExpressionVisitorImpl implements ExpressionVisitor {
 	public static List<String> first_arguments_of_postUpdate=new ArrayList<String>();
 	public static List<FeatureInvocation> feature_invocations=new ArrayList<FeatureInvocation>();
 	public static List<MemberFeatureInvocation> member_feature_invocations=new ArrayList<MemberFeatureInvocation>();
-	public static List<String> assignments_lhs=new ArrayList<String>();
+	public static List<Assignment> assignments_and_variable_declarations=new ArrayList<Assignment>();
 	public static ArrayList<String> member_states_involved=new ArrayList<String>();
 	private ScriptExpressionSwitch<?> expressionSwitch;
 	private static int if_counter = 0;
@@ -68,7 +69,7 @@ public class ExpressionVisitorImpl implements ExpressionVisitor {
 	int old_feature_counter = feature_counter;
 	ConflictAvoidanceChecker.ast_writer.println("Feature:"+feature_counter);
 	ConflictAvoidanceChecker.ast_writer.println("Feature name:" + feature_counter);
-	
+	ConflictAvoidanceChecker.ast_writer.println(xFeatureCallImplCustom.getExpression().getConcreteSyntaxFeatureName());
 	// to ignore postUpdate features.
 	if(!xFeatureCallImplCustom.getExpression().getConcreteSyntaxFeatureName().equals("postUpdate")) {
 		featureInvocation.setMethodName(xFeatureCallImplCustom.getExpression().getConcreteSyntaxFeatureName());
@@ -86,10 +87,8 @@ public class ExpressionVisitorImpl implements ExpressionVisitor {
 			ConflictAvoidanceChecker.ast_writer.println("Arguments:" + old_feature_counter);
 			ArrayList<String>args=new ArrayList<String>();
 			for (XExpression argument : xFeatureCallImplCustom.getExpression().getActualArguments()) {
-				//if(expressionSwitch.caseXExpression(argument) instanceof String){
-					String st= (String) expressionSwitch.caseXExpression(argument);
-					args.add(st);	
-				//}
+				String st= (String) expressionSwitch.caseXExpression(argument);
+				args.add(st);				
 			}
 			featureInvocation.setArgument(args);
 		}
@@ -97,7 +96,7 @@ public class ExpressionVisitorImpl implements ExpressionVisitor {
 		if(xFeatureCallImplCustom.getExpression().getConcreteSyntaxFeatureName().equals("postUpdate")) {
 			first_arguments_of_postUpdate.add(xFeatureCallImplCustom.getExpression().getActualArguments().get(0).toString());
 		}
-		ConflictAvoidanceChecker.ast_writer.println(featureInvocation.getMethodName());
+		
 		feature_invocations.add(featureInvocation);			
 	}
 
@@ -143,7 +142,6 @@ public class ExpressionVisitorImpl implements ExpressionVisitor {
 	public XExpression visit(XVariableDeclarationCustom xVariableDeclaration) {
 		ConflictAvoidanceChecker.ast_writer.println("Variable declaration:");
 		ConflictAvoidanceChecker.ast_writer.println("var name: " + xVariableDeclaration.getExpression().getSimpleName());
-		assignments_lhs.add(xVariableDeclaration.getExpression().getSimpleName());
 		ConflictAvoidanceChecker.ast_writer.println("RHS:");
 		if (xVariableDeclaration.getExpression().getRight() instanceof XExpression) {
 			expressionSwitch.caseXExpression((XExpression) xVariableDeclaration.getExpression().getRight());
@@ -151,6 +149,34 @@ public class ExpressionVisitorImpl implements ExpressionVisitor {
 		return null;
 	}
 
+	@Override
+	public XExpression visit(XAssignmentCustom xAssignmentCustom) {
+		Assignment assignment=new Assignment();
+		ConflictAvoidanceChecker.ast_writer.println("Assignment:");
+		if (xAssignmentCustom.getExpession().getActualReceiver() != null) {
+			ConflictAvoidanceChecker.ast_writer.println(xAssignmentCustom.getExpession().getActualReceiver());			
+			assignment.setLhs(xAssignmentCustom.getExpession().getActualReceiver().toString());	
+			expressionSwitch.caseXExpression(xAssignmentCustom.getExpession().getActualReceiver());
+		} else { 
+			ConflictAvoidanceChecker.ast_writer.println(xAssignmentCustom.getExpession().getConcreteSyntaxFeatureName());
+			assignment.setLhs(xAssignmentCustom.getExpession().getConcreteSyntaxFeatureName());			
+		}
+		// Right now, works only if the rhs is a feature call.	
+		if(xAssignmentCustom.getExpession().getValue().getClass().getSimpleName().equals("XFeatureCallImplCustom")) {
+			List<String>rhs_args=new ArrayList<String>();
+			if (((XFeatureCallImplCustom)(xAssignmentCustom.getExpession().getValue())).getActualArguments().size()>0) {
+				for (XExpression arg: ((XFeatureCallImplCustom)(xAssignmentCustom.getExpession().getValue())).getActualArguments()) {
+					rhs_args.add(arg.toString());
+				}
+			} else {
+				rhs_args.add(((XFeatureCallImplCustom)(xAssignmentCustom.getExpession().getValue())).getConcreteSyntaxFeatureName());
+			}
+			assignment.setRhs(rhs_args);
+		}
+		assignments_and_variable_declarations.add(assignment);
+		return null;
+	}
+	
 	@Override
 	public String visit(XBinaryOperationCustom xBinaryOperationImplCustom) {
 		ConflictAvoidanceChecker.ast_writer.println("Binary operation:");
@@ -164,29 +190,7 @@ public class ExpressionVisitorImpl implements ExpressionVisitor {
 		return xBinaryOperationImplCustom.getExpression().getConcreteSyntaxFeatureName();
 	}
 
-	@Override
-	public XExpression visit(XBlockExpressionCustom xBlockExpressionCustom) {
-		for (EObject child : xBlockExpressionCustom.getExpression().eContents()) {
-			if (child instanceof XExpression) {
-				expressionSwitch.caseXExpression((XExpression) child);
-			}
-		}
-		return null;
-	}
-
-	@Override
-	public XExpression visit(XAssignmentCustom xAssignmentCustom) {
-		ConflictAvoidanceChecker.ast_writer.println("Assignment:");
-		if (xAssignmentCustom.getExpession().getActualReceiver() != null) {
-			expressionSwitch.caseXExpression(xAssignmentCustom.getExpession().getActualReceiver());
-		}
-	
-		ConflictAvoidanceChecker.ast_writer.println(xAssignmentCustom.getExpession().getConcreteSyntaxFeatureName());
-		assignments_lhs.add(xAssignmentCustom.getExpession().getConcreteSyntaxFeatureName());
-		expressionSwitch.caseXExpression(xAssignmentCustom.getExpession().getValue());
-		return null;
-	}
-
+		
 	@Override
 	public UnaryOperation visit(XUnaryOperationCustom xUnaryOperationCustom) {
 		ConflictAvoidanceChecker.ast_writer.println("Unary operation:");
@@ -251,6 +255,16 @@ public class ExpressionVisitorImpl implements ExpressionVisitor {
 	public XExpression visit(XCastedExpression xCastedExpression) {
 		// returns the expression being casted as a jvm type. This is what we need.
 		expressionSwitch.caseXExpression((XExpression) xCastedExpression.getExpression().eContents().get(1));
+		return null;
+	}
+	
+	@Override
+	public XExpression visit(XBlockExpressionCustom xBlockExpressionCustom) {
+		for (EObject child : xBlockExpressionCustom.getExpression().eContents()) {
+			if (child instanceof XExpression) {
+				expressionSwitch.caseXExpression((XExpression) child);
+			}
+		}
 		return null;
 	}
 	

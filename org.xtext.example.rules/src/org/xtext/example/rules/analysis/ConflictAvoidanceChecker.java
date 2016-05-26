@@ -155,7 +155,7 @@ public class ConflictAvoidanceChecker {
 					if(!rule_info.getTriggerItemNames().contains(member_state)){
 						missing_triggers.add(member_state);	
 					}					
-					//dependent_trigger_suggestion=eliminateDependentTriggers(member_state, rule_info, ruleParser);					
+					dependent_trigger_suggestion=eliminateDependentTriggers(member_state, rule_info, ruleParser);					
 					redundant_trigger_suggestion=eliminateRedundantTriggers(member_state);
 				}
 		
@@ -257,7 +257,8 @@ public class ConflictAvoidanceChecker {
 	}
 	
 	public static boolean isDependent(String member_state, RuleInformation rule_info, RuleParser ruleParser) {
-	   if(ruleParser.getPostUpdateFirstArguments().get(rule_info.getName()).contains(member_state)) {			    	
+	   if(ruleParser.getMemberStatesInAssignmentLHSs().get(rule_info.getName()).contains(member_state) &&
+			   !ruleParser.getMemberStates().get(rule_info.getName()).contains(member_state)) {			    	
 		   return true;
 		} else {
 			return false;

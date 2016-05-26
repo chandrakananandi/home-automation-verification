@@ -1,10 +1,16 @@
 package org.xtext.example.rules.analysis.statements;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Assignment {
 	private String lhs;
-	private String rhs;
+	private List<String> rhs=new ArrayList<String>();
 
-	public Assignment(String lhs, String rhs) {
+	public Assignment() {
+		
+	}
+	public Assignment(String lhs, ArrayList<String> rhs) {
 		this.lhs = lhs;
 		this.rhs = rhs;
 	}
@@ -13,14 +19,14 @@ public class Assignment {
 		return lhs;
 	}
 
-	public String getRhs() {
+	public List<String> getRhs() {
 		return rhs;
 	}
 	
-	public void setLhs(){
-		
+	public void setLhs(String lhs){
+		this.lhs=lhs;
 	}
-	public void setRhs(){
-		
+	public void setRhs(List<String> rhs){
+		this.rhs=rhs;
 	}
 }
