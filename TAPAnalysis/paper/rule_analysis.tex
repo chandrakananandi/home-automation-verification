@@ -1,7 +1,11 @@
 \documentclass{sig-alternate-05-2015}
 
+
+\usepackage{caption}
+\captionsetup[lstlisting]{position=bottom}
 \usepackage{listings}
 \usepackage{textcomp}
+
 \lstset{basicstyle=\ttfamily}
 \usepackage{xcolor}
 \newcommand\todo[1]{\textbf{\textcolor{red}{#1}}}
@@ -69,13 +73,14 @@
 %
 \author{
 % 1st. author
-\alignauthor
-Chandrakana Nandi\\
-       \affaddr{University of Washington, Seattle}\\
-       \email{cnandi@cs.washington.edu}
-\alignauthor Michael D. Ernst\\
-       \affaddr{University of Washington, Seattle}\\
-       \email{mernst@cs.washington.edu}
+%\alignauthor
+%Chandrakana Nandi\\
+%       \affaddr{University of Washington, Seattle}\\
+%       \email{cnandi@cs.washington.edu}
+%\alignauthor Michael D. Ernst\\
+%       \affaddr{University of Washington, Seattle}\\
+%       \email{mernst@cs.washington.edu}
+Anonymous submission
 }
 
 \maketitle
@@ -89,11 +94,12 @@ Chandrakana Nandi\\
 \keywords{Security, Home automation, Trigger action programming, Static analysis}
 
 \section{Introduction}
-Most home automation frameworks have a major end-user component: they are the ones who decide what actions should be taken by what device under what conditions. It has been found that rule-based systems are one of the most practical solutions for enabling end-users to customize the behavior of their smart homes~\cite{practical-tap}. A rule-based language has two main components: actions to be executed when a rules fires and triggers that cause a rule to be fired. Such a programming paradigm is also called Trigger Action Programming (TAP). Recent studies~\cite{Huang},\cite{wild-tap} have shown that while TAP is the most commonly used and practical approach for home automation, end users often have difficulty in correctly interpreting the outcome of TAP and make errors in writing a program with the desired behavior. 
+Most home automation platforms have a major end-user component: they are the ones who decide what actions should be taken by what device under what conditions. It has been found that rule-based systems are one of the most practical solutions for enabling end-users to customize the behavior of their smart homes~\cite{practical-tap}. A rule-based language has two main components: actions to be executed when a rules fires and triggers that cause a rule to be fired. Such a programming paradigm is also called Trigger Action Programming (TAP). Recent studies~\cite{Huang},\cite{wild-tap} have shown that while TAP is the most commonly used and practical approach for home automation, end users often have difficulty in correctly interpreting the outcome of TAP and make errors in writing a program with the desired behavior. 
+\todo{SERIOUS LACK OF FLOW: We found 51\% rules to be error prone and deviating from the expected behavior due to lack of trigger conditions. Our approach: instead of verifying the actions in the rule which is something most related work focuses on, we focus on the triggers and how to make sure that the rule writer does not miss triggers. }
 
 \section{Motivating Example}
-Consider the following rule:
-\begin{lstlisting}
+Consider the rule in listing~\ref{lst:away} which is written by an end user using the OpenHAB smart home framework. The name of the rule is \texttt{Away rule}. The part between \texttt{when} and \texttt{then} is the trigger and the part between \texttt{then} and \texttt{end} is the action. There can be multiple triggers in the trigger part. \texttt{Item}s are used to represent the states of devices in the house. They can be read from or written to in order to interact with the devices. Items are connected to real devices through bindings.  
+\begin{lstlisting}[caption={Rule for setting the Away or Sleeping state},label={lst:away}]
 rule "Away rule"
 when
   Item State_Away changed 	
@@ -106,11 +112,12 @@ then
 end
 \end{lstlisting}
 This rule is supposed to set the value of \texttt{State\_Away} to \texttt{ON} when everyone is away. It also sets \texttt{State\_Sleeping} to \texttt{OFF} if it currently \texttt{ON} so that both \texttt{State\_Away} and \texttt{State\_Sleeping} are not \texttt{ON} simultaneously. However, the trigger for this rule only contains \texttt{State\_Away}. As a result, this rule is only fired when \texttt{State\_Away} is changed by the end user. However, if the value of \texttt{State\_Sleeping} is changed instead, then the rule is not fired due to which, it allows both values to be set at the same time. This deviates from the expected behavior of the rule--it is no more clear whether the home inhabitants are away or inside sleeping. This is also a security vulnerability because if this rule triggers another rule for turning on the security alarm in the house and the security alarm is meant to be off when people are at home but on when they are away, then it could get deactivated if the value of \texttt{STATE\_SLEEPING} is set to \texttt{ON}. 
-
+\section{\MakeLowercase{open}HAB background}
 \section{Approach}
 \section{Implementation}
 \section{Experimental Evaluation}
 \section{Related work}
+\cite{smartthings16, todayToTomorrow, rvs, homer, utea}
 \section{Conclusions}
 
 
