@@ -70,8 +70,9 @@ public class ExpressionVisitorImpl implements ExpressionVisitor {
 	ConflictAvoidanceChecker.ast_writer.println("Feature:"+feature_counter);
 	ConflictAvoidanceChecker.ast_writer.println("Feature name:" + feature_counter);
 	ConflictAvoidanceChecker.ast_writer.println(xFeatureCallImplCustom.getExpression().getConcreteSyntaxFeatureName());
-	// to ignore postUpdate features.
-	if(!xFeatureCallImplCustom.getExpression().getConcreteSyntaxFeatureName().equals("postUpdate")) {
+	// to ignore postUpdate and sendCommand features.
+	if(!xFeatureCallImplCustom.getExpression().getConcreteSyntaxFeatureName().equals("postUpdate") &&
+			!xFeatureCallImplCustom.getExpression().getConcreteSyntaxFeatureName().equals("sendCommand")) {
 		featureInvocation.setMethodName(xFeatureCallImplCustom.getExpression().getConcreteSyntaxFeatureName());
 		if (xFeatureCallImplCustom.getExpression().getActualReceiver() != null) {
 			ConflictAvoidanceChecker.ast_writer.println("Target:" + feature_counter);
