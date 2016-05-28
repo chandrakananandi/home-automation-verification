@@ -1,12 +1,13 @@
 \documentclass{sig-alternate-05-2015}
 
-
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage{enumitem}
 \usepackage{caption}
-\captionsetup[lstlisting]{position=bottom}
 \usepackage{listings}
 \usepackage{textcomp}
 
-\lstset{basicstyle=\ttfamily}
+\lstset{basicstyle=\ttfamily, captionpos=b}
 \usepackage{xcolor}
 \newcommand\todo[1]{\textbf{\textcolor{red}{#1}}}
 
@@ -85,7 +86,7 @@ Anonymous submission
 
 \maketitle
 \begin{abstract}
-[\todo {Write abstract}]
+Trigger action programming is one of the most commonly used programming models for end user customizable smart homes~\cite{practical-tap} that allows them to write their own automation rules. Despite of that, recent studies have shown that end users often write incorrect rules and have difficulty in interpreting their behavior correctly~\cite{Huang}. In this paper, we propose a technique to prevent users from making a certain type of mistake in the rules--\textit{errors due to too few triggers}. We found that due to fewer firings of a rule, even a correctly written \textit{action} can lead to security vulnerabilities and unexpected behavior in a smart home. Our solution automatically generates trigger conditions based on the actions written by the end user by performing a static analysis of the actions and extracting potential triggers. It can also identify missing triggers if some of the triggers are already written by the users. We have developed our tool and tested it on 116 end-user written rules based on one of the most popular open source home automation frameworks called openHAB. By manual inspection of the suggested triggers, we found that 51\% of the rules had fewer number of triggers than required for their correct behavior. 
 \end{abstract}
 
 \printccsdesc
@@ -94,12 +95,40 @@ Anonymous submission
 \keywords{Security, Home automation, Trigger action programming, Static analysis}
 
 \section{Introduction}
-Most home automation platforms have a major end-user component: they are the ones who decide what actions should be taken by what device under what conditions. It has been found that rule-based systems are one of the most practical solutions for enabling end-users to customize the behavior of their smart homes~\cite{practical-tap}. A rule-based language has two main components: actions to be executed when a rules fires and triggers that cause a rule to be fired. Such a programming paradigm is also called Trigger Action Programming (TAP). Recent studies~\cite{Huang},\cite{wild-tap} have shown that while TAP is the most commonly used and practical approach for home automation, end users often have difficulty in correctly interpreting the outcome of TAP and make errors in writing a program with the desired behavior. 
-\todo{SERIOUS LACK OF FLOW: We found 51\% rules to be error prone and deviating from the expected behavior due to lack of trigger conditions. Our approach: instead of verifying the actions in the rule which is something most related work focuses on, we focus on the triggers and how to make sure that the rule writer does not miss triggers. }
+Most home automation platforms have a major end-user component: they decide what actions should be taken by what device under what conditions~\cite{Newmannowwere}. 
+Samsung SmartThings~\cite{samsung} allows the users to create their own automation rules through their ``SmartApps" feature. Apple HomeKit~\cite{homekit} allows the users to set up additional conditions to govern when an action should take place. A recent study~\cite{practical-tap} has shown that rule-based systems are one of the most practical solutions for enabling end-users to customize the behavior of their smart homes. A rule-based language has two main components: actions to be executed when a rules fires and triggers that cause a rule to be fired. This is also called Trigger Action Programming (TAP). Listing~\ref{lst:rule} shows the syntax of a rule. The part between \texttt{when} and \texttt{then} is the trigger block and the part between \texttt{then} and \texttt{end} is the action block. There can be multiple triggers in the trigger part. A rule engine is responsible for firing of the rules when the triggers are satisfied.
+\begin{lstlisting}[caption={Syntax of rules.},label={lst:rule}]
+rule "Rule name"
+when
+  <trigger_condition_1> OR
+  <trigger_condition_2> OR 
+  ...	
+then
+  <action_block>
+end
+\end{lstlisting}
+Recent studies~\cite{Huang},\cite{wild-tap} have shown that even though TAP is the most commonly used and practical approach for home automation, end users often have difficulty in correctly interpreting the outcome of TAP and make errors in writing trigger-action programs with the desired behavior. These errors could be in 1) writing the actions, or 2) writing the triggers or 3) both. In a heterogeneous system like a smart home where there are multiple interacting devices, it is common for the rules to interact. As a result, an error in one rule can propagate to others and cause unexpected behavior or security vulnerabilities in different parts of the house. In this paper, we propose a solution to make it easier for the end users to write home automation rules correctly. Our approach eliminates one category of errors in the rules--errors due to too few triggers. By doing a static analysis of the actions, we automatically generate the trigger conditions so that the user does not have to worry about including the correct and sufficient number of trigger conditions in the rules. Our approach can identify potential bugs in the rules statically and thus ensure that the rules are free from \textit{errors due to too few triggers} once they are deployed. To the best of our knowledge, there has not been any prior research on analysing end-user written rules for home automation.
+
+We analysed 116 home automation rules written by end users in the openHAB framework~\cite{openhab} but our approach can be used for any rule-based system.
+openHAB is an open source home automation framework which supports 135 technologies, including more than 50 devices, cloud services like Twitter, DropBox, Google Calendar etc. and multiple communication protocols~\cite{openhabtech}. It has UI support for Android and iOS and an IFTTT integration~\cite{ifttt}. It is a java based solution which can be run on standard Linux, Windows and MacOS X machines as well as on embedded platforms such as Raspberry Pi and Cubietruck. We chose to work with openHAB because
+1) it is open source and that allowed us to access their code base and understand its functioning 2) it supports many devices and technologies and has about 50,000 downloads in the Google Play store with a rating of 4.4/5 and 3) unlike most proprietary solutions, openHAB does not require any hardware installation and is completely technology and vendor agnostic, which makes it more accessible to home owners. 
+
+By a combination of static analysis and manual inspection of the results of the analysis, we found 51\% rules to be vulnerable and deviating from the expected behavior due to lack of trigger conditions. Our results indicate that for all rule-based smart home solutions, together with strong security guarantees provided by home automation framework developers, there is a serious need to focus on the end-user written rules because these are mostly written by non-programmers and are often prone to errors. 
+Our contributions are the following:
+\begin{enumerate}[topsep=0pt,itemsep=-1ex]
+\item Analysis of end-user written rules for home automation and identifying and defining the problem of \textit{too few triggers}.
+\item  Designing and implementing a static analysis tool that can 
+\begin{itemize}[topsep=-10pt,itemsep=-1ex,partopsep=1ex,parsep=1ex]
+\item suggest event-based triggers based on the actions written by end-users.
+\item identify missing triggers 
+\end{itemize}
+\item Evaluating our tool on real end-user written rules for home automation in the openHAB framework.
+\end{enumerate}
 
 \section{Motivating Example}
-Consider the rule in listing~\ref{lst:away} which is written by an end user using the OpenHAB smart home framework. The name of the rule is \texttt{Away rule}. The part between \texttt{when} and \texttt{then} is the trigger and the part between \texttt{then} and \texttt{end} is the action. There can be multiple triggers in the trigger part. \texttt{Item}s are used to represent the states of devices in the house. They can be read from or written to in order to interact with the devices. Items are connected to real devices through bindings.  
-\begin{lstlisting}[caption={Rule for setting the Away or Sleeping state},label={lst:away}]
+\label{sec:motivation}
+Consider the rule in listing~\ref{lst:away} which is written by an end user using the OpenHAB smart home framework. The name of the rule is \texttt{Away rule}. \texttt{Item}s are used to represent the states of the devices in the house. They can be read from or written to in order to interact with the devices. The states of an item can be changed by the end user through the UI of the openHAB application on a smart phone or on a desktop installation.
+\begin{lstlisting}[caption={Rule for setting the Away or Sleeping state.},label={lst:away}]
 rule "Away rule"
 when
   Item State_Away changed 	
@@ -111,18 +140,53 @@ then
   }
 end
 \end{lstlisting}
-This rule is supposed to set the value of \texttt{State\_Away} to \texttt{ON} when everyone is away. It also sets \texttt{State\_Sleeping} to \texttt{OFF} if it currently \texttt{ON} so that both \texttt{State\_Away} and \texttt{State\_Sleeping} are not \texttt{ON} simultaneously. However, the trigger for this rule only contains \texttt{State\_Away}. As a result, this rule is only fired when \texttt{State\_Away} is changed by the end user. However, if the value of \texttt{State\_Sleeping} is changed instead, then the rule is not fired due to which, it allows both values to be set at the same time. This deviates from the expected behavior of the rule--it is no more clear whether the home inhabitants are away or inside sleeping. This is also a security vulnerability because if this rule triggers another rule for turning on the security alarm in the house and the security alarm is meant to be off when people are at home but on when they are away, then it could get deactivated if the value of \texttt{STATE\_SLEEPING} is set to \texttt{ON}. 
+This rule is supposed to set the value of \texttt{State\_Away} to \texttt{ON} when everyone is away. It also sets \texttt{State\_Sleeping} to \texttt{OFF} if it currently \texttt{ON} so that both \texttt{State\_Away} and \texttt{State\_Sleeping} are not \texttt{ON} simultaneously. However, the trigger for this rule only contains \texttt{State\_Away}. As a result, this rule is only fired when \texttt{State\_Away} is changed by the end user. However, if the value of \texttt{State\_Sleeping} is changed after the value of \texttt{State\_Away}, then the rule is not fired due to which, it allows both values to be set at the same time. This deviates from the expected behavior of the rule--it is no longer clear whether the home inhabitants are away or inside sleeping. This is also a security vulnerability because if this rule triggers another rule for turning on the security alarm in the house and the security alarm is meant to be off when people are at home but on when they are away, then it could get wrongly deactivated if the value of \texttt{STATE\_SLEEPING} is set to \texttt{ON}. Figure~\ref{fig:awayrule} shows a snapshot of the desktop application with both states being set to \texttt{ON}. 
+
+\begin{figure}
+\centering
+\includegraphics [trim=0 12cm 0 0, scale=0.135]{images/openhab-runtime.png}
+\caption{Desktop UI showing both \texttt{State\_Away} and \texttt{State\_Sleeping} being set at the same time.}
+\label{fig:awayrule}
+\end{figure}
+This example shows that even if the action block of a rule is implemented correctly, not having all the correct triggers can lead to too few firings of the rule and thus, unexpected behavior. To solve this problem, we propose a technique based on static analysis that can automatically generate event-based triggers and also detect missing ones by analysing code in the action block. The result of running our tool on the rule in listing~\ref{lst:away} is shown in listing~\ref{lst:output}. It shows two features of the tool: suggesting all event based triggers and identifying missing triggers.
+\begin{lstlisting}[caption={List of suggested and missing triggers shown by our tool for the Away rule.},label={lst:output}]
+rule:Away rule
+suggested trigger: State_Away
+suggested trigger: State_Sleeping
+------------------------------
+------------------------------
+rule:Away rule
+missing trigger: State_Sleeping
+------------------------------
+\end{lstlisting}
+
+\section{Threat model}
+Our focus is on security vulnerabilities that result due to incorrectly written automation rules by the home inhabitants or by an adversary although the former is most likely. 
+We target one category of errors in the rules: \textit{errors due to too few triggers}. Our approach can prevent any attack that relies on incorrect number of rule firings. One such example is described in section~\ref{sec:motivation}.
+
+We assume that the action block of the rules is written correctly and rely on it for generating the trigger conditions.
+
+We trust that the devices in the house are not compromised and once they receive a command, they execute it. We also trust the rule engine and the home automation OS for which the rules are written.
+
 \section{\MakeLowercase{open}HAB background}
+\todo{describe the openHAB framework in brief. Describe the language for items, scripts, rules.}
+
 \section{Approach}
+
 \section{Implementation}
+
 \section{Experimental Evaluation}
+
 \section{Related work}
 \cite{smartthings16, todayToTomorrow, rvs, homer, utea}
+Recent work has mentioned possible security loopholes in smart homes~\cite{yoshi, dhanjani, jung}.
+
 \section{Conclusions}
+Home automation application involve end user interference in order to customize the behavior of the devices  
 
 
-\section{Acknowledgments}
-
+\section{Acknowledgements}
+We thank Franziska Roesner for her feedback on this project and the anonymous reviewers for their comments.
 \bibliographystyle{abbrv}
 \bibliography{sigproc}  
 
