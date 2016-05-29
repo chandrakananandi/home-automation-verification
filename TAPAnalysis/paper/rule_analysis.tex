@@ -107,7 +107,7 @@ then
   <action_block>
 end
 \end{lstlisting}
-Recent studies~\cite{Huang},\cite{wild-tap} have shown that even though TAP is the most commonly used and practical approach for home automation, end users often have difficulty in correctly interpreting the outcome of TAP and make errors in writing trigger-action programs with the desired behavior. These errors could be in 1) writing the actions, or 2) writing the triggers or 3) both. In a heterogeneous system like a smart home where there are multiple interacting devices, it is common for the rules to interact. As a result, an error in one rule can propagate to others and cause unexpected behavior or security vulnerabilities in different parts of the house. In this paper, we propose a solution to make it easier for the end users to write home automation rules correctly. Our approach eliminates one category of errors in the rules--errors due to too few triggers. By doing a static analysis of the actions, we automatically generate the trigger conditions so that the user does not have to worry about including the correct and sufficient number of trigger conditions in the rules. Our approach can identify potential bugs in the rules statically and thus ensure that the rules are free from \textit{errors due to too few triggers} once they are deployed. To the best of our knowledge, there has not been any prior research on analysing end-user written rules for home automation.
+Recent studies~\cite{Huang},\cite{wild-tap} have shown that even though TAP is the most commonly used and practical approach for home automation, end users often have difficulty in correctly interpreting the outcome of TAP and make errors in writing trigger-action programs with the desired behavior. These errors could be in 1) writing the actions, or 2) writing the triggers or 3) both. In a heterogeneous system like a smart home where there are multiple interacting devices, it is common for the rules to interact. As a result, an error in one rule can propagate to others and cause unexpected behavior or security vulnerabilities in different parts of the house. In this paper, we propose a solution to make it easier for the end users to write home automation rules correctly. Our approach eliminates one category of errors in the rules--errors due to too few triggers. By doing a static analysis of the actions, we automatically generate the trigger conditions so that the user does not have to worry about including the \textit{correct} and \textit{sufficient number} of trigger conditions in the rules. Our approach can identify potential bugs in the rules statically and thus ensure that the rules are free from \textit{errors due to too few triggers} once they are deployed. To the best of our knowledge, there has not been any prior research on analysing end-user written rules for home automation.
 
 We analysed 116 home automation rules written by end users in the openHAB framework~\cite{openhab} but our approach can be used for any rule-based system.
 openHAB is an open source home automation framework which supports 135 technologies, including more than 50 devices, cloud services like Twitter, DropBox, Google Calendar etc. and multiple communication protocols~\cite{openhabtech}. It has UI support for Android and iOS and an IFTTT integration~\cite{ifttt}. It is a java based solution which can be run on standard Linux, Windows and MacOS X machines as well as on embedded platforms such as Raspberry Pi and Cubietruck. We chose to work with openHAB because
@@ -127,7 +127,7 @@ Our contributions are the following:
 
 \section{Motivating Example}
 \label{sec:motivation}
-Consider the rule in listing~\ref{lst:away} which is written by an end user using the OpenHAB smart home framework. The name of the rule is \texttt{Away rule}. \texttt{Item}s are used to represent the states of the devices in the house. They can be read from or written to in order to interact with the devices. The states of an item can be changed by the end user through the UI of the openHAB application on a smart phone or on a desktop installation.
+Consider the rule in listing~\ref{lst:away} which is written by an end user using the OpenHAB smart home framework. The name of the rule is \texttt{Away rule}. An \texttt{Item} represents the states of a device in the house. They can be read from or written to in order to interact with the devices. The state of an item can be changed by the end user through the UI of the openHAB application on a smart phone or on a desktop installation.
 \begin{lstlisting}[caption={Rule for setting the Away or Sleeping state.},label={lst:away}]
 rule "Away rule"
 when
@@ -144,7 +144,7 @@ This rule is supposed to set the value of \texttt{State\_Away} to \texttt{ON} wh
 
 \begin{figure}
 \centering
-\includegraphics [trim=0 12cm 0 0, scale=0.135]{images/openhab-runtime.png}
+\includegraphics [trim=0 13cm 0 0, scale=0.135]{images/openhab-runtime.png}
 \caption{Desktop UI showing both \texttt{State\_Away} and \texttt{State\_Sleeping} being set at the same time.}
 \label{fig:awayrule}
 \end{figure}
@@ -154,14 +154,12 @@ rule:Away rule
 suggested trigger: State_Away
 suggested trigger: State_Sleeping
 ------------------------------
-------------------------------
 rule:Away rule
 missing trigger: State_Sleeping
-------------------------------
 \end{lstlisting}
 
 \section{Threat model}
-Our focus is on security vulnerabilities that result due to incorrectly written automation rules by the home inhabitants or by an adversary although the former is most likely. 
+Our focus is on security vulnerabilities that result due to incorrectly written automation rules by the home inhabitants or by an adversary although the former is more likely. 
 We target one category of errors in the rules: \textit{errors due to too few triggers}. Our approach can prevent any attack that relies on incorrect number of rule firings. One such example is described in section~\ref{sec:motivation}.
 
 We assume that the action block of the rules is written correctly and rely on it for generating the trigger conditions.
@@ -169,24 +167,68 @@ We assume that the action block of the rules is written correctly and rely on it
 We trust that the devices in the house are not compromised and once they receive a command, they execute it. We also trust the rule engine and the home automation OS for which the rules are written.
 
 \section{\MakeLowercase{open}HAB background}
-\todo{describe the openHAB framework in brief. Describe the language for items, scripts, rules.}
+openHAB~\cite{openhab} is an open source software for integrating different types of smart technologies in a home. openHAB has a runtime implemented in Java and a designer which is used by end users for configuring the homes. 
 
-\section{Approach}
+The runtime provides a communication platform between the devices. There are currently about 135 devices, protocols and cloud technologies supported by openHAB. These are connected by means of an event bus. Figure~\ref{fig:framework} shows the main components of the openHAB framework. The item repository stores the states of the devices. It is connected to the UI and the rule base. Changes to the states can be made through the UI and by rule firings. The latest state is communicated to the actual device through the event bus. The bindings are libraries that connect the physical devices to the openHAB framework. As shown in the figure, there are two types of events that are communicated by the event bus--1) commands: causing an action or change of state in a device, such as \texttt{ON}, \texttt{OFF}, \texttt{UP}, \texttt{DOWN} and 2) updates: informing the UI component or the rule engine or other devices about a change in the state of a device.
+\begin{figure}
+\centering
+\includegraphics [trim=3cm 2cm 0 5cm, scale=0.4]{images/framework.png}
+\caption{openHAB framework.}
+\label{fig:framework}
+\end{figure} 
+
+The designer includes an IDE for writing the configuration files to customize the home. The main configuration files include a \textit{.rules} file containing the automation rules, a \textit{.items} file (storing the states of the devices installed) and a \textit{.sitemap} file that maps items to elements in the UI. Each of these are written in small domain specific languages developed using the xtext framework~\cite{xtext}. The action block in the rules, also called the \textit{script} is written in a Java like language called xbase, which is implemented using xtext. For our research, we required access to the item files and the rule files. 
+\subsection{Items}
+The item file lists the states of all the devices in the house that are to be included in the automation. Every item has a type that indicates the values it can store and the commands it can receive. Items can also be grouped together--all lights in the living room can be in one group so that they can be controlled together. There are 11 types of items that are currently supported. Listing~\ref{lst:items} shows the syntax of an item definition (contents in [~] are optional) and two entries in a sample item file. The binding part is responsible for connecting the item to an actual device ID.
+\begin{lstlisting}[caption={Syntax and two examples of item definitions.},label={lst:items}]
+<type> <name> ["label"] [<icon>] 
+              [(group*)] [{binding}]
+Switch DemoSwitch  "Switch"
+Contact Window_Bedroom "Bedroom" 
+        (Bedroom, Windows)
+\end{lstlisting}
+ 
+\subsection{Rules}
+Listing~\ref{lst:rule} shows the syntax of the rules. There are three types of triggers.
+\begin{enumerate} [topsep=0pt,itemsep=-1ex]
+\item event-based triggers: These triggers are related to changes in the state of a device. Some examples--\\
+\texttt{Item LightSwitch received command} \\
+\texttt{Item State\_Away changed}
+\item temporal triggers: They cause actions to happen at a certain time. An example--\\ \texttt{Time cron "second minute hour day month weekday year"}
+\item system triggers: There are two system triggers--system start up and system shut down.
+\end{enumerate}
+\subsection{Actions}
+Actions are predefined methods in Java that can be used in the scripts of the rules. The openHAB runtime provides a core set of actions but more can be implemented for specific devices by the respective manufacturers. Some of the important core actions are:
+\begin{enumerate} [topsep=0pt,itemsep=-1ex]
+\item event bus actions: \\ \texttt{sendCommand(String itemName, String commandName)}, \texttt{postUpdate(String itemName, String stateValue)}
+\item logging actions: \texttt{logDebug, logWarn, logInfo, logError}
+\end{enumerate}
+ The entire list can be found in the openHAB wiki~\cite{openhabwiki}.
+Currently, our analysis supports the core actions only. 
+
+\section{Errors due to too few triggers}
+\emph{Definition}. Errors due to too few triggers is a condition where an insufficient number of triggers leads to fewer firing of a rule thereby leading to unexpected behavior.
+
+\emph{Approach}.
 
 \section{Implementation}
-
+We implemented the automatic trigger generator in Java. It involved $\sim$ 3000 LOC. Our tool can be used directly on a rule file without any pre-processing of the rules. 
 \section{Experimental Evaluation}
+We evaluated our tool on 116 end user written rules. \todo{how much time did it take to run all the experiments? create a table with all rule names, number of triggers suggested}
 
 \section{Related work}
-\cite{smartthings16, todayToTomorrow, rvs, homer, utea}
-Recent work has mentioned possible security loopholes in smart homes~\cite{yoshi, dhanjani, jung}.
+\todo{\cite{smartthings16, todayToTomorrow, rvs, homer, utea}
+Recent work has mentioned possible security loopholes in smart homes~\cite{yoshi, dhanjani, jung}.}
 
 \section{Conclusions}
-Home automation application involve end user interference in order to customize the behavior of the devices  
+End users have a major role in home automation--they decide the automation rules for their own homes. Not surprisingly, our research shows that these end user written rules \textit{are} a major source of security vulnerability in smart homes. 
+We observed that a common error made by end users while writing the rules is having insufficient number of triggers, leading to fewer firings of the rules than necessary. To prevent this problem, we developed a tool that can automatically generate trigger conditions based on the actions in a rule as well as identify missing triggers if some of them are already provided. This reduces the burden of end user by assisting them in including all the required triggers. 
+
+We evaluated our tool on real home automation rules written by end users and found that out of 116 rules, 59 had insufficient number of triggers. By manual inspecting the suggestions provided by the tool, we found that each one of them were relevant and including them in the rules prevented the unexpected behaviors observed previously. 
 
 
 \section{Acknowledgements}
-We thank Franziska Roesner for her feedback on this project and the anonymous reviewers for their comments.
+We thank Franziska Roesner for her feedback and comments and Jeanette Daum for contributing to an earlier version of this project.
 \bibliographystyle{abbrv}
 \bibliography{sigproc}  
 
