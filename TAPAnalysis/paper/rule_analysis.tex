@@ -74,14 +74,14 @@
 %
 \author{
 % 1st. author
-%\alignauthor
-%Chandrakana Nandi\\
-%       \affaddr{University of Washington, Seattle}\\
-%       \email{cnandi@cs.washington.edu}
-%\alignauthor Michael D. Ernst\\
-%       \affaddr{University of Washington, Seattle}\\
-%       \email{mernst@cs.washington.edu}
-Anonymous submission
+\alignauthor
+Chandrakana Nandi\\
+       \affaddr{University of Washington, Seattle}\\
+       \email{cnandi@cs.washington.edu}
+\alignauthor Michael D. Ernst\\
+       \affaddr{University of Washington, Seattle}\\
+       \email{mernst@cs.washington.edu}
+%Anonymous submission
 }
 
 \maketitle
@@ -95,8 +95,7 @@ Trigger action programming is one of the most commonly used programming models f
 \keywords{Security, Home automation, Trigger action programming, Static analysis}
 
 \section{Introduction}
-Most home automation platforms have a major end-user component: they decide what actions should be taken by what device under what conditions~\cite{Newmannowwere}. 
-Samsung SmartThings~\cite{samsung} allows the users to create their own automation rules through their ``SmartApps" feature. Apple HomeKit~\cite{homekit} allows the users to set up additional conditions to govern when an action should take place. A recent study~\cite{practical-tap} has shown that rule-based systems are one of the most practical solutions for enabling end-users to customize the behavior of their smart homes. A rule-based language has two main components: actions to be executed when a rules fires and triggers that cause a rule to be fired. This is also called Trigger Action Programming (TAP). Listing~\ref{lst:rule} shows the syntax of a rule. The part between \texttt{when} and \texttt{then} is the trigger block and the part between \texttt{then} and \texttt{end} is the action block. There can be multiple triggers in the trigger part. A rule engine is responsible for firing of the rules when the triggers are satisfied.
+Most home automation platforms have a major end-user component: they decide what actions should be taken by what device under what conditions~\cite{Newmannowwere}. For example, Samsung SmartThings~\cite{samsung} allows the users to create their own automation rules through their ``SmartApps" feature, while Apple HomeKit~\cite{homekit} allows the users to set up additional conditions to govern when an action should take place. A recent study~\cite{practical-tap} has shown that rule-based systems are one of the most practical solutions for enabling end-users to customize the behavior of their smart homes. A rule-based language has two main components: actions to be executed when a rules fires and triggers that cause a rule to be fired. This is also called Trigger Action Programming (TAP). Listing~\ref{lst:rule} shows the syntax of a rule. The part between \texttt{when} and \texttt{then} is the trigger block and the part between \texttt{then} and \texttt{end} is the action block. There can be multiple triggers in the trigger part. A rule engine is responsible for firing of the rules when the triggers are satisfied.
 \begin{lstlisting}[caption={Syntax of rules.},label={lst:rule}]
 rule "Rule name"
 when
@@ -107,7 +106,7 @@ then
   <action_block>
 end
 \end{lstlisting}
-Recent studies~\cite{Huang},\cite{wild-tap} have shown that even though TAP is the most commonly used and practical approach for home automation, end users often have difficulty in correctly interpreting the outcome of TAP and make errors in writing trigger-action programs with the desired behavior. These errors could be in 1) writing the actions, or 2) writing the triggers or 3) both. In a heterogeneous system like a smart home where there are multiple interacting devices, it is common for the rules to interact. As a result, an error in one rule can propagate to others and cause unexpected behavior or security vulnerabilities in different parts of the house. In this paper, we propose a solution to make it easier for the end users to write home automation rules correctly. Our approach eliminates one category of errors in the rules--errors due to too few triggers. By doing a static analysis of the actions, we automatically generate the trigger conditions so that the user does not have to worry about including the \textit{correct} and \textit{sufficient number} of trigger conditions in the rules. Our approach can identify potential bugs in the rules statically and thus ensure that the rules are free from \textit{errors due to too few triggers} once they are deployed. To the best of our knowledge, there has not been any prior research on analysing end-user written rules for home automation.
+Some other recent studies~\cite{Huang},\cite{wild-tap} have shown that even though TAP is the most commonly used and practical approach for home automation, end users often have difficulty in correctly interpreting the outcome of TAP and make errors in writing trigger-action programs with the desired behavior. These errors could be in 1) writing the actions, or 2) writing the triggers or 3) both. In a heterogeneous system like a smart home where there are multiple interacting devices, it is common for the rules to interact. As a result, an error in one rule can propagate to others and cause unexpected behavior or security vulnerabilities in different parts of the house. In this paper, we propose a solution to make it easier for the end users to write home automation rules correctly. Our approach eliminates one category of errors in the rules--errors due to too few triggers. By doing a static analysis of the actions, we automatically generate the trigger conditions so that the user does not have to worry about including the \textit{correct} and \textit{sufficient number} of trigger conditions in the rules. Our approach can identify potential bugs in the rules statically and thus ensure that the rules are free from \textit{errors due to too few triggers} once they are deployed. To the best of our knowledge, there has not been any prior research on analysing end-user written rules for home automation.
 
 We analysed 116 home automation rules written by end users in the openHAB framework~\cite{openhab} but our approach can be used for any rule-based system.
 openHAB is an open source home automation framework which supports 135 technologies, including more than 50 devices, cloud services like Twitter, DropBox, Google Calendar etc. and multiple communication protocols~\cite{openhabtech}. It has UI support for Android and iOS and an IFTTT integration~\cite{ifttt}. It is a java based solution which can be run on standard Linux, Windows and MacOS X machines as well as on embedded platforms such as Raspberry Pi and Cubietruck. We chose to work with openHAB because
@@ -172,7 +171,7 @@ openHAB~\cite{openhab} is an open source software for integrating different type
 The runtime provides a communication platform between the devices. There are currently about 135 devices, protocols and cloud technologies supported by openHAB. These are connected by means of an event bus. Figure~\ref{fig:framework} shows the main components of the openHAB framework. The item repository stores the states of the devices. It is connected to the UI and the rule base. Changes to the states can be made through the UI and by rule firings. The latest state is communicated to the actual device through the event bus. The bindings are libraries that connect the physical devices to the openHAB framework. As shown in the figure, there are two types of events that are communicated by the event bus--1) commands: causing an action or change of state in a device, such as \texttt{ON}, \texttt{OFF}, \texttt{UP}, \texttt{DOWN} and 2) updates: informing the UI component or the rule engine or other devices about a change in the state of a device.
 \begin{figure}
 \centering
-\includegraphics [trim=3cm 2cm 0 5cm, scale=0.4]{images/framework.png}
+\includegraphics [trim=2cm 15cm 0 5cm, scale=0.6]{images/framework.pdf}
 \caption{openHAB framework.}
 \label{fig:framework}
 \end{figure} 
@@ -207,12 +206,20 @@ Actions are predefined methods in Java that can be used in the scripts of the ru
 Currently, our analysis supports the core actions only. 
 
 \section{Errors due to too few triggers}
-\emph{Definition}. Errors due to too few triggers is a condition where an insufficient number of triggers leads to fewer firing of a rule thereby leading to unexpected behavior.
+\emph{Problem Definition}. Errors due to too few triggers is a condition where an insufficient number of triggers leads to fewer firing of a rule thereby leading to unexpected behavior or security vulnerabilities.
 
-\emph{Approach}.
+\emph{Goal}. Our goal is to prevent end users from making errors due to too few triggers--we want to ensure that all the correct triggers are included in the rules.
+
+\emph{Approach}. Our approach is to automatically generate all the correct trigger conditions from the actions written by the end users. We developed a static technique to achieve this so that the rules do not need to be fired at all until all the correct triggers are included. Figure~\ref{fig:design} shows the design of our tool. It takes as input a \textit{rules} file and and \textit{items} file. 
+\begin{figure*}
+\centering
+\includegraphics [trim=0cm 19cm 0 0cm, scale=0.7]{images/design.pdf}
+\caption{Design of trigger generator tool}
+\label{fig:design}
+\end{figure*} 
 
 \section{Implementation}
-We implemented the automatic trigger generator in Java. It involved $\sim$ 3000 LOC. Our tool can be used directly on a rule file without any pre-processing of the rules. 
+We implemented the automatic trigger generator in Java. It involved $\sim$ 3000 LOC. Our tool can be used directly on a rule file without any pre-processing of the rules.   \todo{[not sure how much details need to go here, I could talk forever on this]} 
 \section{Experimental Evaluation}
 We evaluated our tool on 116 end user written rules. \todo{how much time did it take to run all the experiments? create a table with all rule names, number of triggers suggested}
 
@@ -221,7 +228,7 @@ We evaluated our tool on 116 end user written rules. \todo{how much time did it 
 Recent work has mentioned possible security loopholes in smart homes~\cite{yoshi, dhanjani, jung}.}
 
 \section{Conclusions}
-End users have a major role in home automation--they decide the automation rules for their own homes. Not surprisingly, our research shows that these end user written rules \textit{are} a major source of security vulnerability in smart homes. 
+End users have a major role in home automation--they decide the automation rules for the devices. Not surprisingly, our research shows that these end user written rules \textit{are} a major source of security vulnerability in smart homes. 
 We observed that a common error made by end users while writing the rules is having insufficient number of triggers, leading to fewer firings of the rules than necessary. To prevent this problem, we developed a tool that can automatically generate trigger conditions based on the actions in a rule as well as identify missing triggers if some of them are already provided. This reduces the burden of end user by assisting them in including all the required triggers. 
 
 We evaluated our tool on real home automation rules written by end users and found that out of 116 rules, 59 had insufficient number of triggers. By manual inspecting the suggestions provided by the tool, we found that each one of them were relevant and including them in the rules prevented the unexpected behaviors observed previously. 
