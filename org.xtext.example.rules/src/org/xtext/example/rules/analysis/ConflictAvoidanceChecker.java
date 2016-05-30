@@ -41,10 +41,10 @@ public class ConflictAvoidanceChecker {
 	}
 	
 	public static void main(String[] args) throws IOException {
-		String rule_file = "sample_rule1.rules";
-		String item_file= "sample_item1.items";
+		String rule_file = "sample_rule2.rules";
+		String item_file= "sample_item2.items";
 		File conflict_file = new File("./src/org/xtext/example/rules/analysis/resources/sample_conflict.conflicts");
-		File config_file= new File("./src/org/xtext/example/rules/analysis/resources/sample_config1.homecfg");
+		File config_file= new File("./src/org/xtext/example/rules/analysis/resources/sample_config2.homecfg");
 		
 		long time_start=System.currentTimeMillis();
 		parseConfiguration(config_file);
@@ -112,6 +112,7 @@ public class ConflictAvoidanceChecker {
 	}
 	// Can suggest event-based triggers, not System or Time based ones.
 	public static void generateTriggers(RuleParser ruleParser, ItemParser itemParser){
+		int count=0;
 		for(RuleInformation rule_info: ruleParser.getRuleSet()) {	
 			Set<String>suggested_triggers=new HashSet<String>();
 			String redundant_trigger_suggestion=null;
@@ -130,8 +131,10 @@ public class ConflictAvoidanceChecker {
 				}
 			}
 						
-			if(suggested_triggers.size()>0) {				
+			if(suggested_triggers.size()>0) {			
+				count ++;
 				System.out.println("rule:" + rule_info.getName());
+				System.out.println("number of suggested triggers:" + suggested_triggers.size());
 				for(String suggested_trigger: suggested_triggers){
 					System.out.println("suggested trigger: "+ suggested_trigger);
 				}			
@@ -143,6 +146,7 @@ public class ConflictAvoidanceChecker {
 			}
 			System.out.println("------------------------------");		
 		}
+		System.out.println("total rules with suggested triggers: "+ count);
 	}
 	
 	public static void checkConflictDueToTooFewTriggers(RuleParser ruleParser, ItemParser itemParser) {
@@ -191,6 +195,7 @@ public class ConflictAvoidanceChecker {
 			if(missing_triggers.size()>0) {				
 				buggy_count ++;
 				System.out.println("rule:" + rule_info.getName());
+				System.out.println("number of missing triggers:" + missing_triggers.size());
 				for(String missing_trigger: missing_triggers){
 					System.out.println("missing trigger: "+ missing_trigger);
 				}			
