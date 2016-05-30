@@ -41,15 +41,16 @@ public class ConflictAvoidanceChecker {
 	}
 	
 	public static void main(String[] args) throws IOException {
-		String rule_file = "sample_rule.rules";
-		String item_file= "sample_item2.items";
+		String rule_file = "sample_rule1.rules";
+		String item_file= "sample_item1.items";
 		File conflict_file = new File("./src/org/xtext/example/rules/analysis/resources/sample_conflict.conflicts");
-		File config_file= new File("./src/org/xtext/example/rules/analysis/resources/sample_config2.homecfg");
+		File config_file= new File("./src/org/xtext/example/rules/analysis/resources/sample_config1.homecfg");
 		
+		long time_start=System.currentTimeMillis();
 		parseConfiguration(config_file);
 		
-		SpecificationParser specParser = new SpecificationParser();
-		specParser.parseConflicts(conflict_file);
+		//SpecificationParser specParser = new SpecificationParser();
+		//specParser.parseConflicts(conflict_file);
 		
 		ItemParser itemParser=new ItemParser(item_file);
 		itemParser.analyseItems();
@@ -61,6 +62,9 @@ public class ConflictAvoidanceChecker {
 		System.out.println("------------------------------");
 		System.out.println("------------------------------");
 		checkConflictDueToTooFewTriggers(ruleParser, itemParser);
+		long time_end=System.currentTimeMillis();
+		
+		System.out.println("Time:" + (time_end-time_start));
 		
 	}
 
@@ -188,7 +192,7 @@ public class ConflictAvoidanceChecker {
 				buggy_count ++;
 				System.out.println("rule:" + rule_info.getName());
 				for(String missing_trigger: missing_triggers){
-					System.out.println("missing: "+ missing_trigger);
+					System.out.println("missing trigger: "+ missing_trigger);
 				}			
 			}
 			

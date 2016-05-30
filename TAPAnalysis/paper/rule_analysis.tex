@@ -108,7 +108,7 @@ end
 \end{lstlisting}
 Some other recent studies~\cite{Huang},\cite{wild-tap} have shown that even though TAP is the most commonly used and practical approach for home automation, end users often have difficulty in correctly interpreting the outcome of TAP and make errors in writing trigger-action programs with the desired behavior. These errors could be in 1) writing the actions, or 2) writing the triggers or 3) both. In a heterogeneous system like a smart home where there are multiple interacting devices, it is common for the rules to interact. As a result, an error in one rule can propagate to others and cause unexpected behavior or security vulnerabilities in different parts of the house. In this paper, we propose a solution to make it easier for the end users to write home automation rules correctly. Our approach eliminates one category of errors in the rules--errors due to too few triggers. By doing a static analysis of the actions, we automatically generate the trigger conditions so that the user does not have to worry about including the \textit{correct} and \textit{sufficient number} of trigger conditions in the rules. Our approach can identify potential bugs in the rules statically and thus ensure that the rules are free from \textit{errors due to too few triggers} once they are deployed. To the best of our knowledge, there has not been any prior research on analysing end-user written rules for home automation.
 
-We analysed 116 home automation rules written by end users in the openHAB framework~\cite{openhab} but our approach can be used for any rule-based system.
+We analysed 116 home automation rules written by end users in the openHAB framework~\cite{openhab} and implemented our tool for rules written in the domain specific languages provided by openHAB, but our idea can be used for any rule-based system.
 openHAB is an open source home automation framework which supports 135 technologies, including more than 50 devices, cloud services like Twitter, DropBox, Google Calendar etc. and multiple communication protocols~\cite{openhabtech}. It has UI support for Android and iOS and an IFTTT integration~\cite{ifttt}. It is a java based solution which can be run on standard Linux, Windows and MacOS X machines as well as on embedded platforms such as Raspberry Pi and Cubietruck. We chose to work with openHAB because
 1) it is open source and that allowed us to access their code base and understand its functioning 2) it supports many devices and technologies and has about 50,000 downloads in the Google Play store with a rating of 4.4/5 and 3) unlike most proprietary solutions, openHAB does not require any hardware installation and is completely technology and vendor agnostic, which makes it more accessible to home owners. 
 
@@ -210,22 +210,83 @@ Currently, our analysis supports the core actions only.
 
 \emph{Goal}. Our goal is to prevent end users from making errors due to too few triggers--we want to ensure that all the correct triggers are included in the rules.
 
-\emph{Approach}. Our approach is to automatically generate all the correct trigger conditions from the actions written by the end users. We developed a static technique to achieve this so that the rules do not need to be fired at all until all the correct triggers are included. Figure~\ref{fig:design} shows the design of our tool. It takes as input a \textit{rules} file and and \textit{items} file. 
+\emph{Approach}. Our approach is to automatically generate all the correct trigger conditions from the actions written by the end users. We developed a static technique to achieve this so that the rules do not need to be fired at all until all the correct triggers are included. Figure~\ref{fig:design} shows the design of our tool. It takes as input a \textit{rules} file and and \textit{items} file. In the first step, we manually generate a \textit{homecfg} configuration file based on the items file and the core actions supported by the openHAB runtime. This configuration file contains two types of information:
+\begin{enumerate} [topsep=0pt,itemsep=-1ex]
+\item names of those actions that do not affect the state of any device, e.g. logging actions. 
+\item item names that represent output states.
+\end{enumerate}
+\todo{finish this section, lots to add-- use of homecfg, what happens in case of time and system triggers only?--no suggestions and missing triggers identified if rule also has atleast some event based trigger. How to eliminate triggers that dont make sense? if it is not modified before reading from, then it is not useful--how did you implement this?}
 \begin{figure*}
 \centering
 \includegraphics [trim=0cm 19cm 0 0cm, scale=0.7]{images/design.pdf}
-\caption{Design of trigger generator tool}
+\caption{Design of trigger generator tool.}
 \label{fig:design}
 \end{figure*} 
 
 \section{Implementation}
-We implemented the automatic trigger generator in Java. It involved $\sim$ 3000 LOC. Our tool can be used directly on a rule file without any pre-processing of the rules.   \todo{[not sure how much details need to go here, I could talk forever on this]} 
+We implemented the automatic trigger generator in Java. It involved $\sim$ 3000 LOC. Our tool can be used directly on a rule file without any pre-processing of the rules. 
+
+We used the AST generated by xtext for the rule \textit{scripts} and visited the nodes in the tree to extract relevant information such as the names of the device states used in the method calls or in conditional statements. \todo{[do people care to know about the details?]}
+ 
 \section{Experimental Evaluation}
-We evaluated our tool on 116 end user written rules. \todo{how much time did it take to run all the experiments? create a table with all rule names, number of triggers suggested}
+We evaluated our tool on 116 end user written rules. We obtained the rules from links provided on the openHAB wiki~\cite{data1},\cite{data2}. It took $\sim$ 7.12 ms for the tool to generate the triggers for all the rules. Tables~\ref{tab:results1} and \ref{tab:results2} show the summary of our results.
+\begin{table*}
+\centering
+\begin{tabular}{|c|c|c|c|}
+\hline
+Rule name & \# suggested triggers & \# user written triggers & \# missing triggers \\ \hline
+Rule name & \# suggested triggers & \# user written triggers & \# missing triggers \\ \hline
+Rule name & \# suggested triggers & \# user written triggers & \# missing triggers \\ \hline
+Rule name & \# suggested triggers & \# user written triggers & \# missing triggers \\ \hline
+Rule name & \# suggested triggers & \# user written triggers & \# missing triggers \\ \hline
+Rule name & \# suggested triggers & \# user written triggers & \# missing triggers \\ \hline
+Rule name & \# suggested triggers & \# user written triggers & \# missing triggers \\ \hline
+Rule name & \# suggested triggers & \# user written triggers & \# missing triggers \\ \hline
+Rule name & \# suggested triggers & \# user written triggers & \# missing triggers \\ \hline
+Rule name & \# suggested triggers & \# user written triggers & \# missing triggers \\ \hline
+Rule name & \# suggested triggers & \# user written triggers & \# missing triggers \\ \hline
+Rule name & \# suggested triggers & \# user written triggers & \# missing triggers \\ \hline
+Rule name & \# suggested triggers & \# user written triggers & \# missing triggers \\ \hline
+Rule name & \# suggested triggers & \# user written triggers & \# missing triggers \\ \hline
+Rule name & \# suggested triggers & \# user written triggers & \# missing triggers \\ \hline
+Rule name & \# suggested triggers & \# user written triggers & \# missing triggers \\ \hline
+Rule name & \# suggested triggers & \# user written triggers & \# missing triggers \\ \hline
+Rule name & \# suggested triggers & \# user written triggers & \# missing triggers \\ \hline
+\end{tabular}
+\caption{Summary of results for rules for which triggers were suggested.}
+\label{tab:results1}
+\end{table*}
+
+\begin{table*}
+\centering
+\begin{tabular}{|c|c|c|c|}
+\hline
+Rule name & \# suggested triggers & \# user written triggers & \# missing triggers \\ \hline
+Rule name & \# suggested triggers & \# user written triggers & \# missing triggers \\ \hline
+Rule name & \# suggested triggers & \# user written triggers & \# missing triggers \\ \hline
+Rule name & \# suggested triggers & \# user written triggers & \# missing triggers \\ \hline
+Rule name & \# suggested triggers & \# user written triggers & \# missing triggers \\ \hline
+Rule name & \# suggested triggers & \# user written triggers & \# missing triggers \\ \hline
+Rule name & \# suggested triggers & \# user written triggers & \# missing triggers \\ \hline
+Rule name & \# suggested triggers & \# user written triggers & \# missing triggers \\ \hline
+Rule name & \# suggested triggers & \# user written triggers & \# missing triggers \\ \hline
+Rule name & \# suggested triggers & \# user written triggers & \# missing triggers \\ \hline
+Rule name & \# suggested triggers & \# user written triggers & \# missing triggers \\ \hline
+Rule name & \# suggested triggers & \# user written triggers & \# missing triggers \\ \hline
+Rule name & \# suggested triggers & \# user written triggers & \# missing triggers \\ \hline
+Rule name & \# suggested triggers & \# user written triggers & \# missing triggers \\ \hline
+Rule name & \# suggested triggers & \# user written triggers & \# missing triggers \\ \hline
+Rule name & \# suggested triggers & \# user written triggers & \# missing triggers \\ \hline
+Rule name & \# suggested triggers & \# user written triggers & \# missing triggers \\ \hline
+Rule name & \# suggested triggers & \# user written triggers & \# missing triggers \\ \hline
+\end{tabular}
+\caption{Summary of results for rules for which missing triggers were detected.}
+\label{tab:results2}
+\end{table*}
 
 \section{Related work}
 \todo{\cite{smartthings16, todayToTomorrow, rvs, homer, utea}
-Recent work has mentioned possible security loopholes in smart homes~\cite{yoshi, dhanjani, jung}.}
+Recent work has mentioned possible security loopholes in smart homes~\cite{yoshi, dhanjani, jung}. there is more, need to add from previous documents I wrote.}
 
 \section{Conclusions}
 End users have a major role in home automation--they decide the automation rules for the devices. Not surprisingly, our research shows that these end user written rules \textit{are} a major source of security vulnerability in smart homes. 
@@ -235,7 +296,7 @@ We evaluated our tool on real home automation rules written by end users and fou
 
 
 \section{Acknowledgements}
-We thank Franziska Roesner for her feedback and comments and Jeanette Daum for contributing to an earlier version of this project.
+We thank Franziska Roesner for her valuable feedback and Jeanette Daum for contributing to an earlier version of this project.
 \bibliographystyle{abbrv}
 \bibliography{sigproc}  
 
