@@ -215,23 +215,34 @@ Currently, our analysis supports the core actions only.
 
 Our algorithm is based on an elimination technique which is explained below.
 \begin{enumerate}
-\item First of all, by statically analysing the AST of the script, we identify all the items that appear in a rule. This is an exhaustive list of all potential event-based triggers. 
-\item Naively adding all of the potential triggers would unnecessarily fire the rules too many time. Hence, we apply an elimination algorithm which has two steps.
+\item By statically analysing the AST of the script, $S$, we first identify all the items that appear in a rule, $R$. This is an exhaustive list of all potential event-based triggers. Let this list be $T$.
+\item Naively adding all $t \in T$ as triggers of $R$ would either unnecessarily fire $R$ too many time or add redundant triggers which would make $R$ unnecessarily complicated. Hence, we apply an elimination algorithm which has two steps. The following two definitions are used in the elimination algorithm. 
+
+\emph{Dependent item}. We define an item to be \emph{dependent} if its value is computed based on other items and it is not live at any point in a rule, i.e its value is not read before it is written to.
+
+\emph{Independent item}. We define an item to be \emph{independent} if its value is directly obtained from a sensor or a user's input.
+
+\emph{Redundant trigger}. We define an event-based trigger to be redundant if inclusion of the trigger in a rule \emph{never} changes the state of any item involved in the rule when the rule is fired due to it.
 \begin{enumerate}
-\item In the first step, we manually generate a \textit{homecfg} configuration file based on the items file and the core actions supported by the openHAB runtime as described in section~\ref{subsec:actions}. This configuration file contains two types of information:
+\item  A dependent item $d$ is not included in $T$ because it is redundant.  \\
+\emph{Theorem}. A dependent item $d$ is a redundant trigger.\\
+\emph{Proof}. Let us prove this by contradiction and assume that $d$ is not a redundant trigger. Since $d$ is dependent, it means that $d$'s value is computed based on other items and $d$ is never read before being written to. Let $i_1, i_2, ..., i_n, n > 0$ be the other items involved in $R$ and let $i_1, i_2, ..., i_m, m \leqslant n$ be those on which $d$ depends: $d = f (i_1, i_2, ..., i_m)$. Without loss of generality, we assume $i_1, i_2, ..., i_m$ to be independent.
+If $d$ is not redundant, then in some firing of $R$ due to $d$, the value of at least one of $d, i_1, i_2, ..., i_n$ must change. Since $d$ is never read from before being written to, none of $i_1, i_2, ..., i_n$ can be affected by $d$. Further, since $d$ only depends on $i_1, i_2, ..., i_m$ and not on itself, $d$ as a trigger will never change its own value. Thus, $d$ never changes the value of any of the involved items in R. This contradicts our assumption that $d$ is non-redundant and we thus conclude that $d$ must be redundant. $\blacksquare$
+
+
+\item We manually generate a \textit{homecfg} configuration file based on the items file and the core actions supported by the openHAB runtime as described in section~\ref{subsec:actions}. This configuration file contains two types of information:
 \begin{enumerate}
 \item names of those actions that do not affect the state of any device, e.g. logging actions. \label{itm: one}
 \item item names that represent output states. This refers to states that do not change the state of any device in the house. Examples would be items meant for notifications or status messages. \label{itm: two}
 \end{enumerate}
 If an item appears \emph{only} as an argument to the actions mentioned in~\ref{itm: one}, we do not add them as triggers. Output items mentioned in~\ref{itm: two} are also not added as triggers. 
-\item We define an item to be \emph{dependent} if its value is computed based on other items and it is not live at any point in a rule, i.e its value is not read before it is written to.  We do not add dependent items as triggers. 
 
 \end{enumerate}
 \end{enumerate}
 
-\emph{Scope of our algorithm}. The algorithm for automatically generating triggers described above targets event-based triggers only--our tool does not aim to suggest temporal or system triggers. This is because temporal and system based triggers are highly dependent on the end user's preference and without any additional annotations from the user, it is impossible to suggest a generic temporal or system trigger that will be applicable to all users. Since our tool does not require any annotations from the end user, the scope of our tool is limited to event-based triggers only. This means that if the end user intends a rule to be fired only under system or temporal triggers, the suggestions provided by our tool will not be useful. 
+\emph{Scope}. The algorithm for automatically generating triggers described above targets event-based triggers only--our tool does not aim to suggest temporal or system triggers. This is because temporal and system based triggers are highly dependent on the end user's preference and without any additional annotations from the user, it is impossible to suggest a generic temporal or system trigger that will be applicable to all users. Since our tool does not require any annotations from the end user, the scope of our tool is limited to event-based triggers only. This means that if the end user intends a rule to be fired only under system or temporal triggers, the suggestions provided by our tool will not be useful. 
 
-As mentioned before, our tool also identifies triggers that are missing, in case the end user already has written some triggers. If the triggers written by the end users only include system and temporal triggers, then our tool does not suggest any other event-based trigger because that would modify the behavior of the rule. If however, at least one event-based trigger is included,  then our tool identifies all other event-based triggers that should also be included. 
+As mentioned before, our tool can also identify triggers that are missing, in case the end user already has written some triggers. If the triggers written by the end users only include system and temporal triggers, then our tool does not suggest any other event-based trigger because that would modify the behavior of the rule. If however, at least one event-based trigger is included,  then our tool identifies all other event-based triggers that should also be included. 
 
 \begin{figure*}
 \centering
@@ -293,7 +304,7 @@ We evaluated our tool on 116 end user written rules. We obtained the rules from 
 Recent work has mentioned possible security loopholes in smart homes~\cite{yoshi, dhanjani, jung}. there is more, need to add from previous documents I wrote.}
 
 \section{Conclusions}
-End users have a major role in home automation--they decide the automation rules for the devices. Not surprisingly, our research shows that these end user written rules \textit{are} a major source of security vulnerability in smart homes.3 
+End users have a major role in home automation--they decide the automation rules for the devices. Not surprisingly, our research shows that these end user written rules \textit{are} a major source of security vulnerability in smart homes.
 We observed that a common error made by end users while writing the rules is having insufficient number of triggers, leading to fewer firings of the rules than necessary. To prevent this problem, we developed a tool that can automatically generate trigger conditions based on the actions in a rule as well as identify missing triggers if some of them are already provided. This reduces the burden of end user by assisting them in including all the required triggers. 
 
 We evaluated our tool on real home automation rules written by end users and found that out of 116 rules, 74 had insufficient number of triggers. By manual inspecting the suggestions provided by the tool, we found that each one of them were relevant and including them in the rules prevented the unexpected behaviors observed previously. 
