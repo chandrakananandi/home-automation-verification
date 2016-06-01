@@ -216,21 +216,23 @@ Currently, our analysis supports the core actions only.
 Our algorithm is based on an elimination technique which is explained below.
 \begin{enumerate}
 \item First of all, by statically analysing the AST of the script, we identify all the items that appear in a rule. This is an exhaustive list of all potential event-based triggers. 
-\item Naively adding all of the potential triggers would unnecessarily fire the rules too many time. Hence, we apply an elimination algorithm which has three steps.
-\begin{itemize}
+\item Naively adding all of the potential triggers would unnecessarily fire the rules too many time. Hence, we apply an elimination algorithm which has two steps.
+\begin{enumerate}
 \item In the first step, we manually generate a \textit{homecfg} configuration file based on the items file and the core actions supported by the openHAB runtime as described in section~\ref{subsec:actions}. This configuration file contains two types of information:
 \begin{enumerate}
-\item names of those actions that do not affect the state of any device, e.g. logging actions. 
-\item item names that represent output states. This refers to states that do not change the state of any device in the house. Examples would be items meant for notifications or status messages. 
+\item names of those actions that do not affect the state of any device, e.g. logging actions. \label{itm: one}
+\item item names that represent output states. This refers to states that do not change the state of any device in the house. Examples would be items meant for notifications or status messages. \label{itm: two}
 \end{enumerate}
-\end{itemize}
+If an item appears \emph{only} as an argument to the actions mentioned in~\ref{itm: one}, we do not add them as triggers. Output items mentioned in~\ref{itm: two} are also not added as triggers. 
+\item We define an item to be \emph{dependent} if its value is computed based on other items and it is not live at any point in a rule, i.e its value is not read before it is written to.  We do not add dependent items as triggers. 
+
+\end{enumerate}
 \end{enumerate}
 
 \emph{Scope of our algorithm}. The algorithm for automatically generating triggers described above targets event-based triggers only--our tool does not aim to suggest temporal or system triggers. This is because temporal and system based triggers are highly dependent on the end user's preference and without any additional annotations from the user, it is impossible to suggest a generic temporal or system trigger that will be applicable to all users. Since our tool does not require any annotations from the end user, the scope of our tool is limited to event-based triggers only. This means that if the end user intends a rule to be fired only under system or temporal triggers, the suggestions provided by our tool will not be useful. 
 
 As mentioned before, our tool also identifies triggers that are missing, in case the end user already has written some triggers. If the triggers written by the end users only include system and temporal triggers, then our tool does not suggest any other event-based trigger because that would modify the behavior of the rule. If however, at least one event-based trigger is included,  then our tool identifies all other event-based triggers that should also be included. 
 
-\todo{finish this section, LOTS TO ADD-- use of homecfg, what happens in case of time and system triggers only?--suggestions are not useful and missing triggers are identified if rule also has atleast some event based trigger. How to eliminate triggers that dont make sense? if it is not modified before reading from, then it is not useful--how did you implement this?}
 \begin{figure*}
 \centering
 \includegraphics [trim=0cm 19cm 0 0cm, scale=0.7]{images/design.pdf}
