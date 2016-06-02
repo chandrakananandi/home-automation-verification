@@ -211,7 +211,7 @@ Actions are predefined methods in Java that can be used in the scripts of the ru
 \item By statically analysing the AST of the script, $S$, we first identify all the items that appear in the action block of a rule, $R$. This is an exhaustive list of all potential event-based triggers. Let this list be $T$.
 \item Naively adding all $t \in T$ as triggers of $R$ would either unnecessarily fire $R$ too many time or add redundant triggers which would make $R$ too complicated. Hence, we apply an elimination technique to get rid of triggers that are not required. The following definitions are used in the elimination algorithm. 
 
-\emph{Live item}. An item is live in R if its value is read before it is written to in the rule script. 
+\emph{Live item}. An item is live in $R$ if its value is read before it is written to in the rule script, $S$. 
 
 \emph{Dependent item}. We define an item to be \emph{dependent} in $R$ if its value is computed based on other items or variables in the rule--this implies that the item is \emph{not live}. 
  
