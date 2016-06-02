@@ -2001,7 +2001,7 @@ then
 		})
 		sendCommand(Light_FF_Kitchen_Cupboard, ON)
 		sendCommand(Light_FF_Kitchen_Bar, ON)
-		sendCommand(Socket_Livingroom1, ON)
+		sendCommand(Socket_Livingroom, ON)
 		postUpdate(Scene1, OFF)
 	}
 end
