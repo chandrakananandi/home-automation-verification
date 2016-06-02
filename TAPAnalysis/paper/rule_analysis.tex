@@ -219,7 +219,7 @@ Actions are predefined methods in Java that can be used in the scripts of the ru
 
 \emph{Redundant trigger}. We define an event-based trigger to be redundant if inclusion of the trigger in a rule \emph{never} changes the state of any item or the value of any variable involved in the rule when the rule is fired due to it.
 \begin{enumerate}
-\item  An item $d$ which is not \textit{live} in $R$ is not included in $T$ because it is redundant. As a corollary, if $d$ is dependent, it is also not included it $T$.\\
+\item  An item $d$ which is not \textit{live} in $R$ is not included in $T$ because it is redundant. As a corollary, if $d$ is dependent, it is also not included in $T$.\\
 \emph{Theorem}. If $d$ is not live in $R$, then it is a redundant trigger.\\
 \emph{Proof}. Let us assume that $d$ is not redundant. That means it must change the value of some item or variable in $R$ in some firing. Let this item or variable be $a$. Since $d$ is not live, its value is never read before it is written to. The following cases are possible:
 \begin{itemize} [topsep=-2pt, itemsep=-1pt]
@@ -240,14 +240,12 @@ combination of event-based, temporal, system  & medium \\ \hline
 temporal & low \\\hline
 system & low \\ \hline
 combination of temporal, system & low  \\ \hline
-
 \end{tabular}
 \caption{Scope of our tool for suggesting triggers only based on the rule script (no triggers written by the user). High indicates that all the suggestions are useful, medium indicates that only the event-based suggestions are useful and none indicates that none of the suggestions are useful. }
 \label{tab:scope1}
 \end{table}
 
 As mentioned before, our tool can also identify triggers that are missing, in case the end user already has written some triggers. Table~\ref{tab:scope2} summarizes the scope of our tool for identifying missing triggers. If the triggers written by the end users only include system and temporal triggers, then our tool does not suggest any other event-based trigger because that would modify the behavior of the rule. If however, at least one event-based trigger is included, then our tool identifies all other event-based triggers that should also be included. 
- 
 \begin{table}[h]
 \centering
 \begin{tabular}{|l|l|}
