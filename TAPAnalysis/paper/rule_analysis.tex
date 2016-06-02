@@ -141,14 +141,13 @@ then
 end
 \end{lstlisting}
 This rule is supposed to set the value of \texttt{State\_Away} to \texttt{ON} when everyone is away. It also sets \texttt{State\_Sleeping} to \texttt{OFF} if it currently \texttt{ON} so that both \texttt{State\_Away} and \texttt{State\_Sleeping} are not \texttt{ON} simultaneously. However, the trigger for this rule only contains \texttt{State\_Away}. As a result, this rule is only fired when \texttt{State\_Away} is changed by the end user. However, if the value of \texttt{State\_Sleeping} is changed after the value of \texttt{State\_Away}, then the rule is not fired due to which, it allows both values to be set at the same time. This deviates from the expected behavior of the rule--it is no longer clear whether the home inhabitants are away or inside sleeping. This is also a security vulnerability because if this rule triggers another rule for turning on the security alarm in the house and the security alarm is meant to be off when people are at home but on when they are away, then it could get wrongly deactivated if the value of \texttt{STATE\_SLEEPING} is set to \texttt{ON}. Figure~\ref{fig:awayrule} shows a snapshot of the desktop application with both states being set to \texttt{ON}. 
-
 \begin{figure}
 \centering
-\includegraphics [trim=0 13cm 0 0, scale=0.135]{images/openhab-runtime.png}
-\caption{Desktop UI showing both \texttt{State\_Away} and \texttt{State\_Sleeping} being set at the same time.}
+\includegraphics [trim=1cm 13cm 0 0, scale=0.14]{images/openhab-runtime.png}
+\caption{Desktop UI showing that it is possible to set both \texttt{State\_Away} and \texttt{State\_Sleeping} to \texttt{ON} at the same time. Blue indicate that they are \texttt{ON}.}
 \label{fig:awayrule}
 \end{figure}
-This example shows that even if the action block of a rule is implemented correctly, not having all the correct triggers can lead to too few firings of the rule and thus, unexpected behavior. To solve this problem, we propose a technique based on static analysis that can automatically generate event-based triggers and also detect missing ones by analysing code in the action block. The result of running our tool on the rule in listing~\ref{lst:away} is shown in listing~\ref{lst:output}. It shows two features of the tool: suggesting all event based triggers and identifying missing triggers.
+This example shows that even if the action block of a rule is implemented correctly, not having all the correct triggers can lead to too few firings of the rule and thus, unexpected behavior. To solve this problem, we propose a technique based on static analysis that can automatically generate event-based triggers and also detect missing ones by analysing code in the action block. 
 \begin{lstlisting}[caption={List of suggested and missing triggers shown by our tool for the Away rule.},label={lst:output}]
 rule:Away rule
 suggested trigger: State_Away
@@ -157,6 +156,7 @@ suggested trigger: State_Sleeping
 rule:Away rule
 missing trigger: State_Sleeping
 \end{lstlisting}
+The result of running our tool on the rule in listing~\ref{lst:away} is shown in listing~\ref{lst:output}. It shows two features of the tool: suggesting all event based triggers and identifying missing triggers when some triggers are already written by the end user.
 
 \section{Threat model}
 Our focus is on security vulnerabilities that result due to incorrectly written automation rules by the home inhabitants or by an adversary although the former is more likely. 
@@ -199,13 +199,7 @@ Listing~\ref{lst:rule} shows the syntax of the rules. There are three types of t
 \end{enumerate}
 \subsection{Actions}
 \label{subsec:actions}
-Actions are predefined methods in Java that can be used in the scripts of the rules. The openHAB runtime provides a core set of actions but more can be implemented for specific devices by the respective manufacturers. Some of the important core actions are:
-\begin{enumerate} [topsep=0pt,itemsep=-1ex]
-\item event bus actions: \\ \texttt{sendCommand(String itemName, String commandName)}, \texttt{postUpdate(String itemName, String stateValue)}
-\item logging actions: \texttt{logDebug, logWarn, logInfo, logError}
-\end{enumerate}
- The entire list can be found in the openHAB wiki~\cite{openhabwiki}.
-Currently, our analysis supports the core actions only. 
+Actions are predefined methods in Java that can be used in the scripts of the rules. The openHAB runtime provides a core set of actions but more can be implemented for specific devices by the respective manufacturers. The most important core actions for the purpose of our analysis are the event bus actions: \texttt{sendCommand(String itemName, String commandName)}, \texttt{postUpdate(String itemName, String stateValue)}. The entire list of actions can be found in the openHAB wiki~\cite{openhabwiki}.
 
 \section{Errors due to too few triggers}
 \emph{Problem Definition}. Errors due to too few triggers is a condition where an insufficient number of triggers leads to fewer firing of a rule thereby leading to unexpected behavior or security vulnerabilities. \\
@@ -217,11 +211,11 @@ Currently, our analysis supports the core actions only.
 \item By statically analysing the AST of the script, $S$, we first identify all the items that appear in a rule, $R$. This is an exhaustive list of all potential event-based triggers. Let this list be $T$.
 \item Naively adding all $t \in T$ as triggers of $R$ would either unnecessarily fire $R$ too many time or add redundant triggers which would make $R$ unnecessarily complicated. Hence, we apply an elimination technique to get rid of triggers that are not relevant. The following definitions are used in the elimination algorithm. 
 
-\emph{Live item}. An item is live in R if its value is read before it is written to. 
+\emph{Live item}. An item is live in R if its value is read before it is written to in the rule script. 
 
-\emph{Dependent item}. We define an item to be \emph{dependent} in $R$ if its value is computed based on other items or variables in the rule which implies that it is not \emph{live}. 
+\emph{Dependent item}. We define an item to be \emph{dependent} in $R$ if its value is computed based on other items or variables in the rule--this implies that the item is \emph{not live}. 
  
-\emph{Independent item}. We define an item to be \emph{independent} in $R$ if  its value is directly obtained from a sensor or a user's input and not computed based on any other item or variable. 
+\emph{Independent item}. We define an item to be \emph{independent} in $R$ if  its value is directly obtained from a sensor or a user's input and not computed based on any other item or variable--this implies that the item is \emph{live} in $R$. 
 
 \emph{Redundant trigger}. We define an event-based trigger to be redundant if inclusion of the trigger in a rule \emph{never} changes the state of any item or the value of any variable involved in the rule when the rule is fired due to it.
 \begin{enumerate}
@@ -229,52 +223,48 @@ Currently, our analysis supports the core actions only.
 \emph{Theorem}. If $d$ is not live in $R$, then it is a redundant trigger.\\
 \emph{Proof}. Let us assume that $d$ is not redundant. That means it must change the value of some item or variable in $R$ in some firing. Let this item or variable be $a$. Since $d$ is not live, its value is never read before it is written to. The following cases are possible:
 \begin{itemize} [topsep=-2pt, itemsep=-1pt]
-\item $d$ is assigned a constant value. In this case, $d$ as a trigger does not change the value of $a$ because the action block of R never changes and thus $d$'s value is always the same in every firing.
+\item $d$ is assigned a constant value. In this case, $d$ as a trigger does not change the value of $a$ because $d$'s value is always the same (as long as the script of R  itself is not changed).
 \item $d$ is some function of other items, $i_1, i_2, ..., i_n$ and variables $v_1, v_2, ..., v_m$ in $R$. In this case, $d$ as a trigger will still not affect the value of $a$ because $d$'s own value depends on the values of items $i_1, i_2, ..., i_n$--adding the live items from $i_1, i_2, ..., i_n$ as triggers would be sufficient.
 \end{itemize}
 \end{enumerate}
 \end{enumerate}
 
-%\begin{lstlisting}[mathescape, caption={Example of a state which is not dependent but should still not be a trigger.},label={lst:redundant}]
-%rule "Auto changed"
-%when
-%  ...
-%then
-%  var String msg = ""
-%  if(Auto_Rollershutter.state == ON)
-%  { 
-%    ...
-%  } 
-%  ...
-%  if($\lstul{AutoStatus.state != msg})$
-%  {
-%    postUpdate(AutoStatus,msg)
-%  }
-%end
-%\end{lstlisting}
+\emph{Scope}. The algorithm for automatically generating triggers described above targets event-based triggers only--our tool does not aim to suggest temporal or system triggers. This is because temporal and system based triggers are highly dependent on the end user's preference and without any additional annotations from the user, it is impossible to suggest a generic temporal or system trigger that will be applicable to all users. Since our tool does not require any annotations from the end user, the scope of our tool is limited to event-based triggers. This means that if the end user intends a rule to be fired only under system or temporal triggers, the suggestions provided by our tool will not be useful. Table~\ref{tab:scope1} summarizes the usefulness of our tool for suggesting triggers with respect to the conditions under which the user actually expects the rule to be fired.
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|}
+\hline
+user's expectation & usefulness \\ \hline
+event-based & high \\ \hline
+combination of event-based, temporal, system  & medium \\ \hline
+temporal & low \\\hline
+system & low \\ \hline
+combination of temporal, system & low  \\ \hline
 
+\end{tabular}
+\caption{Scope of our tool for suggesting triggers only based on the rule script (no triggers written by the user). High indicates that all the suggestions are useful, medium indicates that it only the event-based suggestions are useful and none indicates that none of the suggestions are useful. }
+\label{tab:scope1}
+\end{table}
 
-\emph{Scope}. The algorithm for automatically generating triggers described above targets event-based triggers only--our tool does not aim to suggest temporal or system triggers. This is because temporal and system based triggers are highly dependent on the end user's preference and without any additional annotations from the user, it is impossible to suggest a generic temporal or system trigger that will be applicable to all users. Since our tool does not require any annotations from the end user, the scope of our tool is limited to event-based triggers. This means that if the end user intends a rule to be fired only under system or temporal triggers, the suggestions provided by our tool will not be useful. 
-
-As mentioned before, our tool can also identify triggers that are missing, in case the end user already has written some triggers. Table~\ref{tab:scope} summarizes the scope of our tool for identifying missing triggers. If the triggers written by the end users only include system and temporal triggers, then our tool does not suggest any other event-based trigger because that would modify the behavior of the rule. If however, at least one event-based trigger is included, then our tool identifies all other event-based triggers that should also be included. 
+As mentioned before, our tool can also identify triggers that are missing, in case the end user already has written some triggers. Table~\ref{tab:scope2} summarizes the scope of our tool for identifying missing triggers. If the triggers written by the end users only include system and temporal triggers, then our tool does not suggest any other event-based trigger because that would modify the behavior of the rule. If however, at least one event-based trigger is included, then our tool identifies all other event-based triggers that should also be included. 
  
 \begin{table}[h]
 \centering
-\begin{tabular}{|c|c|}
+\begin{tabular}{|l|l|}
 \hline
-user written triggers & tool output \\ \hline
+user written triggers & tool's output \\ \hline
+at least one event-based & missing event-based triggers \\ \hline
 only temporal & none \\\hline
 only system & none \\ \hline
 temporal and system & none  \\ \hline
-at least one event-based & missing event-based triggers \\ \hline
 \end{tabular}
 \caption{Scope of our tool for detecting missing triggers when some triggers are already written by the user.}
-\label{tab:scope}
+\label{tab:scope2}
 \end{table}
 
 \begin{figure*}
 \centering
-\includegraphics [trim=0cm 19cm 0 0cm, scale=0.7]{images/design.pdf}
+\includegraphics [trim=0cm 18cm 0 5cm, scale=0.8]{images/design.pdf}
 \caption{Design of trigger generator tool.}
 \label{fig:design}
 \end{figure*} 
