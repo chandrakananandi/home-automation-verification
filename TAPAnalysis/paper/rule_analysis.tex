@@ -208,8 +208,8 @@ Actions are predefined methods in Java that can be used in the scripts of the ru
 
 \emph{Approach}. Our approach is to automatically generate all the correct trigger conditions from the actions written by the end users. We developed a static technique to achieve this so that the rules do not need to be fired at all until all the correct triggers are included. Figure~\ref{fig:design} shows the design of our tool. It takes as input a \textit{rules} file and and \textit{items} file. The technique is explained below.
 \begin{enumerate}
-\item By statically analysing the AST of the script, $S$, we first identify all the items that appear in a rule, $R$. This is an exhaustive list of all potential event-based triggers. Let this list be $T$.
-\item Naively adding all $t \in T$ as triggers of $R$ would either unnecessarily fire $R$ too many time or add redundant triggers which would make $R$ unnecessarily complicated. Hence, we apply an elimination technique to get rid of triggers that are not relevant. The following definitions are used in the elimination algorithm. 
+\item By statically analysing the AST of the script, $S$, we first identify all the items that appear in the action block of a rule, $R$. This is an exhaustive list of all potential event-based triggers. Let this list be $T$.
+\item Naively adding all $t \in T$ as triggers of $R$ would either unnecessarily fire $R$ too many time or add redundant triggers which would make $R$ too complicated. Hence, we apply an elimination technique to get rid of triggers that are not required. The following definitions are used in the elimination algorithm. 
 
 \emph{Live item}. An item is live in R if its value is read before it is written to in the rule script. 
 
