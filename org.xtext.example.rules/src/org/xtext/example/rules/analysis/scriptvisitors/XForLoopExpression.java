@@ -1,6 +1,7 @@
 package org.xtext.example.rules.analysis.scriptvisitors;
 
 import org.eclipse.xtext.xbase.XExpression;
+import org.eclipse.xtext.xbase.impl.XForLoopExpressionImpl;
 
 /**
  * 
@@ -9,13 +10,13 @@ import org.eclipse.xtext.xbase.XExpression;
  */
 public class XForLoopExpression extends org.eclipse.xtext.xbase.impl.XForLoopExpressionImpl implements Expression {
 
-	private XExpression expression;
+	private XForLoopExpressionImpl expression;
 
-	public XForLoopExpression(XExpression exp) {
+	public XForLoopExpression(XForLoopExpressionImpl exp) {
 		expression = exp;
 	}
 
-	public XExpression getExpression() {
+	public XForLoopExpressionImpl getExpression() {
 		return expression;
 	}
 

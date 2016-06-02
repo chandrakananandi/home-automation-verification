@@ -41,10 +41,10 @@ public class ConflictAvoidanceChecker {
 	}
 	
 	public static void main(String[] args) throws IOException {
-		String rule_file = "sample_rule2.rules";
-		String item_file= "sample_item2.items";
+		String rule_file = "sample_rule.rules";
+		String item_file= "sample_item1.items";
 		File conflict_file = new File("./src/org/xtext/example/rules/analysis/resources/sample_conflict.conflicts");
-		File config_file= new File("./src/org/xtext/example/rules/analysis/resources/sample_config2.homecfg");
+		File config_file= new File("./src/org/xtext/example/rules/analysis/resources/sample_config1.homecfg");
 		
 		long time_start=System.currentTimeMillis();
 		parseConfiguration(config_file);
@@ -157,8 +157,7 @@ public class ConflictAvoidanceChecker {
 			Set<String>missing_triggers=new HashSet<String>();
 			String redundant_trigger_suggestion=null;
 			String dependent_trigger_suggestion=null;
-			for(String member_state: ruleParser.getMemberStates().get(rule_info.getName())) {	
-				
+			for(String member_state: ruleParser.getMemberStates().get(rule_info.getName())) {					
 				if(itemParser.getItemNames().contains(member_state)) {				
 					if(!rule_info.getTriggerItemNames().contains(member_state)){
 						missing_triggers.add(member_state);	
@@ -212,7 +211,8 @@ public class ConflictAvoidanceChecker {
 		System.out.println("total potential buggy rules: "+ buggy_count);
 	}
 		
-	// if member state is an argument of an output action (those in the homecfg file) only, it is not needed to be a trigger.
+	// if member state is an argument of an output action (those in the homecfg file) only, it is not needed to be a trigger. Also, if it is an output state listed in
+	// homecfg and does not appear in more than one rule, then it does not need to be a trigger.
 	public static String eliminateRedundantTriggers(String member_state) {
 		String eliminate_member=null;
 		int side_effect_free_occurences=0;
@@ -224,6 +224,7 @@ public class ConflictAvoidanceChecker {
 		}
 		for(FeatureInvocation feature: ExpressionVisitorImpl.feature_invocations) {
 			if(side_effect_free_actions_output_states.contains(feature.getMethodName())) {
+				
 				if(feature.getArguments().contains(member_state)) {
 					side_effect_free_occurences++;								
 				} else {

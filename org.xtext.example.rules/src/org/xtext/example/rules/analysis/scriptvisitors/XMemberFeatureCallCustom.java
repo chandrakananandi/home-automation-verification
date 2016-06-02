@@ -2,8 +2,7 @@ package org.xtext.example.rules.analysis.scriptvisitors;
 
 import org.eclipse.xtext.xbase.impl.XMemberFeatureCallImplCustom;
 
-public class XMemberFeatureCallCustom extends org.eclipse.xtext.xbase.impl.XMemberFeatureCallImplCustom
-		implements Expression {
+public class XMemberFeatureCallCustom extends org.eclipse.xtext.xbase.impl.XMemberFeatureCallImplCustom implements Expression {
 	private XMemberFeatureCallImplCustom expression;
 
 	public XMemberFeatureCallCustom(XMemberFeatureCallImplCustom exp) {

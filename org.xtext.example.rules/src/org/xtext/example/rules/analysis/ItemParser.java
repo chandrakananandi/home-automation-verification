@@ -2,6 +2,8 @@ package org.xtext.example.rules.analysis;
 
 
 import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
@@ -14,17 +16,22 @@ import org.xtext.example.items.items.impl.ModelNormalItemImpl;
 public class ItemParser {
 	
 	String item_file_name;
-	ArrayList<ItemInformation> item_database = new ArrayList<ItemInformation>();
+	List<ItemInformation> item_database = new ArrayList<ItemInformation>();
+	List<String> group_names=new ArrayList<String>();
 	
 	public ItemParser(String file_name){
 		item_file_name=file_name;
+	}
+	
+	public List<String> getGroupsNames() {
+		return group_names;
 	}
 	
 	public String getItemFileName(){
 		return item_file_name;
 	}
 	
-	public ArrayList<ItemInformation> getItemSet(){
+	public List<ItemInformation> getItemSet(){
 		return item_database;
 	}
 	
@@ -45,7 +52,11 @@ public class ItemParser {
 		while(eobjects.hasNext()){
 			EObject obj=eobjects.next();
 			if(obj instanceof ModelNormalItemImpl){
-				ItemInformation item=new ItemInformation(((ModelNormalItemImpl) obj).getName(), ((ModelNormalItemImpl) obj).getType());
+				for(String group: ((ModelNormalItemImpl)obj).getGroups()) {
+					group_names.add(group);
+				}
+				ItemInformation item=new ItemInformation(((ModelNormalItemImpl) obj).getName(), ((ModelNormalItemImpl) obj).getType(), 
+						((ModelNormalItemImpl) obj).getGroups());
 				item_database.add(item);
 			}
 		}

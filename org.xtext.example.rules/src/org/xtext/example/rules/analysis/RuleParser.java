@@ -79,6 +79,7 @@ public class RuleParser {
 			
 		while (eobjects.hasNext()) {
 			EObject eobj = eobjects.next();
+			//System.err.println(eobj.getClass());
 			if (eobj.getClass().getSimpleName().equals("RuleImpl")) {
 				Rule rule = (Rule) eobj;
 				int member_feature_start_index=0;
@@ -131,6 +132,7 @@ public class RuleParser {
 				ConflictAvoidanceChecker.ast_writer.println("rule name: " + rule.getName());
 								
 				for (EObject obj : rule.getScript().eContents()) {
+					
 					generateSimplerAST(obj, expressionSwitch);					
 				}
 				

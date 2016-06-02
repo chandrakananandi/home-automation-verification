@@ -259,13 +259,24 @@ public class ExpressionVisitorImpl implements ExpressionVisitor {
 		return null;
 	}
 	
+
 	@Override
 	public XExpression visit(XBlockExpressionCustom xBlockExpressionCustom) {
-		for (EObject child : xBlockExpressionCustom.getExpression().eContents()) {
-			if (child instanceof XExpression) {
-				expressionSwitch.caseXExpression((XExpression) child);
-			}
+		for (XExpression child : xBlockExpressionCustom.getExpression().getExpressions()) {
+			expressionSwitch.caseXExpression(child);			
 		}
+		return null;
+	}
+	
+	@Override
+	public XExpression visit(XClosure xClosure) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public XExpression visit(XForLoopExpression xForLoopExpression) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 	
@@ -337,11 +348,6 @@ public class ExpressionVisitorImpl implements ExpressionVisitor {
 
 	}
 
-	@Override
-	public XExpression visit(XClosure xClosure) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	@Override
 	public XExpression visit(XBinaryOperation xBinaryOperation) {
@@ -429,12 +435,6 @@ public class ExpressionVisitorImpl implements ExpressionVisitor {
 
 	@Override
 	public XExpression visit(XSynchronizedExpression xSynchronizedExpression) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public XExpression visit(XForLoopExpression xForLoopExpression) {
 		// TODO Auto-generated method stub
 		return null;
 	}

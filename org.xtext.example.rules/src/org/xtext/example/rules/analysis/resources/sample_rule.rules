@@ -1,0 +1,24 @@
+rule "Scene 1"
+when
+	Item Scene1 changed
+then
+	if( Scene1.state == ON )
+	{
+		Lights_FF.members.forEach(kreis|{
+			if(kreis.state!=OFF && kreis.state!=0 && kreis!=Light_FF_Kitchen_Cupboard && kreis!=Light_FF_Kitchen_Bar && kreis!=Socket_Livingroom)
+			{
+				sendCommand(kreis, OFF)
+			}
+		})
+		Lights_SF.members.forEach(kreis|{
+			if(kreis.state!=OFF && kreis.state!=0)
+			{
+				sendCommand(kreis, OFF)
+			}
+		})
+		sendCommand(Light_FF_Kitchen_Cupboard, ON)
+		sendCommand(Light_FF_Kitchen_Bar, ON)
+		sendCommand(Socket_Livingroom1, ON)
+		postUpdate(Scene1, OFF)
+	}
+end
