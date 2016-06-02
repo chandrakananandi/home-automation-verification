@@ -10,6 +10,7 @@
 \lstset{basicstyle=\ttfamily, captionpos=b}
 \usepackage{xcolor}
 \newcommand\todo[1]{\textbf{\textcolor{red}{#1}}}
+\newcommand{\lstul}[1]{\underline{\mbox{\tt #1}}}
 
 \toappear{}
 \begin{document}
@@ -171,7 +172,7 @@ openHAB~\cite{openhab} is an open source software for integrating different type
 The runtime provides a communication platform between the devices. There are currently about 135 devices, protocols and cloud technologies supported by openHAB. These are connected by means of an event bus. Figure~\ref{fig:framework} shows the main components of the openHAB framework. The item repository stores the states of the devices. It is connected to the UI and the rule base. Changes to the states can be made through the UI and by rule firings. The latest state is communicated to the actual device through the event bus. The bindings are libraries that connect the physical devices to the openHAB framework. As shown in the figure, there are two types of events that are communicated by the event bus--1) commands: causing an action or change of state in a device, such as \texttt{ON}, \texttt{OFF}, \texttt{UP}, \texttt{DOWN} and 2) updates: informing the UI component or the rule engine or other devices about a change in the state of a device.
 \begin{figure}
 \centering
-\includegraphics [trim=2cm 15cm 0 5cm, scale=0.6]{images/framework.pdf}
+\includegraphics [trim=-2cm 15cm 0 6.5cm, scale=0.4]{images/framework.pdf}
 \caption{openHAB framework.}
 \label{fig:framework}
 \end{figure} 
@@ -211,38 +212,65 @@ Currently, our analysis supports the core actions only.
 
 \emph{Goal}. Our goal is to prevent end users from making errors due to too few triggers--we want to ensure that all the correct triggers are included in the rules. \\
 
-\emph{Approach}. Our approach is to automatically generate all the correct trigger conditions from the actions written by the end users. We developed a static technique to achieve this so that the rules do not need to be fired at all until all the correct triggers are included. Figure~\ref{fig:design} shows the design of our tool. It takes as input a \textit{rules} file and and \textit{items} file. 
-
-Our algorithm is based on an elimination technique which is explained below.
+\emph{Approach}. Our approach is to automatically generate all the correct trigger conditions from the actions written by the end users. We developed a static technique to achieve this so that the rules do not need to be fired at all until all the correct triggers are included. Figure~\ref{fig:design} shows the design of our tool. It takes as input a \textit{rules} file and and \textit{items} file. The technique is explained below.
 \begin{enumerate}
 \item By statically analysing the AST of the script, $S$, we first identify all the items that appear in a rule, $R$. This is an exhaustive list of all potential event-based triggers. Let this list be $T$.
-\item Naively adding all $t \in T$ as triggers of $R$ would either unnecessarily fire $R$ too many time or add redundant triggers which would make $R$ unnecessarily complicated. Hence, we apply an elimination algorithm which has two steps. The following two definitions are used in the elimination algorithm. 
+\item Naively adding all $t \in T$ as triggers of $R$ would either unnecessarily fire $R$ too many time or add redundant triggers which would make $R$ unnecessarily complicated. Hence, we apply an elimination technique to get rid of triggers that are not relevant. The following definitions are used in the elimination algorithm. 
 
-\emph{Dependent item}. We define an item to be \emph{dependent} if its value is computed based on other items and it is not live at any point in a rule, i.e its value is not read before it is written to.
+\emph{Live item}. An item is live in R if its value is read before it is written to. 
 
-\emph{Independent item}. We define an item to be \emph{independent} if its value is directly obtained from a sensor or a user's input.
+\emph{Dependent item}. We define an item to be \emph{dependent} in $R$ if its value is computed based on other items or variables in the rule which implies that it is not \emph{live}. 
+ 
+\emph{Independent item}. We define an item to be \emph{independent} in $R$ if  its value is directly obtained from a sensor or a user's input and not computed based on any other item or variable. 
 
-\emph{Redundant trigger}. We define an event-based trigger to be redundant if inclusion of the trigger in a rule \emph{never} changes the state of any item involved in the rule when the rule is fired due to it.
+\emph{Redundant trigger}. We define an event-based trigger to be redundant if inclusion of the trigger in a rule \emph{never} changes the state of any item or the value of any variable involved in the rule when the rule is fired due to it.
 \begin{enumerate}
-\item  A dependent item $d$ is not included in $T$ because it is redundant.  \\
-\emph{Theorem}. A dependent item $d$ is a redundant trigger.\\
-\emph{Proof}. Let us prove this by contradiction and assume that $d$ is not a redundant trigger. Since $d$ is dependent, it means that $d$'s value is computed based on other items and $d$ is never read before being written to. Let $i_1, i_2, ..., i_n, n > 0$ be the other items involved in $R$ and let $i_1, i_2, ..., i_m, m \leqslant n$ be those on which $d$ depends: $d = f (i_1, i_2, ..., i_m)$. Without loss of generality, we assume $i_1, i_2, ..., i_m$ to be independent.
-If $d$ is not redundant, then in some firing of $R$ due to $d$, the value of at least one of $d, i_1, i_2, ..., i_n$ must change. Since $d$ is never read from before being written to, none of $i_1, i_2, ..., i_n$ can be affected by $d$. Further, since $d$ only depends on $i_1, i_2, ..., i_m$ and not on itself, $d$ as a trigger will never change its own value. Thus, $d$ never changes the value of any of the involved items in R. This contradicts our assumption that $d$ is non-redundant and we thus conclude that $d$ must be redundant. $\blacksquare$
-
-
-\item We manually generate a \textit{homecfg} configuration file based on the items file and the core actions supported by the openHAB runtime as described in section~\ref{subsec:actions}. This configuration file contains two types of information:
-\begin{enumerate}
-\item names of those actions that do not affect the state of any device, e.g. logging actions. \label{itm: one}
-\item item names that represent output states. This refers to states that do not change the state of any device in the house. Examples would be items meant for notifications or status messages. \label{itm: two}
-\end{enumerate}
-If an item appears \emph{only} as an argument to the actions mentioned in~\ref{itm: one}, we do not add them as triggers. Output items mentioned in~\ref{itm: two} are also not added as triggers. 
-
+\item  An item $d$ which is not \textit{live} in $R$ is not included in $T$ because it is redundant. As a corollary, if $d$ is dependent, it is also not included it $T$.\\
+\emph{Theorem}. If $d$ is not live in $R$, then it is a redundant trigger.\\
+\emph{Proof}. Let us assume that $d$ is not redundant. That means it must change the value of some item or variable in $R$ in some firing. Let this item or variable be $a$. Since $d$ is not live, its value is never read before it is written to. The following cases are possible:
+\begin{itemize} [topsep=-2pt, itemsep=-1pt]
+\item $d$ is assigned a constant value. In this case, $d$ as a trigger does not change the value of $a$ because the action block of R never changes and thus $d$'s value is always the same in every firing.
+\item $d$ is some function of other items, $i_1, i_2, ..., i_n$ and variables $v_1, v_2, ..., v_m$ in $R$. In this case, $d$ as a trigger will still not affect the value of $a$ because $d$'s own value depends on the values of items $i_1, i_2, ..., i_n$--adding the live items from $i_1, i_2, ..., i_n$ as triggers would be sufficient.
+\end{itemize}
 \end{enumerate}
 \end{enumerate}
 
-\emph{Scope}. The algorithm for automatically generating triggers described above targets event-based triggers only--our tool does not aim to suggest temporal or system triggers. This is because temporal and system based triggers are highly dependent on the end user's preference and without any additional annotations from the user, it is impossible to suggest a generic temporal or system trigger that will be applicable to all users. Since our tool does not require any annotations from the end user, the scope of our tool is limited to event-based triggers only. This means that if the end user intends a rule to be fired only under system or temporal triggers, the suggestions provided by our tool will not be useful. 
+%\begin{lstlisting}[mathescape, caption={Example of a state which is not dependent but should still not be a trigger.},label={lst:redundant}]
+%rule "Auto changed"
+%when
+%  ...
+%then
+%  var String msg = ""
+%  if(Auto_Rollershutter.state == ON)
+%  { 
+%    ...
+%  } 
+%  ...
+%  if($\lstul{AutoStatus.state != msg})$
+%  {
+%    postUpdate(AutoStatus,msg)
+%  }
+%end
+%\end{lstlisting}
 
-As mentioned before, our tool can also identify triggers that are missing, in case the end user already has written some triggers. If the triggers written by the end users only include system and temporal triggers, then our tool does not suggest any other event-based trigger because that would modify the behavior of the rule. If however, at least one event-based trigger is included,  then our tool identifies all other event-based triggers that should also be included. 
+
+\emph{Scope}. The algorithm for automatically generating triggers described above targets event-based triggers only--our tool does not aim to suggest temporal or system triggers. This is because temporal and system based triggers are highly dependent on the end user's preference and without any additional annotations from the user, it is impossible to suggest a generic temporal or system trigger that will be applicable to all users. Since our tool does not require any annotations from the end user, the scope of our tool is limited to event-based triggers. This means that if the end user intends a rule to be fired only under system or temporal triggers, the suggestions provided by our tool will not be useful. 
+
+As mentioned before, our tool can also identify triggers that are missing, in case the end user already has written some triggers. Table~\ref{tab:scope} summarizes the scope of our tool for identifying missing triggers. If the triggers written by the end users only include system and temporal triggers, then our tool does not suggest any other event-based trigger because that would modify the behavior of the rule. If however, at least one event-based trigger is included, then our tool identifies all other event-based triggers that should also be included. 
+ 
+\begin{table}[h]
+\centering
+\begin{tabular}{|c|c|}
+\hline
+user written triggers & tool output \\ \hline
+only temporal & none \\\hline
+only system & none \\ \hline
+temporal and system & none  \\ \hline
+at least one event-based & missing event-based triggers \\ \hline
+\end{tabular}
+\caption{Scope of our tool for detecting missing triggers when some triggers are already written by the user.}
+\label{tab:scope}
+\end{table}
 
 \begin{figure*}
 \centering
@@ -252,7 +280,7 @@ As mentioned before, our tool can also identify triggers that are missing, in ca
 \end{figure*} 
 
 \section{Implementation}
-We implemented the automatic trigger generator in Java. It involved $\sim$ 3000 LOC. Our tool can be used directly on a rule file without any pre-processing of the rules. 
+We implemented the automatic trigger generator and missing trigger identifier in Java. It involved $\sim$ 3000 LOC. Our tool can be used directly on a rule file without any pre-processing of the rules. 
 
 We used the AST generated by xtext for the rule \textit{scripts} and visited the nodes in the tree to extract relevant information such as the names of the device states used in the method calls or in conditional statements. 
 \todo{[do people care to know about the details?]}
