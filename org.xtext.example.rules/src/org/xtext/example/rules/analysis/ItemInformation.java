@@ -19,8 +19,7 @@ public class ItemInformation {
 	
 	public String getItemType(){
 		return itemType;
-	}
-	
+	}	
 	public ItemInformation(String itemName, String itemType, List<String> groups) {
 		this.itemName=itemName;
 		this.itemType=itemType;
