@@ -208,25 +208,25 @@ Actions are predefined methods in Java that can be used in the scripts of the ru
 
 \emph{Approach}. Our approach is to automatically generate all the correct trigger conditions from the actions written by the end users. We developed a static technique to achieve this so that the rules do not need to be fired at all until all the correct triggers are included. Figure~\ref{fig:design} shows the design of our tool. It takes as input a \textit{rules} file and and \textit{items} file. The technique is explained below.
 \begin{enumerate}
-\item By statically analysing the AST of the script, $S$, we first identify all the items that appear in a rule, $R$. This is an exhaustive list of all potential event-based triggers. Let this list be $T$.
-\item Naively adding all $t \in T$ as triggers of $R$ would either unnecessarily fire $R$ too many time or add redundant triggers which would make $R$ unnecessarily complicated. Hence, we apply an elimination technique to get rid of triggers that are not relevant. The following definitions are used in the elimination algorithm. 
+\item By statically analysing the AST of the script, $S$, we first identify all the items that appear in the action block of a rule, $R$. This is an exhaustive list of all potential event-based triggers. Let this list be $T$.
+\item Naively adding all $t \in T$ as triggers of $R$ would either unnecessarily fire $R$ too many time or add redundant triggers which would make $R$ too complicated. Hence, we apply an elimination technique to get rid of triggers that are not required. The following definitions are used in the elimination algorithm. 
 
-\emph{Live item}. An item is live in R if its value is read before it is written to in the rule script. 
+\emph{Live item}. An item is live in $R$ if its value is read before it is written to in the rule script, $S$. 
 
 \emph{Dependent item}. We define an item to be \emph{dependent} in $R$ if its value is computed based on other items or variables in the rule--this implies that the item is \emph{not live}. 
  
 \emph{Independent item}. We define an item to be \emph{independent} in $R$ if  its value is directly obtained from a sensor or a user's input and not computed based on any other item or variable--this implies that the item is \emph{live} in $R$. 
 
-\emph{Redundant trigger}. We define an event-based trigger to be redundant if inclusion of the trigger in a rule \emph{never} changes the state of any item or the value of any variable involved in the rule when the rule is fired due to it.
-\begin{enumerate}
-\item  An item $d$ which is not \textit{live} in $R$ is not included in $T$ because it is redundant. As a corollary, if $d$ is dependent, it is also not included in $T$.\\
+\emph{Redundant trigger}. We define an event-based trigger to be redundant if inclusion of the trigger in a rule \emph{never} changes the state of any item or the value of any variable involved in $S$ when the rule is fired due to it.
+
+An item $d$ which is not \textit{live} in $R$ is not included in $T$ because it is redundant. As a corollary, if $d$ is dependent, it is also not included in $T$.\\
 \emph{Theorem}. If $d$ is not live in $R$, then it is a redundant trigger.\\
 \emph{Proof}. Let us assume that $d$ is not redundant. That means it must change the value of some item or variable in $R$ in some firing. Let this item or variable be $a$. Since $d$ is not live, its value is never read before it is written to. The following cases are possible:
 \begin{itemize} [topsep=-2pt, itemsep=-1pt]
 \item $d$ is assigned a constant value. In this case, $d$ as a trigger does not change the value of $a$ because $d$'s value is always the same (as long as the script of R  itself is not changed).
-\item $d$ is some function of other items, $i_1, i_2, ..., i_n$ and variables $v_1, v_2, ..., v_m$ in $R$. In this case, $d$ as a trigger will still not affect the value of $a$ because $d$'s own value depends on the values of items $i_1, i_2, ..., i_n$--adding the live items from $i_1, i_2, ..., i_n$ as triggers would be sufficient.
+\item $d$ is some function of other items, $i_1, i_2, ..., i_n$ and variables $v_1, v_2, ..., v_m$ in $R$. In this case, $d$ as a trigger will still not affect the value of $a$ because $d$'s own value depends on the values of items $i_1, i_2, ..., i_n$--a will change only if the values of the live items from $i_1, i_2, ..., i_n$ change. Hence, adding them as triggers would be sufficient.
 \end{itemize}
-\end{enumerate}
+This shows that $d$ never causes the value of $a$ to change. Therefore, our assumption that $d$ is not redundant is wrong. Hence, $d$ must be redundant. $\blacksquare$
 \end{enumerate}
 
 \emph{Scope}. The algorithm for automatically generating triggers described above targets event-based triggers only--our tool does not aim to suggest temporal or system triggers. This is because temporal and system based triggers are highly dependent on the end user's preference and without any additional annotations from the user, it is impossible to suggest a generic temporal or system trigger that will be applicable to all users. Since our tool does not require any annotations from the end user, the scope of our tool is limited to event-based triggers. This means that if the end user intends a rule to be fired only under system or temporal triggers, the suggestions provided by our tool will not be useful. Table~\ref{tab:scope1} summarizes the usefulness of our tool for suggesting triggers with respect to the conditions under which the user actually expects the rule to be fired.
@@ -241,7 +241,7 @@ temporal & low \\\hline
 system & low \\ \hline
 combination of temporal, system & low  \\ \hline
 \end{tabular}
-\caption{Scope of our tool for suggesting triggers only based on the rule script (no triggers written by the user). High indicates that all the suggestions are useful, medium indicates that only the event-based suggestions are useful and none indicates that none of the suggestions are useful. }
+\caption{Scope of our tool for suggesting triggers only based on the rule script (no triggers written by the user)--\textit{high} indicates that all the suggestions are useful, \textit{medium} indicates that only the event-based suggestions are useful and \textit{low} indicates that none of the suggestions are useful. }
 \label{tab:scope1}
 \end{table}
 

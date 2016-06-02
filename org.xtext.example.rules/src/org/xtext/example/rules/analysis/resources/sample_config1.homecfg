@@ -3,14 +3,12 @@
 # involved in these side-effect free actions such as logging and postUpdate and filtering them out from the suggested triggers. This list also contains items that
 # represent output states.
 # actions
-logInfo
-logWarn
-logError
+#logInfo
+#logWarn
+#logError
 # states
-State_Notify
-AutoStatus
-MainStatus
-RoomStatus
-Heating_Common_Fault
-Ventilation_State_Message
-Watering_Program_State
+#AutoStatus
+#MainStatus
+#RoomStatus
+#Ventilation_State_Message
+#Watering_Program_State

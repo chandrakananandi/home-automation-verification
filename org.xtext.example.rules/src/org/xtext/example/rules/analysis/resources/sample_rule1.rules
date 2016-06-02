@@ -1988,7 +1988,7 @@ then
 	if( Scene1.state == ON )
 	{
 		Lights_FF.members.forEach(kreis|{
-			if(kreis.state!=OFF && kreis.state!=0 && kreis!=Light_FF_Kitchen_Cupboard && kreis!=Light_FF_Kitchen_Bar && kreis!=Socket_Livingroom1)
+			if(kreis.state!=OFF && kreis.state!=0 && kreis!=Light_FF_Kitchen_Cupboard && kreis!=Light_FF_Kitchen_Bar && kreis!=Socket_Livingroom)
 			{
 				sendCommand(kreis, OFF)
 			}
