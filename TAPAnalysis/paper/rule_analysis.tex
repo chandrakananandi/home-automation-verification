@@ -217,7 +217,7 @@ Actions are predefined methods in Java that can be used in the scripts of the ru
  
 \emph{Independent item}. We define an item to be \emph{independent} in $R$ if  its value is directly obtained from a sensor or a user's input and not computed based on any other item or variable--this implies that the item is \emph{live} in $R$. 
 
-\emph{Redundant trigger}. We define an event-based trigger to be redundant if inclusion of the trigger in a rule \emph{never} changes the state of any item or the value of any variable involved in the rule when the rule is fired due to it.
+\emph{Redundant trigger}. We define an event-based trigger to be redundant if inclusion of the trigger in a rule \emph{never} changes the state of any item or the value of any variable involved in $S$ when the rule is fired due to it.
 \begin{enumerate}
 \item  An item $d$ which is not \textit{live} in $R$ is not included in $T$ because it is redundant. As a corollary, if $d$ is dependent, it is also not included in $T$.\\
 \emph{Theorem}. If $d$ is not live in $R$, then it is a redundant trigger.\\
