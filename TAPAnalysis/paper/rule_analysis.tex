@@ -226,7 +226,7 @@ An item $d$ which is not \textit{live} in $R$ is not included in $T$ because it 
 \item $d$ is assigned a constant value. In this case, $d$ as a trigger does not change the value of $a$ because $d$'s value is always the same (as long as the script of R  itself is not changed).
 \item $d$ is some function of other items, $i_1, i_2, ..., i_n$ and variables $v_1, v_2, ..., v_m$ in $R$. In this case, $d$ as a trigger will still not affect the value of $a$ because $d$'s own value depends on the values of items $i_1, i_2, ..., i_n$--a will change only if the values of the live items from $i_1, i_2, ..., i_n$ change. Hence, adding them as triggers would be sufficient.
 \end{itemize}
-This shows that $d$ never causes the value of $a$ to change. Therefore, our assumption that $d$ is not redundant is wrong. Hence, $d$ must be redundant. \blacksquare
+This shows that $d$ never causes the value of $a$ to change. Therefore, our assumption that $d$ is not redundant is wrong. Hence, $d$ must be redundant. $\blacksquare$
 \end{enumerate}
 
 \emph{Scope}. The algorithm for automatically generating triggers described above targets event-based triggers only--our tool does not aim to suggest temporal or system triggers. This is because temporal and system based triggers are highly dependent on the end user's preference and without any additional annotations from the user, it is impossible to suggest a generic temporal or system trigger that will be applicable to all users. Since our tool does not require any annotations from the end user, the scope of our tool is limited to event-based triggers. This means that if the end user intends a rule to be fired only under system or temporal triggers, the suggestions provided by our tool will not be useful. Table~\ref{tab:scope1} summarizes the usefulness of our tool for suggesting triggers with respect to the conditions under which the user actually expects the rule to be fired.
@@ -241,7 +241,7 @@ temporal & low \\\hline
 system & low \\ \hline
 combination of temporal, system & low  \\ \hline
 \end{tabular}
-\caption{Scope of our tool for suggesting triggers only based on the rule script (no triggers written by the user). High indicates that all the suggestions are useful, medium indicates that only the event-based suggestions are useful and none indicates that none of the suggestions are useful. }
+\caption{Scope of our tool for suggesting triggers only based on the rule script (no triggers written by the user)--\textit{high} indicates that all the suggestions are useful, \textit{medium} indicates that only the event-based suggestions are useful and \textit{low} indicates that none of the suggestions are useful. }
 \label{tab:scope1}
 \end{table}
 
