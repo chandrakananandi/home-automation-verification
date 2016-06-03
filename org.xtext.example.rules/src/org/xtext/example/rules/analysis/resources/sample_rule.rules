@@ -1,24 +1,24 @@
-rule "Scene 1"
+rule "Rollershutter auto"
 when
-	Item Scene1 changed
+	Item State_Rollershutter changed
 then
-	if( Scene1.state == ON )
+	if( Auto_Rollershutter.state == ON && State_Away.state == ON && State_Rollershutter.state != Uninitialized )
 	{
-		Lights_FF.members.forEach(kreis|{
-			if(kreis.state!=OFF && kreis.state!=0 && kreis!=Light_FF_Kitchen_Cupboard && kreis!=Light_FF_Kitchen_Bar && kreis!=Socket_Livingroom)
+		if( State_Rollershutter.state == ON )
+		{
+			if( Window_FF_Livingroom_Terrace.state == CLOSED && Shutters.members.filter(s | s.state == UP).size > 0 )
 			{
-				sendCommand(kreis, OFF)
+				logInfo("Rollershutter","can down")
+				sendCommand(Shutters,DOWN)
 			}
-		})
-		Lights_SF.members.forEach(kreis|{
-			if(kreis.state!=OFF && kreis.state!=0)
+		}
+		else
+		{
+			if( Shutters.members.filter(s | s.state == DOWN).size > 0 )
 			{
-				sendCommand(kreis, OFF)
+				logInfo("Rollershutter","can up")
+				sendCommand(Shutters,UP)
 			}
-		})
-		sendCommand(Light_FF_Kitchen_Cupboard, ON)
-		sendCommand(Light_FF_Kitchen_Bar, ON)
-		sendCommand(Socket_Livingroom, ON)
-		postUpdate(Scene1, OFF)
+		}
 	}
 end
