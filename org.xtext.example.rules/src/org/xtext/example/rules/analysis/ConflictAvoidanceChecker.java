@@ -161,7 +161,12 @@ public class ConflictAvoidanceChecker {
 			Set<String>missing_triggers=new HashSet<String>();
 			String redundant_trigger_suggestion=null;
 			String dependent_trigger_suggestion=null;
-			for(String member_state: ruleParser.getMemberStates().get(rule_info.getName())) {					
+			for(String member_state: ruleParser.getMemberStates().get(rule_info.getName())) {			
+				// handling groups of items
+				if(itemParser.getGroupNames().contains(member_state)) {
+					missing_triggers.addAll(itemParser.getGroupItemMap().get(member_state));
+				}
+				
 				if(itemParser.getItemNames().contains(member_state)) {				
 					if(!rule_info.getTriggerItemNames().contains(member_state)){
 						missing_triggers.add(member_state);	

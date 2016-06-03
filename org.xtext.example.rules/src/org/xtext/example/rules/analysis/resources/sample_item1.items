@@ -1,3 +1,4 @@
+Group Alle
 Group gFF 										"Erdgeschoss"							<groundfloor>
 Group gSF 										"Obergeschoss"							<firstfloor>
 Group Outdoor 									"Garten"								<garden>

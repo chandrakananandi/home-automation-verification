@@ -1,6 +1,6 @@
-Switch DemoSwitch				"Switch"
-Dimmer DimmedLight				"Dimmer [%d %%]"		<slider>
-Color  RGBLight					"RGB Light"				<slider>
-Rollershutter DemoShutter	 	"Roller Shutter"
+Group gFF 										"Erdgeschoss"							<groundfloor>
+Group Shutters 							"Wohnzimmer" 							<sofa> 			(gFF)
+Group:Rollershutter:OR(UP, DOWN)	Shutters_FF	"EG Rollläden [%d]" 					<selfRollershutter>	(Shutters)
 
-itemtype itemname ["labeltext"] [<iconname>] [(group1, group2, ...)] [{bindingconfig}]
+
+Rollershutter Shutters_FF_Livingroom_Terrace 	"Terasse"								<selfRollershutter>	( Shutters_FF)	{ knx="0/2/4, 0/2/5, +<0/2/6" }
