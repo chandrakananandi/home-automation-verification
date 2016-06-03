@@ -71,8 +71,9 @@ public class ExpressionVisitorImpl implements ExpressionVisitor {
 	ConflictAvoidanceChecker.ast_writer.println("Feature name:" + feature_counter);
 	ConflictAvoidanceChecker.ast_writer.println(xFeatureCallImplCustom.getExpression().getConcreteSyntaxFeatureName());
 	// to ignore postUpdate and sendCommand features.
-	if(!xFeatureCallImplCustom.getExpression().getConcreteSyntaxFeatureName().equals("postUpdate") &&
-			!xFeatureCallImplCustom.getExpression().getConcreteSyntaxFeatureName().equals("sendCommand")) {
+	if(!xFeatureCallImplCustom.getExpression().getConcreteSyntaxFeatureName().equals("postUpdate") 
+			&& !xFeatureCallImplCustom.getExpression().getConcreteSyntaxFeatureName().equals("sendCommand")
+			) {
 		featureInvocation.setMethodName(xFeatureCallImplCustom.getExpression().getConcreteSyntaxFeatureName());
 		if (xFeatureCallImplCustom.getExpression().getActualReceiver() != null) {
 			ConflictAvoidanceChecker.ast_writer.println("Target:" + feature_counter);
@@ -162,6 +163,7 @@ public class ExpressionVisitorImpl implements ExpressionVisitor {
 			ConflictAvoidanceChecker.ast_writer.println(xAssignmentCustom.getExpession().getConcreteSyntaxFeatureName());
 			assignment.setLhs(xAssignmentCustom.getExpession().getConcreteSyntaxFeatureName());			
 		}
+		
 		// Right now, works only if the rhs is a feature call.	
 		if(xAssignmentCustom.getExpession().getValue().getClass().getSimpleName().equals("XFeatureCallImplCustom")) {
 			List<String>rhs_args=new ArrayList<String>();
@@ -243,7 +245,8 @@ public class ExpressionVisitorImpl implements ExpressionVisitor {
 	@Override
 	public String visit(XStringLiteral xStringLiteral) {
 		ConflictAvoidanceChecker.ast_writer.println("string: " + xStringLiteral.getExpression().getValue());
-		return xStringLiteral.getExpression().getValue();
+		//return xStringLiteral.getExpression().getValue();
+		return null;
 	}
 
 	@Override
