@@ -1,6 +1,6 @@
 package org.xtext.example.rules.analysis.scriptvisitors;
 
-import org.eclipse.xtext.xbase.XExpression;
+import org.eclipse.xtext.xbase.impl.XInstanceOfExpressionImpl;
 
 /**
  * 
@@ -10,13 +10,13 @@ import org.eclipse.xtext.xbase.XExpression;
 public class XInstanceOfExpression extends org.eclipse.xtext.xbase.impl.XInstanceOfExpressionImpl
 		implements Expression {
 
-	private XExpression expression;
+	private XInstanceOfExpressionImpl expression;
 
-	public XInstanceOfExpression(XExpression exp) {
+	public XInstanceOfExpression(XInstanceOfExpressionImpl exp) {
 		expression = exp;
 	}
 
-	public XExpression getExpression() {
+	public XInstanceOfExpressionImpl getExpression() {
 		return expression;
 	}
 

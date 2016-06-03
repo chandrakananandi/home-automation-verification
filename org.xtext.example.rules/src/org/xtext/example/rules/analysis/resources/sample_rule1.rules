@@ -92,7 +92,7 @@ end
  
 rule "Attic_Light_Mode"
 when
-        Item Attic_Light_Mode changed
+        Item Auto_Attic_Light changed
         or
         Time cron "0 1 5,8,20,23 * * ?"
 then
