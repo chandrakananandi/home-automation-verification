@@ -269,6 +269,12 @@ public class ExpressionVisitorImpl implements ExpressionVisitor {
 	}
 	
 	@Override
+	public XExpression visit(XInstanceOfExpression xInstanceOfExpression) {
+		expressionSwitch.caseXExpression(xInstanceOfExpression.getExpression().getExpression());
+		return null;
+	}
+	
+	@Override
 	public XExpression visit(XClosure xClosure) {
 		// TODO Auto-generated method stub
 		return null;
@@ -397,11 +403,7 @@ public class ExpressionVisitorImpl implements ExpressionVisitor {
 		return null;
 	}
 
-	@Override
-	public XExpression visit(XInstanceOfExpression xInstanceOfExpression) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	
 
 	@Override
 	public XExpression visit(XThrowExpression xThrowExpression) {

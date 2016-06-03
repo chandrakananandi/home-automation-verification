@@ -41,7 +41,7 @@ public class ConflictAvoidanceChecker {
 	}
 	
 	public static void main(String[] args) throws IOException {
-		String rule_file = "sample_rule.rules";
+		String rule_file = "sample_rule1.rules";
 		String item_file= "sample_item1.items";
 		File conflict_file = new File("./src/org/xtext/example/rules/analysis/resources/sample_conflict.conflicts");
 		File config_file= new File("./src/org/xtext/example/rules/analysis/resources/sample_config1.homecfg");
@@ -117,7 +117,11 @@ public class ConflictAvoidanceChecker {
 			Set<String>suggested_triggers=new HashSet<String>();
 			String redundant_trigger_suggestion=null;
 			String dependent_trigger_suggestion=null;
-			for(String member_state: ruleParser.getMemberStates().get(rule_info.getName())) {				
+			for(String member_state: ruleParser.getMemberStates().get(rule_info.getName())) {	
+				// handling groups of items
+				if(itemParser.getGroupNames().contains(member_state)) {
+					suggested_triggers.addAll(itemParser.getGroupItemMap().get(member_state));
+				}
 				if(itemParser.getItemNames().contains(member_state)) {						
 					suggested_triggers.add(member_state);				
 					//dependent_trigger_suggestion=eliminateIsolatedDependentTriggers(member_state, rule_info, ruleParser);

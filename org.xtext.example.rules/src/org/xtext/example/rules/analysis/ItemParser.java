@@ -2,7 +2,11 @@ package org.xtext.example.rules.analysis;
 
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.common.util.URI;
@@ -17,13 +21,14 @@ public class ItemParser {
 	
 	String item_file_name;
 	List<ItemInformation> item_database = new ArrayList<ItemInformation>();
-	List<String> group_names=new ArrayList<String>();
+	Set<String> group_names=new HashSet<String>();
+	Map<String, ArrayList<String>> group_item_map=new HashMap<String, ArrayList<String>>();
 	
 	public ItemParser(String file_name){
 		item_file_name=file_name;
 	}
 	
-	public List<String> getGroupsNames() {
+	public Set<String> getGroupNames() {
 		return group_names;
 	}
 	
@@ -33,6 +38,10 @@ public class ItemParser {
 	
 	public List<ItemInformation> getItemSet(){
 		return item_database;
+	}
+	
+	public Map<String, ArrayList<String>> getGroupItemMap() {
+		return group_item_map;
 	}
 	
 	public ArrayList<String> getItemNames(){
@@ -59,6 +68,16 @@ public class ItemParser {
 						((ModelNormalItemImpl) obj).getGroups());
 				item_database.add(item);
 			}
+		}
+		
+		for(String group: this.getGroupNames()) {
+			ArrayList<String> items=new ArrayList<String>();
+			for(ItemInformation item: item_database) {
+				if(item.getGroups().contains(group)) {
+					items.add(item.getItemName());
+				}
+			}
+			group_item_map.put(group, items);
 		}
 	}
 }
