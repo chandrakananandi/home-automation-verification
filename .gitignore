@@ -1,6 +1,13 @@
+<<<<<<< HEAD
 .classpath
 .settings
 .project
 *.xtendbin
 *.class
 *~
+TAPAnalysis/paper/rule_analysis.aux
+TAPAnalysis/paper/rule_analysis.bbl
+TAPAnalysis/paper/rule_analysis.blg
+TAPAnalysis/paper/rule_analysis.log
+TAPAnalysis/paper/rule_analysis.pdf
+
