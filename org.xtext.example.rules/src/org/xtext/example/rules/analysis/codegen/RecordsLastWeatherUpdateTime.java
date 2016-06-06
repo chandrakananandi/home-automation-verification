@@ -1,5 +1,7 @@
 package org.xtext.example.rules.analysis.codegen;
 
 public class RecordsLastWeatherUpdateTime {
-//1
+public void records_last_weather_update_time() {
+postUpdate(<XFeatureCallImplCustom>,<XConstructorCallImplCustom>)
+}
 }

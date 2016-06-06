@@ -1,5 +1,7 @@
 package org.xtext.example.rules.analysis.codegen;
 
 public class TimerDemo {
-//1
+public void timer_demo() {
+org.eclipse.xtext.xbase.impl.XIfExpressionImpl@4f67e3df
+}
 }
