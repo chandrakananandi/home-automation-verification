@@ -31,11 +31,12 @@ public class RuleToJavaTranslator {
 			EObject eobj=eobjects.next();	
 			if(eobj.getClass().getSimpleName().equals("RuleImpl")) {
 				String java_file_name=createClassNameFromRuleName(((RuleImpl)eobj).getName());
+				String method_name=createMethodNameFromRuleName(((RuleImpl)eobj).getName());
 				PrintWriter writer=new PrintWriter(new File("src/org/xtext/example/rules/analysis/codegen/"+ java_file_name+".java"));
 				while(eobjects.hasNext()) {
 					eobj=eobjects.next();				
 					if(eobj.getClass().getSimpleName().equals("ScriptImpl")) {
-						generateClassCode(writer, java_file_name, ((ScriptImpl)eobj).getExpressions());
+						generateClassCode(writer, java_file_name, method_name, ((ScriptImpl)eobj).getExpressions());
 						break;
 					}						
 				}
@@ -54,10 +55,20 @@ public class RuleToJavaTranslator {
 		return class_name;
 	}
 	
-	public static void generateClassCode(PrintWriter writer, String java_file_name, List<XExpression>script) {
+	public static String createMethodNameFromRuleName(String rule_name) {
+		String method_name="";
+		method_name=rule_name.replaceAll(" ", "_");
+		return method_name.toLowerCase();
+	}
+	
+	public static void generateClassCode(PrintWriter writer, String java_file_name, String method_name, List<XExpression>script) {	
 		writer.println("package org.xtext.example.rules.analysis.codegen;\n");
 		writer.println("public class " + java_file_name + " {");
-		
+		writer.println("public void " + method_name + "() {");
+		for(XExpression expression: script) {			
+			writer.println(expression);
+		}
+		writer.println("}");
 		writer.println("}");
 	}
 }
