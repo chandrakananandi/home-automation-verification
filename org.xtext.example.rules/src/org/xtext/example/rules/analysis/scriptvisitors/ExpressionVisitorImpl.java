@@ -61,17 +61,15 @@ public class ExpressionVisitorImpl implements ExpressionVisitor {
 	}
 
 	@Override
-	public String visit(XFeatureCallCustom xFeatureCallImplCustom) {
-		
-	FeatureInvocation featureInvocation=new FeatureInvocation();
-	
-	feature_counter++;
-	int old_feature_counter = feature_counter;
-	ConflictAvoidanceChecker.ast_writer.println("Feature:"+feature_counter);
-	ConflictAvoidanceChecker.ast_writer.println("Feature name:" + feature_counter);
-	ConflictAvoidanceChecker.ast_writer.println(xFeatureCallImplCustom.getExpression().getConcreteSyntaxFeatureName());
-	// to ignore postUpdate and sendCommand features.
-	if(!xFeatureCallImplCustom.getExpression().getConcreteSyntaxFeatureName().equals("postUpdate") 
+	public String visit(XFeatureCallCustom xFeatureCallImplCustom) {		
+		FeatureInvocation featureInvocation=new FeatureInvocation();	
+		feature_counter++;
+		int old_feature_counter = feature_counter;
+		ConflictAvoidanceChecker.ast_writer.println("Feature:"+feature_counter);
+		ConflictAvoidanceChecker.ast_writer.println("Feature name:" + feature_counter);
+		ConflictAvoidanceChecker.ast_writer.println(xFeatureCallImplCustom.getExpression().getConcreteSyntaxFeatureName());
+		// to ignore postUpdate and sendCommand features which are analogous to writing values to the states.
+		if(!xFeatureCallImplCustom.getExpression().getConcreteSyntaxFeatureName().equals("postUpdate") 
 			&& !xFeatureCallImplCustom.getExpression().getConcreteSyntaxFeatureName().equals("sendCommand")
 			) {
 		featureInvocation.setMethodName(xFeatureCallImplCustom.getExpression().getConcreteSyntaxFeatureName());
@@ -89,12 +87,11 @@ public class ExpressionVisitorImpl implements ExpressionVisitor {
 			ConflictAvoidanceChecker.ast_writer.println("Arguments:" + old_feature_counter);
 			ArrayList<String>args=new ArrayList<String>();
 			for (XExpression argument : xFeatureCallImplCustom.getExpression().getActualArguments()) {
-				String st= (String) expressionSwitch.caseXExpression(argument);
+				String st = (String) expressionSwitch.caseXExpression(argument);
 				args.add(st);				
 			}
 			featureInvocation.setArgument(args);
 		}
-	
 		if(xFeatureCallImplCustom.getExpression().getConcreteSyntaxFeatureName().equals("postUpdate")) {
 			first_arguments_of_postUpdate.add(xFeatureCallImplCustom.getExpression().getActualArguments().get(0).toString());
 		}
@@ -169,6 +166,8 @@ public class ExpressionVisitorImpl implements ExpressionVisitor {
 			List<String>rhs_args=new ArrayList<String>();
 			if (((XFeatureCallImplCustom)(xAssignmentCustom.getExpession().getValue())).getActualArguments().size()>0) {
 				for (XExpression arg: ((XFeatureCallImplCustom)(xAssignmentCustom.getExpession().getValue())).getActualArguments()) {
+					//System.err.println(arg);
+					expressionSwitch.caseXExpression(arg);
 					rhs_args.add(arg.toString());
 				}
 			} else {

@@ -1,4 +1,4 @@
-package org.xtext.example.rules.analysis.codegen;
+package org.xtext.example.rules.analysis.resources;
 
 public class UpdateMaxAndMinTemperatures {
 	public void update_max_and_min_temperatures() {

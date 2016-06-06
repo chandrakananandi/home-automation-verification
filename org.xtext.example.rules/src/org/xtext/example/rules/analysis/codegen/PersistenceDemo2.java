@@ -1,5 +1,5 @@
 package org.xtext.example.rules.analysis.codegen;
 
-public class ComputeHumidex {
-//6
+public class PersistenceDemo2 {
+//1
 }

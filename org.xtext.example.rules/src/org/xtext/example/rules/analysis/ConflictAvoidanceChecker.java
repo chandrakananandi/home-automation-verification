@@ -18,6 +18,7 @@ import org.xtext.example.rules.analysis.statements.FeatureInvocation;
 import com.sun.javafx.css.Rule;
 
 import org.xtext.example.rules.analysis.constants.Constants;
+import org.xtext.example.rules.analysis.ruletojava.RuleToJavaTranslator;
 
 /**
  * 
@@ -41,16 +42,14 @@ public class ConflictAvoidanceChecker {
 	}
 	
 	public static void main(String[] args) throws IOException {
-		String rule_file = "sample_rule2.rules";
-		String item_file= "sample_item2.items";
-		File conflict_file = new File("./src/org/xtext/example/rules/analysis/resources/sample_conflict.conflicts");
+		String rule_file = "sample_rule.rules";
+		String item_file= "sample_item.items";
 		File config_file= new File("./src/org/xtext/example/rules/analysis/resources/sample_config2.homecfg");
 		
 		long time_start=System.currentTimeMillis();
 		parseConfiguration(config_file);
 		
-		//SpecificationParser specParser = new SpecificationParser();
-		//specParser.parseConflicts(conflict_file);
+		RuleToJavaTranslator.ruleToJavaTranslator(rule_file);
 		
 		ItemParser itemParser=new ItemParser(item_file);
 		itemParser.analyseItems();
@@ -68,25 +67,7 @@ public class ConflictAvoidanceChecker {
 		
 	}
 
-	public void parseRuleForConflictingStates(File rule_file) {
-		String line = null;
-		try {
-			FileReader fileReader = new FileReader(rule_file);
-			BufferedReader bufferedReader = new BufferedReader(fileReader);
-			while ((line = bufferedReader.readLine()) != null) {
-				if (line.contains(".state")) {
-					//TODO: nothing happens. This method is useless but keeping for now in case I need it in future.
-				}
-			}
-			bufferedReader.close();
-		} catch (FileNotFoundException e) {
-			System.err.println("cannot find file " + rule_file);
-			e.printStackTrace();
-		} catch (IOException e) {
-			System.err.println("unable to read file " + rule_file);
-			e.printStackTrace();
-		}
-	}
+	
 
 	public static void parseConfiguration(File config_file){
 		String line=null; 
@@ -252,9 +233,8 @@ public class ConflictAvoidanceChecker {
 	}
 	
 	public static String eliminateDependentTriggers(String member_state, RuleInformation rule_info, RuleParser ruleParser) {
-		
-		String dependent_trigger=null;
-		boolean dependent=isDependent(member_state, rule_info, ruleParser);
+		String dependent_trigger = null;
+		boolean dependent = isDependent(member_state, rule_info, ruleParser);
 		// not dependent
 		if(!dependent) {
 			dependent_trigger=null;
