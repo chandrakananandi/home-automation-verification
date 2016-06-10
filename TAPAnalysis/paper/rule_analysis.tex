@@ -110,38 +110,41 @@ and security vulnerabilities in a smart home.
 \keywords{Security, Home automation, Trigger action programming, Static analysis}
 
 \section{Introduction}
-Most home automation platforms support end-user customization components: a user writes rules to determine what actions should be taken by what device under what conditions~\cite{Newmannowwere}. For example, Samsung SmartThings~\cite{samsung} allows the users to create their own automation rules through their ``SmartApps" feature, while Apple HomeKit~\cite{homekit} allows the users to set up additional conditions to govern when an action should take place. A recent study~\cite{practical-tap} has shown that rule-based systems are one of the most practical solutions for enabling end-users to customize the behavior of their smart homes. A rule-based language has two main components: triggers that cause a rule to be fired and actions to be executed when a rules fires. This is also called Trigger Action Programming (TAP). Listing~\ref{lst:rule} shows the syntax of a rule. The part between \texttt{when} and \texttt{then} is the trigger block and the part between \texttt{then} and \texttt{end} is the action block. There can be multiple triggers in the trigger part. A rule engine fires the rules when its triggers are satisfied.
-\begin{lstlisting}[caption={Syntax of rules.},label={lst:rule}]
-rule "Rule name"
+Most home automation platforms support end-user customization components: a user writes rules to determine what actions should be taken by what device under what conditions~\cite{Newmannowwere}. For example, Samsung SmartThings~\cite{samsung} allows the users to create their own automation rules through their ``SmartApps" feature, while Apple HomeKit~\cite{homekit} allows the users to set up additional conditions to govern when an action should take place. A recent study~\cite{practical-tap} has shown that rule-based systems are one of the most practical solutions for enabling end-users to customize the behavior of their smart homes. A rule-based language has two main components: triggers that cause a rule to be fired and actions to be executed when a rules fires. This is also called Trigger Action Programming (TAP). Listing~\ref{lst:rule} shows the syntax of a rule. The part between \texttt{when} and \texttt{then} is the trigger block and the part between \texttt{then} and \texttt{end} is the action block. There can be multiple triggers in the trigger part---if one or more is satisfied, the rule is fired. 
+A rule engine fires the rules when its triggers are satisfied.
+\begin{lstlisting}[caption={Example of a rule for turning on the ceiling light on the first floor (FF) and turning off the light next to the living room couch at 10 pm during holiday mode. },label={lst:rule}]
+rule "Holiday lights on before going sleeping"
 when
-  <trigger_condition_1> OR
-  <trigger_condition_2> OR 
-  ...	
+ //trigger block
+ Time cron "0 0 22 * * ?" 
 then
-  <action_block>
+ //action block
+ if(Auto_Holiday.state==ON){
+  sendCommand(Light_FF_Livingroom_Couch,OFF)
+  sendCommand(Light_FF_Floor_Ceiling,ON)
+ }
 end
+
 \end{lstlisting}
-Some other recent studies~\cite{Huang},\cite{wild-tap} have shown that even though TAP is the most commonly used and practical approach for home automation, end users often have difficulty in correctly interpreting the outcome of TAP and make errors in writing trigger-action programs with the desired behavior. These errors could be in 1) writing the actions, or 2) writing the triggers or 3) both. In a heterogeneous system like a smart home where there are multiple interacting devices, it is common for the rules to interact. As a result, an error in one rule can propagate to others and cause unexpected behavior or security vulnerabilities in different parts of the house. In this paper, we propose a solution to make it easier for the end users to write home automation rules correctly. Our approach eliminates one category of errors in the rules--errors due to too few triggers. By doing a static analysis of the actions, we automatically generate the trigger conditions so that the user does not have to worry about including the \textit{correct} and \textit{sufficient number} of trigger conditions in the rules. Our approach can identify potential bugs in the rules statically and thus ensure that the rules are free from \textit{errors due to too few triggers} once they are deployed. To the best of our knowledge, there has not been any prior research on analysing end-user written rules for home automation.
+Even though TAP is the most commonly used and practical approach for home automation, end users often make errors in writing trigger-action programs~\cite{Huang},\cite{wild-tap}. These errors could be in 1) writing the triggers, or 2) writing the actions or 3) both. In a heterogeneous system like a smart home where there are multiple interacting devices, it is common for the rules to interact. As a result, an error in one rule can propagate to others and cause unexpected behavior or security vulnerabilities in different parts of the house. In this paper, we propose a solution to make it easier for the end users to write home automation rules correctly. Our approach eliminates one category of errors in the rules---errors due to too few triggers. By doing a static analysis of the actions, our approach automatically generates the trigger conditions so that the user does not have to worry about including the \textit{correct} and \textit{sufficient number} of trigger conditions in the rules. Our approach can identify potential bugs in the rules statically and thus ensure that the rules are free from \textit{errors due to too few triggers} once they are deployed. To the best of our knowledge, there has not been any prior research on analysing end-user written rules for home automation.
 
-We analysed 116 home automation rules written by end users in the openHAB framework~\cite{openhab} and implemented our tool for rules written in the domain specific languages provided by openHAB, but our idea can be used for any rule-based system.
-openHAB is an open source home automation framework which supports 135 technologies, including more than 50 devices, cloud services like Twitter, DropBox, Google Calendar etc. and multiple communication protocols~\cite{openhabtech}. It has UI support for Android and iOS and an IFTTT integration~\cite{ifttt}. It is a java based solution which can be run on standard Linux, Windows and MacOS X machines as well as on embedded platforms such as Raspberry Pi and Cubietruck. We chose to work with openHAB because
-1) it is open source and that allowed us to access their code base and understand its functioning 2) it supports many devices and technologies and has about 50,000 downloads in the Google Play store with a rating of 4.4/5 and 3) unlike most proprietary solutions, openHAB does not require any hardware installation and is completely technology and vendor agnostic, which makes it more accessible to home owners. 
-
-By a combination of static analysis and manual inspection of the results of the analysis, we found 73\% rules to be vulnerable and deviating from the expected behavior due to lack of trigger conditions. Our results indicate that for all rule-based smart home solutions, together with strong security guarantees provided by home automation framework developers, there is a serious need to focus on the end-user written rules because these are mostly written by non-programmers and are often prone to errors. 
+We analysed 116 home automation rules written by end users in the openHAB framework~\cite{openhab} and implemented our tool for rules written in the domain specific language provided by openHAB, but our idea can be used for any rule-based system.
+By a combination of static analysis and manual inspection of the results of the analysis, we found 73\% rules to be vulnerable and deviating from the expected behavior due to lack of trigger conditions---this indicates that for rule-based smart home solutions, together with strong security guarantees provided by home automation framework developers, there is a serious need to focus on the end-user written rules because these are mostly written by non-programmers and are often prone to errors. 
 Our contributions are the following:
 \begin{enumerate}[topsep=0pt,itemsep=-1ex]
-\item Analysis of end-user written rules for home automation and identifying and defining the problem of \textit{too few triggers}.
-\item  Designing and implementing a static analysis tool that can 
+\item Analysis of end-user written rules for home automation and identifying the security and correctness issues due to \textit{too few triggers}.
+\item  Designing and implementing a static analysis tool that can determine appropriate triggers to be included in a rule and can be used to
 \begin{itemize}[topsep=-10pt,itemsep=-1ex,partopsep=1ex,parsep=1ex]
 \item suggest event-based triggers based on the actions written by end-users.
 \item identify missing triggers 
+\item eliminate triggers that are not needed.
 \end{itemize}
 \item Evaluating our tool on real end-user written rules for home automation in the openHAB framework.
 \end{enumerate}
 
 \section{Motivating Example}
 \label{sec:motivation}
-Consider the rule in listing~\ref{lst:away} which is written by an end user using the OpenHAB smart home framework. The name of the rule is \texttt{Away rule}. An \texttt{Item} represents the states of a device in the house. They can be read from or written to in order to interact with the devices. The state of an item can be changed by the end user through the UI of the openHAB application on a smart phone or on a desktop installation.
+Consider the rule in listing~\ref{lst:away}. This rule has been written by an end user who uses the OpenHAB smart home framework to automate his home~\cite{data1}. The name of the rule is \texttt{Away rule}. An \texttt{Item} represents the states of a device in the house. They can be read from or written to in order to interact with the devices. The state of an item can be changed 1) by the end user through the UI of the openHAB application on a smart phone or on a desktop installation or 2) as an effect of a rule firing.
 \begin{lstlisting}[caption={Rule for setting the Away or Sleeping state.},label={lst:away}]
 rule "Away rule"
 when
@@ -154,7 +157,7 @@ then
   }
 end
 \end{lstlisting}
-This rule is supposed to set the value of \texttt{State\_Away} to \texttt{ON} when everyone is away. It also sets \texttt{State\_Sleeping} to \texttt{OFF} if it currently \texttt{ON} so that both \texttt{State\_Away} and \texttt{State\_Sleeping} are not \texttt{ON} simultaneously. However, the trigger for this rule only contains \texttt{State\_Away}. As a result, this rule is only fired when \texttt{State\_Away} is changed by the end user. However, if the value of \texttt{State\_Sleeping} is changed after the value of \texttt{State\_Away}, then the rule is not fired due to which, it allows both values to be set at the same time. This deviates from the expected behavior of the rule--it is no longer clear whether the home inhabitants are away or inside sleeping. This is also a security vulnerability because if this rule triggers another rule for turning on the security alarm in the house and the security alarm is meant to be off when people are at home but on when they are away, then it could get wrongly deactivated if the value of \texttt{STATE\_SLEEPING} is set to \texttt{ON}. Figure~\ref{fig:awayrule} shows a snapshot of the desktop application with both states being set to \texttt{ON}. 
+This rule is supposed to set the value of \texttt{State\_Away} to \texttt{ON} when no one is in the house. It also sets \texttt{State\_Sleeping} to \texttt{OFF} if it currently \texttt{ON} so that  \texttt{State\_Away} and \texttt{State\_Sleeping} are not \texttt{ON} simultaneously. However, the trigger for this rule only contains \texttt{State\_Away}. As a result, this rule is only fired when \texttt{State\_Away} is changed by the end user. However, if the value of \texttt{State\_Sleeping} is changed after the value of \texttt{State\_Away}, then the rule is not fired due to which, it allows both values to be set at the same time. This deviates from the expected behavior of the rule---it is no longer clear whether the home inhabitants are away or inside sleeping. This is also a security vulnerability because if this rule triggers another rule for turning on the security alarm in the house and the security alarm is meant to be off when people are at home but on when they are away, then it could get wrongly deactivated if the value of \texttt{STATE\_SLEEPING} is set to \texttt{ON}. Figure~\ref{fig:awayrule} shows a snapshot of the desktop application with both states being set to \texttt{ON}. 
 \begin{figure}
 \centering
 \includegraphics [trim=1cm 13cm 0 0, scale=0.14]{images/openhab-runtime.png}
@@ -162,28 +165,25 @@ This rule is supposed to set the value of \texttt{State\_Away} to \texttt{ON} wh
 \label{fig:awayrule}
 \end{figure}
 This example shows that even if the action block of a rule is implemented correctly, not having all the correct triggers can lead to too few firings of the rule and thus, unexpected behavior. To solve this problem, we propose a technique based on static analysis that can automatically generate event-based triggers and also detect missing ones by analysing code in the action block. 
-\begin{lstlisting}[caption={List of suggested and missing triggers shown by our tool for the Away rule.},label={lst:output}]
-rule:Away rule
-suggested trigger: State_Away
-suggested trigger: State_Sleeping
-------------------------------
+\begin{lstlisting}[caption={Missing triggers detection by our tool for the Away rule.},label={lst:output}]
 rule:Away rule
 missing trigger: State_Sleeping
+
 \end{lstlisting}
-The result of running our tool on the rule in listing~\ref{lst:away} is shown in listing~\ref{lst:output}. It shows two features of the tool: suggesting all event based triggers and identifying missing triggers when some triggers are already written by the end user.
+The result of running our tool on the rule in listing~\ref{lst:away} is shown in listing~\ref{lst:output}. It shows the trigger that is missing from the rule.
 
 \section{Threat model}
-Our focus is on security vulnerabilities that result due to incorrectly written automation rules by the home inhabitants or by an adversary although the former is more likely. 
-We target one category of errors in the rules: \textit{errors due to too few triggers}. Our approach can prevent any attack that relies on incorrect number of rule firings. One such example is described in section~\ref{sec:motivation}.
+Our focus is on security vulnerabilities and incorrect behavior that result due to \textit{too few triggers}. Our approach can prevent any attack that relies on incorrect number of rule firings. One such example is described below with reference to the \texttt{Away rule} in section~\ref{sec:motivation}.\\
+\textit{Example attack.}
 
 We assume that the action block of the rules is written correctly and rely on it for generating the trigger conditions.
 
 We trust that the devices in the house are not compromised and once they receive a command, they execute it. We also trust the rule engine and the home automation OS for which the rules are written.
 
 \section{\MakeLowercase{open}HAB background}
-openHAB~\cite{openhab} is an open source software for integrating different types of smart technologies in a home. openHAB has a runtime implemented in Java and a designer which is used by end users for configuring the homes. 
+openHAB~\cite{openhab} is an open source software for integrating different types of smart devices in a home. openHAB has a runtime implemented in Java and a UI which can be used by end users for monitoring and controlling the devices. It supports 135 technologies, including more than 50 devices, cloud services like Twitter, DropBox, Google Calendar etc. and multiple communication protocols~\cite{openhabtech}. It has UI support for Android and iOS and an IFTTT integration~\cite{ifttt}. It is a java based solution which can be run on standard Linux, Windows and MacOS X machines as well as on embedded platforms such as Raspberry Pi and Cubietruck. It has about 50,000 downloads in the Google Play store with a rating of 4.4/5 and unlike most proprietary solutions, openHAB does not require any hardware installation and is completely technology and vendor agnostic, which makes it more accessible to home owners. 
 
-The runtime provides a communication platform between the devices. There are currently about 135 devices, protocols and cloud technologies supported by openHAB. These are connected by means of an event bus. Figure~\ref{fig:framework} shows the main components of the openHAB framework. The item repository stores the states of the devices. It is connected to the UI and the rule base. Changes to the states can be made through the UI and by rule firings. The latest state is communicated to the actual device through the event bus. The bindings are libraries that connect the physical devices to the openHAB framework. As shown in the figure, there are two types of events that are communicated by the event bus--1) commands: causing an action or change of state in a device, such as \texttt{ON}, \texttt{OFF}, \texttt{UP}, \texttt{DOWN} and 2) updates: informing the UI component or the rule engine or other devices about a change in the state of a device.
+The runtime provides a communication platform between the devices. These are connected by means of an event bus. Figure~\ref{fig:framework} shows the main components of the openHAB framework. The item repository stores the states of the devices. It is connected to the UI and the rule base. Changes to the states can be made through the UI and by rule firings. The latest state is communicated to the actual device through the event bus. The bindings are libraries that connect the physical devices to the openHAB framework. As shown in the figure, there are two types of events that are communicated by the event bus---1) commands: causing an action or change of state in a device, such as \texttt{ON}, \texttt{OFF}, \texttt{UP}, \texttt{DOWN} and 2) updates: informing the UI component or the rule engine or other devices about a change in the state of a device.
 \begin{figure}
 \centering
 \includegraphics [trim=-2cm 15cm 0 6.5cm, scale=0.4]{images/framework.pdf}
@@ -191,9 +191,9 @@ The runtime provides a communication platform between the devices. There are cur
 \label{fig:framework}
 \end{figure} 
 
-The designer includes an IDE for writing the configuration files to customize the home. The main configuration files include a \textit{.rules} file containing the automation rules, a \textit{.items} file (storing the states of the devices installed) and a \textit{.sitemap} file that maps items to elements in the UI. Each of these are written in small domain specific languages developed using the xtext framework~\cite{xtext}. The action block in the rules, also called the \textit{script} is written in a Java like language called xbase, which is implemented using xtext. For our research, we required access to the item files and the rule files. 
+End users can write the configuration files to customize the home. The main configuration files include a \textit{.rules} file containing the automation rules and an \textit{.items} file for storing the states of the devices installed. Each of these are written in small domain specific languages developed using the xtext framework~\cite{xtext}. The \textit{action block} in the rules, also called the \textit{script} is written in a Java like language called xbase, which is implemented using xtext. For our research, we required access to the item files and the rule files. 
 \subsection{Items}
-The item file lists the states of all the devices in the house that are to be included in the automation. Every item has a type that indicates the values it can store and the commands it can receive. Items can also be grouped together--all lights in the living room can be in one group so that they can be controlled together. There are 11 types of items that are currently supported. Listing~\ref{lst:items} shows the syntax of an item definition (contents in [~] are optional) and two entries in a sample item file. The binding part is responsible for connecting the item to an actual device ID.
+An item is any device installed in the house. There is an item file that contains a list of all items that are to be included in the automation. Every item has a type that indicates the values it can hold and the commands it can receive. Items can also be grouped together---all lights in the living room can be in one group so that they can be controlled together. There are 11 types of items that are currently supported~\cite{openhabitem}. Listing~\ref{lst:items} shows the syntax of an item definition (contents in [~] are optional) and two entries in a sample item file. The binding part is responsible for connecting the item to an actual device ID.
 \begin{lstlisting}[caption={Syntax and two examples of item definitions.},label={lst:items}]
 <type> <name> ["label"] [<icon>] 
               [(group*)] [{binding}]
@@ -203,22 +203,23 @@ Contact Window_Bedroom "Bedroom"
 \end{lstlisting}
  
 \subsection{Rules}
-Listing~\ref{lst:rule} shows the syntax of the rules. There are three types of triggers.
+Listing~\ref{lst:rule} shows an example of a rule---it has two parts: a \emph{trigger block} and an \emph{action block}. The \emph{trigger block} can have one or more triggers. There are three types of triggers.
 \begin{enumerate} [topsep=0pt,itemsep=-1ex]
-\item event-based triggers: These triggers are related to changes in the state of a device. Some examples--\\
+\item event-based triggers: These triggers are related to changes in the state of a device. Some examples---\\
 \texttt{Item LightSwitch received command} \\
 \texttt{Item State\_Away changed}
-\item temporal triggers: They cause actions to happen at a certain time. An example--\\ \texttt{Time cron "second minute hour day month weekday year"}
-\item system triggers: There are two system triggers--system start up and system shut down.
+\item temporal triggers: They cause actions to happen at a certain time. An example---\\ \texttt{Time cron "second minute hour day month weekday year"}
+\item system triggers: There are two system triggers---system start up and system shut down.
 \end{enumerate}
+The \emph{action block} of a rule in openHAB is also called the \emph{script}. It describes what the rule should do when the triggers occur.
 \subsection{Actions}
 \label{subsec:actions}
-Actions are predefined methods in Java that can be used in the scripts of the rules. The openHAB runtime provides a core set of actions but more can be implemented for specific devices by the respective manufacturers. The most important core actions for the purpose of our analysis are the event bus actions: \texttt{sendCommand(String itemName, String commandName)}, \texttt{postUpdate(String itemName, String stateValue)}. The entire list of actions can be found in the openHAB wiki~\cite{openhabwiki}.
+Actions are predefined methods that can be used in the \textit{action block} of a rule. The openHAB runtime provides a core set of actions but more can be implemented for specific devices by the respective manufacturers. The most important core actions for the purpose of our analysis are the event bus actions: \texttt{sendCommand(String itemName, String commandName)}, \texttt{postUpdate(String itemName, String stateValue)}. The entire list of actions can be found in the openHAB wiki~\cite{openhabwiki}. The \textit{action block} of a rule which is written in xbase, can invoke these actions. 
 
 \section{Errors due to too few triggers}
 \emph{Problem Definition}. Errors due to too few triggers is a condition where an insufficient number of triggers leads to fewer firing of a rule thereby leading to unexpected behavior or security vulnerabilities. \\
 
-\emph{Goal}. Our goal is to prevent end users from making errors due to too few triggers--we want to ensure that all the correct triggers are included in the rules. \\
+\emph{Goal}. Our goal is to prevent end users from making errors due to too few triggers---we want to ensure that all the correct triggers are included in the rules. \\
 
 \emph{Approach}. Our approach is to automatically generate all the correct trigger conditions from the actions written by the end users. We developed a static technique to achieve this so that the rules do not need to be fired at all until all the correct triggers are included. Figure~\ref{fig:design} shows the design of our tool. It takes as input a \textit{rules} file and and \textit{items} file. The technique is explained below.
 \begin{enumerate}
@@ -227,9 +228,9 @@ Actions are predefined methods in Java that can be used in the scripts of the ru
 
 \emph{Live item}. An item is live in $R$ if its value is read before it is written to in the rule script, $S$. 
 
-\emph{Dependent item}. We define an item to be \emph{dependent} in $R$ if its value is computed based on other items or variables in the rule--this implies that the item is \emph{not live}. 
+\emph{Dependent item}. We define an item to be \emph{dependent} in $R$ if its value is computed based on other items or variables in the rule---this implies that the item is \emph{not live}. 
  
-\emph{Independent item}. We define an item to be \emph{independent} in $R$ if  its value is directly obtained from a sensor or a user's input and not computed based on any other item or variable--this implies that the item is \emph{live} in $R$. 
+\emph{Independent item}. We define an item to be \emph{independent} in $R$ if  its value is directly obtained from a sensor or a user's input and not computed based on any other item or variable---this implies that the item is \emph{live} in $R$. 
 
 \emph{Redundant trigger}. We define an event-based trigger to be redundant if inclusion of the trigger in a rule \emph{never} changes the state of any item or the value of any variable involved in $S$ when the rule is fired due to it.
 
@@ -238,12 +239,12 @@ An item $d$ which is not \textit{live} in $R$ is not included in $T$ because it 
 \emph{Proof}. Let us assume that $d$ is not redundant. That means it must change the value of some item or variable in $R$ in some firing. Let this item or variable be $a$. Since $d$ is not live, its value is never read before it is written to. The following cases are possible:
 \begin{itemize} [topsep=-2pt, itemsep=-1pt]
 \item $d$ is assigned a constant value. In this case, $d$ as a trigger does not change the value of $a$ because $d$'s value is always the same (as long as the script of R  itself is not changed).
-\item $d$ is some function of other items, $i_1, i_2, ..., i_n$ and variables $v_1, v_2, ..., v_m$ in $R$. In this case, $d$ as a trigger will still not affect the value of $a$ because $d$'s own value depends on the values of items $i_1, i_2, ..., i_n$--a will change only if the values of the live items from $i_1, i_2, ..., i_n$ change. Hence, adding them as triggers would be sufficient.
+\item $d$ is some function of other items, $i_1, i_2, ..., i_n$ and variables $v_1, v_2, ..., v_m$ in $R$. In this case, $d$ as a trigger will still not affect the value of $a$ because $d$'s own value depends on the values of items $i_1, i_2, ..., i_n$---a will change only if the values of the live items from $i_1, i_2, ..., i_n$ change. Hence, adding them as triggers would be sufficient.
 \end{itemize}
 This shows that $d$ never causes the value of $a$ to change. Therefore, our assumption that $d$ is not redundant is wrong. Hence, $d$ must be redundant. $\blacksquare$
 \end{enumerate}
 
-\emph{Scope}. The algorithm for automatically generating triggers described above targets event-based triggers only--our tool does not aim to suggest temporal or system triggers. This is because temporal and system based triggers are highly dependent on the end user's preference and without any additional annotations from the user, it is impossible to suggest a generic temporal or system trigger that will be applicable to all users. Since our tool does not require any annotations from the end user, the scope of our tool is limited to event-based triggers. This means that if the end user intends a rule to be fired only under system or temporal triggers, the suggestions provided by our tool will not be useful. Table~\ref{tab:scope1} summarizes the usefulness of our tool for suggesting triggers with respect to the conditions under which the user actually expects the rule to be fired.
+\emph{Scope}. The algorithm for automatically generating triggers described above targets event-based triggers only---our tool does not aim to suggest temporal or system triggers. This is because temporal and system based triggers are highly dependent on the end user's preference and without any additional annotations from the user, it is impossible to suggest a generic temporal or system trigger that will be applicable to all users. Since our tool does not require any annotations from the end user, the scope of our tool is limited to event-based triggers. This means that if the end user intends a rule to be fired only under system or temporal triggers, the suggestions provided by our tool will not be useful. Table~\ref{tab:scope1} summarizes the usefulness of our tool for suggesting triggers with respect to the conditions under which the user actually expects the rule to be fired.
 \begin{table}[ht]
 \centering
 \begin{tabular}{|l|l|}
@@ -255,7 +256,7 @@ temporal & low \\\hline
 system & low \\ \hline
 combination of temporal, system & low  \\ \hline
 \end{tabular}
-\caption{Scope of our tool for suggesting triggers only based on the rule script (no triggers written by the user)--\textit{high} indicates that all the suggestions are useful, \textit{medium} indicates that only the event-based suggestions are useful and \textit{low} indicates that none of the suggestions are useful. }
+\caption{Scope of our tool for suggesting triggers only based on the rule script (no triggers written by the user)---\textit{high} indicates that all the suggestions are useful, \textit{medium} indicates that only the event-based suggestions are useful and \textit{low} indicates that none of the suggestions are useful. }
 \label{tab:scope1}
 \end{table}
 
@@ -335,7 +336,7 @@ We evaluated our tool on 116 end user written rules. We obtained the rules from 
 Recent work has mentioned possible security loopholes in smart homes~\cite{yoshi, dhanjani, jung}. Anything on static analysis of end user written rules? }
 
 \section{Conclusions}
-End users have a major role in home automation--they decide the automation rules for the devices. Not surprisingly, our research shows that these end user written rules \textit{are} a major source of security vulnerability in smart homes.
+End users have a major role in home automation---they decide the automation rules for the devices. Not surprisingly, our research shows that these end user written rules \textit{are} a major source of security vulnerability in smart homes.
 We observed that a common error made by end users while writing the rules is having insufficient number of triggers, leading to fewer firings of the rules than necessary. To prevent this problem, we developed a tool that can automatically generate trigger conditions based on the actions in a rule as well as identify missing triggers if some of them are already provided. This reduces the burden of end user by assisting them in including all the required triggers. 
 
 We evaluated our tool on real home automation rules written by end users and found that out of 116 rules, 74 had insufficient number of triggers. By manual inspecting the suggestions provided by the tool, we found that each one of them were relevant and including them in the rules prevented the unexpected behaviors observed previously. 
