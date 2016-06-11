@@ -161,7 +161,7 @@ This rule is supposed to set the value of \texttt{State\_Away} to \texttt{ON} wh
 \begin{figure}
 \centering
 \includegraphics [trim=1cm 13cm 0 0, scale=0.14]{images/openhab-runtime.png}
-\caption{Desktop UI showing that it is possible to set both \texttt{State\_Away} and \texttt{State\_Sleeping} to \texttt{ON} at the same time. Blue indicate that they are \texttt{ON}.}
+\caption{Desktop UI showing that it is possible to set both \texttt{State\_Away} and \texttt{State\_Sleeping} to \texttt{ON} at the same time. Blue indicates that they are \texttt{ON}.}
 \label{fig:awayrule}
 \end{figure}
 This example shows that even if the action block of a rule is implemented correctly, not having all the correct triggers can lead to too few firings of the rule and thus, unexpected behavior. To solve this problem, we propose a technique based on static analysis that can automatically generate event-based triggers and also detect missing ones by analysing code in the action block. 
