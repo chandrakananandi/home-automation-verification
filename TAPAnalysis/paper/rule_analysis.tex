@@ -7,7 +7,7 @@
 \usepackage{listings}
 \usepackage{textcomp}
 
-\lstset{basicstyle=\ttfamily, captionpos=b}
+\lstset{basicstyle=\ttfamily, captionpos=b, escapeinside={<@}{@>}}
 \usepackage{xcolor}
 \newcommand\todo[1]{\textbf{\textcolor{red}{#1}}}
 \newcommand{\lstul}[1]{\underline{\mbox{\tt #1}}}
@@ -114,10 +114,10 @@ A rule engine fires the rules when its triggers are satisfied.
 \begin{lstlisting}[caption={Example of a rule for turning on the ceiling light on the first floor (FF) and turning off the light next to the living room couch at 10 pm during holiday mode. },label={lst:rule}]
 rule "Holiday lights on before going sleeping"
 when
- //trigger block
+ <@\textcolor{green}{ //trigger block}@>
  Time cron "0 0 22 * * ?" 
 then
- //action block
+ <@\textcolor{green}{ //action block}@>
  if(Auto_Holiday.state==ON){
   sendCommand(Light_FF_Livingroom_Couch,OFF)
   sendCommand(Light_FF_Floor_Ceiling,ON)
