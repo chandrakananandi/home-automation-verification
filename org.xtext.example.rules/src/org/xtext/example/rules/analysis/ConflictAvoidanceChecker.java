@@ -42,8 +42,8 @@ public class ConflictAvoidanceChecker {
 	}
 	
 	public static void main(String[] args) throws IOException {
-		String rule_file = "sample_rule.rules";
-		String item_file= "sample_item.items";
+		String rule_file = "sample_rule1.rules";
+		String item_file= "sample_item1.items";
 		File config_file= new File("./src/org/xtext/example/rules/analysis/resources/sample_config2.homecfg");
 		
 		long time_start=System.currentTimeMillis();
@@ -61,13 +61,10 @@ public class ConflictAvoidanceChecker {
 		System.out.println("------------------------------");
 		System.out.println("------------------------------");
 		checkConflictDueToTooFewTriggers(ruleParser, itemParser);
-		long time_end=System.currentTimeMillis();
-		
+		long time_end=System.currentTimeMillis();		
 		System.out.println("Time:" + (time_end-time_start));
 		
 	}
-
-	
 
 	public static void parseConfiguration(File config_file){
 		String line=null; 
@@ -103,10 +100,13 @@ public class ConflictAvoidanceChecker {
 				if(itemParser.getGroupNames().contains(member_state)) {
 					suggested_triggers.addAll(itemParser.getGroupItemMap().get(member_state));
 				}
+				
+				// check if the member state is indeed a device and not just a local variable
 				if(itemParser.getItemNames().contains(member_state)) {						
 					suggested_triggers.add(member_state);				
 					//dependent_trigger_suggestion=eliminateIsolatedDependentTriggers(member_state, rule_info, ruleParser);
 					redundant_trigger_suggestion=eliminateRedundantTriggers(member_state);
+					
 				}
 				if(redundant_trigger_suggestion!=null){
 					suggested_triggers.remove(redundant_trigger_suggestion);
@@ -115,13 +115,22 @@ public class ConflictAvoidanceChecker {
 					suggested_triggers.remove(dependent_trigger_suggestion);
 				}
 			}
-						
+			
+			for(String t: suggested_triggers) {
+				rule_info.addGeneratedTrigger(t);
+			}
+			
+			HashMap<String, HashSet<String>> conflicting_rules  = findConflictingRulesForATrigger(rule_info, ruleParser, suggested_triggers);
+					
 			if(suggested_triggers.size()>0) {			
 				count ++;
 				System.out.println("rule:" + rule_info.getName());
 				System.out.println("number of suggested triggers:" + suggested_triggers.size());
 				for(String suggested_trigger: suggested_triggers){
 					System.out.println("suggested trigger: "+ suggested_trigger);
+					if(conflicting_rules.containsKey(suggested_trigger)) {
+						System.out.println(Constants.CONFLICT + suggested_trigger + " in rules: "+conflicting_rules.get(suggested_trigger));
+					}
 				}			
 			}
 			
@@ -132,6 +141,35 @@ public class ConflictAvoidanceChecker {
 			System.out.println("------------------------------");		
 		}
 		System.out.println("total rules with suggested triggers: "+ count);
+	}
+	
+	/**
+	 * go through all other rules apart from rule_info and check if a trigger in rule_info appears in the LHS of any assignment in any 
+	 * of those. If this is the case, then that means that another rule is trying to set the value of this trigger item and the user should be
+	 * made aware of this conflict in the rules.
+	 * @param rule_info
+	 * @param ruleParser
+	 * @param triggers
+	 * @return mapping of triggers with all the rules that have potential conflicts.
+	 */
+	public static HashMap<String, HashSet<String>> findConflictingRulesForATrigger(RuleInformation rule_info, 
+			RuleParser ruleParser, Set<String> triggers) {		
+		HashSet<String> rules=new HashSet<String>();
+		String conflicting_trigger=new String();
+		HashMap<String, HashSet<String>> conflict_map=new HashMap<String, HashSet<String>>();
+		for(String trigger: triggers) {			
+			for(RuleInformation rule: ruleParser.getRuleSet()) {
+				if(!rule.equals(rule_info)) {
+					if (ruleParser.getMemberStatesInAssignmentLHSs().get(rule.getName()).contains(trigger) ||
+							ruleParser.getPostUpdateFirstArguments().get(rule.getName()).contains(trigger)) {
+						conflicting_trigger=trigger;
+						rules.add(rule.getName());					
+					}
+				}
+			}
+			conflict_map.put(conflicting_trigger, rules);
+		}				 
+		return conflict_map;	
 	}
 	
 	public static void checkConflictDueToTooFewTriggers(RuleParser ruleParser, ItemParser itemParser) {
@@ -148,6 +186,7 @@ public class ConflictAvoidanceChecker {
 					missing_triggers.addAll(itemParser.getGroupItemMap().get(member_state));
 				}
 				
+				// check if the member state is indeed a device and not just a local variable
 				if(itemParser.getItemNames().contains(member_state)) {				
 					if(!rule_info.getTriggerItemNames().contains(member_state)){
 						missing_triggers.add(member_state);	
@@ -199,8 +238,8 @@ public class ConflictAvoidanceChecker {
 		
 		System.out.println("total rules: "+count);
 		System.out.println("total potential buggy rules: "+ buggy_count);
-	}
-		
+	}	
+
 	// if member state is an argument of an output action (those in the homecfg file) only, it is not needed to be a trigger. Also, if it is an output state listed in
 	// homecfg and does not appear in more than one rule, then it does not need to be a trigger.
 	public static String eliminateRedundantTriggers(String member_state) {
@@ -214,7 +253,6 @@ public class ConflictAvoidanceChecker {
 		}
 		for(FeatureInvocation feature: ExpressionVisitorImpl.feature_invocations) {
 			if(side_effect_free_actions_output_states.contains(feature.getMethodName())) {
-				
 				if(feature.getArguments().contains(member_state)) {
 					side_effect_free_occurences++;								
 				} else {

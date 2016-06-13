@@ -178,11 +178,10 @@ public class RuleParser {
 				
 				Set<String>discardable_member_states_in_assignments=new HashSet<String>();
 				Set<String>keepable_member_states_in_assignments=new HashSet<String>();
-				
 				// remove member_states that appear in an LHS first and then in an RHS: this means they are written to before reading from.
 				for(int y=assignments_start_index+1;y<assignments_stop_index;y++) {
 					for(int x=assignments_start_index;x<y;x++) {
-						for(String rhs: ExpressionVisitorImpl.assignments_and_variable_declarations.get(y).getRhs()) {
+						for(String rhs: ExpressionVisitorImpl.assignments_and_variable_declarations.get(y).getRhs()) {							
 							if(ExpressionVisitorImpl.assignments_and_variable_declarations.get(x).getLhs().equals(rhs)) {
 								discardable_member_states_in_assignments.add(rhs);
 							}
@@ -191,28 +190,30 @@ public class RuleParser {
 				}
 				
 				for(int y=assignments_start_index;y<assignments_stop_index;y++) {
+					discardable_member_states_in_assignments.add(ExpressionVisitorImpl.assignments_and_variable_declarations.get(y).getLhs());
+				}
+				
+				// Not adding any member state to this list which only appear on LHS. 
+				for(int y=assignments_start_index;y<assignments_stop_index;y++) {
 					for(String rhs:ExpressionVisitorImpl.assignments_and_variable_declarations.get(y).getRhs()) {
 						if(!discardable_member_states_in_assignments.contains(rhs)) {
 							keepable_member_states_in_assignments.add(rhs);
 						}
 					}
 				}
-				member_states.addAll(keepable_member_states_in_assignments);
 				
-				
+				member_states.addAll(keepable_member_states_in_assignments);							
 				member_features_involved.put(rule.getName(), member_states);		
 				postupdates_involved.put(rule.getName(), post_update_first_argument);
 				assignment_left_hand_sides.put(rule.getName(), discardable_member_states_in_assignments);
-				ConflictAvoidanceChecker.ast_writer.println(rule.getName()+" :rule end");			
-				
+				ConflictAvoidanceChecker.ast_writer.println(rule.getName()+" :rule end");							
 			}			
 		}
 		
 		ConflictAvoidanceChecker.ast_writer.close();		
 		for (Rule rule : rules) {
 			BufferedReader br = new BufferedReader(new FileReader("/home/cnandi/openHABworkspace/org.xtext.example.rules/ast-output.txt"));
-			List<String> scriptContent = analyseSimplerAST(rule.getName(), br);
-		
+			List<String> scriptContent = analyseSimplerAST(rule.getName(), br);		
 			RuleInformation rule_information = new RuleInformation(rule.getName(), rule.getEventtrigger(), scriptContent);
 			rule_database.add(rule_information);
 			br.close();			

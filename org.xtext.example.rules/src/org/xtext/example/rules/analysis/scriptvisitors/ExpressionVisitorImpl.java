@@ -92,13 +92,13 @@ public class ExpressionVisitorImpl implements ExpressionVisitor {
 			}
 			featureInvocation.setArgument(args);
 		}
-		if(xFeatureCallImplCustom.getExpression().getConcreteSyntaxFeatureName().equals("postUpdate")) {
+			feature_invocations.add(featureInvocation);			
+		}
+		if(xFeatureCallImplCustom.getExpression().getConcreteSyntaxFeatureName().equals("postUpdate")
+			|| xFeatureCallImplCustom.getExpression().getConcreteSyntaxFeatureName().equals("sendCommand")) {
 			first_arguments_of_postUpdate.add(xFeatureCallImplCustom.getExpression().getActualArguments().get(0).toString());
 		}
 		
-		feature_invocations.add(featureInvocation);			
-	}
-
 		ConflictAvoidanceChecker.ast_writer.println("Feature ends:" + old_feature_counter);
 		return featureInvocation.getMethodName();
 	}
@@ -111,13 +111,12 @@ public class ExpressionVisitorImpl implements ExpressionVisitor {
 		int old_member_feature_counter = member_feature_counter;
 		ConflictAvoidanceChecker.ast_writer.println("Member feature:"+member_feature_counter);	
 		
-
 		if (xMemberFeatureCallImplCustom.getExpression().getActualReceiver() != null) {
 			ConflictAvoidanceChecker.ast_writer.println("Member target:" + member_feature_counter);
 			memberFeatureInvocation.setFeatureName((String)expressionSwitch.caseXExpression(xMemberFeatureCallImplCustom.getExpression().getMemberCallTarget()));	
-			member_states_involved.add(memberFeatureInvocation.getFeatureName());
-					
+			member_states_involved.add(memberFeatureInvocation.getFeatureName());					
 		}
+		
 		ConflictAvoidanceChecker.ast_writer.println("Member feature name:" + member_feature_counter);
 		ConflictAvoidanceChecker.ast_writer.println(xMemberFeatureCallImplCustom.getExpression().getConcreteSyntaxFeatureName());
 		memberFeatureInvocation.setMemberName(xMemberFeatureCallImplCustom.getExpression().getConcreteSyntaxFeatureName());
@@ -139,11 +138,14 @@ public class ExpressionVisitorImpl implements ExpressionVisitor {
 
 	@Override
 	public XExpression visit(XVariableDeclarationCustom xVariableDeclaration) {
+		Assignment var_decl = new Assignment();
 		ConflictAvoidanceChecker.ast_writer.println("Variable declaration:");
 		ConflictAvoidanceChecker.ast_writer.println("var name: " + xVariableDeclaration.getExpression().getSimpleName());
-		ConflictAvoidanceChecker.ast_writer.println("RHS:");
+		var_decl.setLhs(xVariableDeclaration.getExpression().getIdentifier());
+		ConflictAvoidanceChecker.ast_writer.println("RHS:");		
 		if (xVariableDeclaration.getExpression().getRight() instanceof XExpression) {
 			expressionSwitch.caseXExpression((XExpression) xVariableDeclaration.getExpression().getRight());
+			assignments_and_variable_declarations.add(var_decl);
 		}
 		return null;
 	}
@@ -152,26 +154,26 @@ public class ExpressionVisitorImpl implements ExpressionVisitor {
 	public XExpression visit(XAssignmentCustom xAssignmentCustom) {
 		Assignment assignment=new Assignment();
 		ConflictAvoidanceChecker.ast_writer.println("Assignment:");
-		if (xAssignmentCustom.getExpession().getActualReceiver() != null) {
-			ConflictAvoidanceChecker.ast_writer.println(xAssignmentCustom.getExpession().getActualReceiver());			
-			assignment.setLhs(xAssignmentCustom.getExpession().getActualReceiver().toString());	
-			expressionSwitch.caseXExpression(xAssignmentCustom.getExpession().getActualReceiver());
+		
+		if (xAssignmentCustom.getExpression().getActualReceiver() != null) {
+			ConflictAvoidanceChecker.ast_writer.println(xAssignmentCustom.getExpression().getActualReceiver());			
+			assignment.setLhs(xAssignmentCustom.getExpression().getActualReceiver().toString());	
+			expressionSwitch.caseXExpression(xAssignmentCustom.getExpression().getActualReceiver());
 		} else { 
-			ConflictAvoidanceChecker.ast_writer.println(xAssignmentCustom.getExpession().getConcreteSyntaxFeatureName());
-			assignment.setLhs(xAssignmentCustom.getExpession().getConcreteSyntaxFeatureName());			
+			ConflictAvoidanceChecker.ast_writer.println(xAssignmentCustom.getExpression().getConcreteSyntaxFeatureName());
+			assignment.setLhs(xAssignmentCustom.getExpression().getConcreteSyntaxFeatureName());			
 		}
 		
 		// Right now, works only if the rhs is a feature call.	
-		if(xAssignmentCustom.getExpession().getValue().getClass().getSimpleName().equals("XFeatureCallImplCustom")) {
+		if(xAssignmentCustom.getExpression().getValue().getClass().getSimpleName().equals("XFeatureCallImplCustom")) {
 			List<String>rhs_args=new ArrayList<String>();
-			if (((XFeatureCallImplCustom)(xAssignmentCustom.getExpession().getValue())).getActualArguments().size()>0) {
-				for (XExpression arg: ((XFeatureCallImplCustom)(xAssignmentCustom.getExpession().getValue())).getActualArguments()) {
-					//System.err.println(arg);
+			if (((XFeatureCallImplCustom)(xAssignmentCustom.getExpression().getValue())).getActualArguments().size()>0) {
+				for (XExpression arg: ((XFeatureCallImplCustom)(xAssignmentCustom.getExpression().getValue())).getActualArguments()) {
 					expressionSwitch.caseXExpression(arg);
 					rhs_args.add(arg.toString());
 				}
 			} else {
-				rhs_args.add(((XFeatureCallImplCustom)(xAssignmentCustom.getExpession().getValue())).getConcreteSyntaxFeatureName());
+				rhs_args.add(((XFeatureCallImplCustom)(xAssignmentCustom.getExpression().getValue())).getConcreteSyntaxFeatureName());
 			}
 			assignment.setRhs(rhs_args);
 		}

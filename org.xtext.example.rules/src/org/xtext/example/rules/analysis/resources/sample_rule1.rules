@@ -82,7 +82,9 @@ then
 	{
 		msg = "Inaktiv"
 	}
-	
+	// autoStatus is being read here, hence it should be a trigger because it could have been changed in some other rule.
+	// The tool should also indicate that there could be a potential conflict if it find autoStatus in some other rule as an LHS
+	// of an assignment.
 	if( AutoStatus.state != msg )
 	{
 		postUpdate(AutoStatus,msg)
@@ -101,6 +103,7 @@ then
 	var Number hour   = now.getHourOfDay
 	if( Auto_Attic_Light.state == 2 )
 	{
+		postUpdate(AutoStatus, "bla")
 		logInfo("Mode W",""+hour)
 		if( hour >= 5 && hour < 23 ) sendCommand(Socket_Attic, ON)
 		else sendCommand(Socket_Attic, OFF)

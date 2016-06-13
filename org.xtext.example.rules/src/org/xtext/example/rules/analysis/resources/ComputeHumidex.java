@@ -2,12 +2,12 @@ package org.xtext.example.rules.analysis.resources;
 
 public class ComputeHumidex {
 	public void compute_humidex() {		
-		Number Weather_Humidex = 0;
-		Number T = Util.f(Weather_Temperature.state);
-		Number H = Util.f(Weather_Humidity.state);
-		Number x = Util.f(T);
-		Number e = Util.f(x, H);
-		Number humidex = Util.f(T, e);
+		Object Weather_Humidex = null;
+		Object T = Util.f(Weather_Temperature.state);
+		Object H = Util.f(Weather_Humidity.state);
+		Object x = Util.f(T);
+		Object e = Util.f(x, H);
+		Object humidex = Util.f(T, e);
 		Util.postUpdate(Weather_Humidex, humidex);
 	}	
 }

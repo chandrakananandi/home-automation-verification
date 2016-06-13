@@ -10,7 +10,7 @@ public class XAssignmentCustom extends org.eclipse.xtext.xbase.impl.XAssignmentI
 		expression = object;
 	}
 
-	public XAssignmentImplCustom getExpession() {
+	public XAssignmentImplCustom getExpression() {
 		return expression;
 	}
 

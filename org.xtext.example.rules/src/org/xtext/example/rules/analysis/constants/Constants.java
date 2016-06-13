@@ -9,4 +9,6 @@ public class Constants {
 	public static final String SYSTEM_SHUTDOWN = "SystemOnShutdownTriggerImpl";
 	public static final String MIDNIGHT = "midnight";
 	public static final String NOON = "noon";
+	
+	public static final String CONFLICT="CONFLICT POSSIBLE FOR: ";	
 }

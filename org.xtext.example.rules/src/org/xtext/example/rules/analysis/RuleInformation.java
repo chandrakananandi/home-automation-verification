@@ -2,7 +2,9 @@ package org.xtext.example.rules.analysis;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.emf.common.util.EList;
 import org.xtext.example.rules.analysis.constants.Constants;
@@ -21,6 +23,7 @@ public class RuleInformation {
 
 	private String name;
 	private EList<EventTrigger> triggers;
+	private Set<String> generated_triggers=new HashSet<String>();
 	//private ScriptContent action;
 	private List<String> action=new ArrayList<String>();
 	
@@ -29,7 +32,15 @@ public class RuleInformation {
 		this.triggers = triggers;
 		this.action = script;
 	}
+	
+	public void addGeneratedTrigger(String trigger) {
+		generated_triggers.add(trigger);
+	}
 
+	public Set<String> getGeneratedTriggers() {
+		return generated_triggers;
+	}
+	
 	public EList<EventTrigger> getTriggers() {
 		return this.triggers;
 	}
