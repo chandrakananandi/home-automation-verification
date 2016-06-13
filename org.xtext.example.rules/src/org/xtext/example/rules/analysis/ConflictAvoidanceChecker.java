@@ -144,7 +144,7 @@ public class ConflictAvoidanceChecker {
 	}
 	
 	/**
-	 * go through all other rules apart from rule_info and check if a trigger in rule_info appears in the LHS of any assignment in any 
+	 * Go through all other rules apart from rule_info and check if a trigger in rule_info appears in the LHS of any assignment in any 
 	 * of those. If this is the case, then that means that another rule is trying to set the value of this trigger item and the user should be
 	 * made aware of this conflict in the rules.
 	 * @param rule_info
