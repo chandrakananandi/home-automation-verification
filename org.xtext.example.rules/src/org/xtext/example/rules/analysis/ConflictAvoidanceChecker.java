@@ -154,20 +154,20 @@ public class ConflictAvoidanceChecker {
 	 */
 	public static HashMap<String, HashSet<String>> findConflictingRulesForATrigger(RuleInformation rule_info, 
 			RuleParser ruleParser, Set<String> triggers) {		
-		HashSet<String> rules=new HashSet<String>();
 		String conflicting_trigger=new String();
 		HashMap<String, HashSet<String>> conflict_map=new HashMap<String, HashSet<String>>();
-		for(String trigger: triggers) {			
+		for(String trigger: triggers) {		
+			HashSet<String> rules=new HashSet<String>();
 			for(RuleInformation rule: ruleParser.getRuleSet()) {
 				if(!rule.equals(rule_info)) {
 					if (ruleParser.getMemberStatesInAssignmentLHSs().get(rule.getName()).contains(trigger) ||
 							ruleParser.getPostUpdateFirstArguments().get(rule.getName()).contains(trigger)) {
 						conflicting_trigger=trigger;
-						rules.add(rule.getName());					
+						rules.add(rule.getName());	
+						conflict_map.put(conflicting_trigger, rules);
 					}
 				}
-			}
-			conflict_map.put(conflicting_trigger, rules);
+			}		
 		}				 
 		return conflict_map;	
 	}
