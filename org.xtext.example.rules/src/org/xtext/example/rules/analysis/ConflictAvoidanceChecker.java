@@ -91,6 +91,7 @@ public class ConflictAvoidanceChecker {
 	// Can suggest event-based triggers, not System or Time based ones.
 	public static void generateTriggers(RuleParser ruleParser, ItemParser itemParser){
 		int count=0;
+		int conflict_count=0;
 		for(RuleInformation rule_info: ruleParser.getRuleSet()) {	
 			Set<String>suggested_triggers=new HashSet<String>();
 			String redundant_trigger_suggestion=null;
@@ -138,9 +139,13 @@ public class ConflictAvoidanceChecker {
 				System.out.println("rule:" + rule_info.getName());
 				System.out.println("no suggested triggers");
 			}
-			System.out.println("------------------------------");		
+			System.out.println("------------------------------");	
+			if(!conflicting_rules.isEmpty()) {
+				conflict_count++;
+			}
 		}
 		System.out.println("total rules with suggested triggers: "+ count);
+		System.out.println("total number of rules with potential conflicts:" + conflict_count);
 	}
 	
 	/**
