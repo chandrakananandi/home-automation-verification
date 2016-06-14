@@ -159,7 +159,7 @@ public class ConflictAvoidanceChecker {
 		for(String trigger: triggers) {		
 			HashSet<String> rules=new HashSet<String>();
 			for(RuleInformation rule: ruleParser.getRuleSet()) {
-				if(!rule.equals(rule_info)) {
+				if(!rule.equals(rule_info) && rule.getTriggerTypes().contains("ChangedEventTriggerImpl")) {		
 					if (ruleParser.getMemberStatesInAssignmentLHSs().get(rule.getName()).contains(trigger) ||
 							ruleParser.getPostUpdateFirstArguments().get(rule.getName()).contains(trigger)) {
 						conflicting_trigger=trigger;
