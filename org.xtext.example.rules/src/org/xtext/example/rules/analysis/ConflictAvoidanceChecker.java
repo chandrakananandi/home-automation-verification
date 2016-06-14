@@ -156,18 +156,21 @@ public class ConflictAvoidanceChecker {
 			RuleParser ruleParser, Set<String> triggers) {		
 		String conflicting_trigger=new String();
 		HashMap<String, HashSet<String>> conflict_map=new HashMap<String, HashSet<String>>();
-		for(String trigger: triggers) {		
+		for(String trigger: triggers) {
 			HashSet<String> rules=new HashSet<String>();
-			for(RuleInformation rule: ruleParser.getRuleSet()) {
-				if(!rule.equals(rule_info) && rule.getTriggerTypes().contains("ChangedEventTriggerImpl")) {		
-					if (ruleParser.getMemberStatesInAssignmentLHSs().get(rule.getName()).contains(trigger) ||
-							ruleParser.getPostUpdateFirstArguments().get(rule.getName()).contains(trigger)) {
-						conflicting_trigger=trigger;
-						rules.add(rule.getName());	
-						conflict_map.put(conflicting_trigger, rules);
+			if ((ruleParser.getMemberStatesInAssignmentLHSs().get(rule_info.getName()).contains(trigger) ||
+				ruleParser.getPostUpdateFirstArguments().get(rule_info.getName()).contains(trigger))) {			
+				for(RuleInformation rule: ruleParser.getRuleSet()) {
+					if(!rule.equals(rule_info) && rule.getTriggerTypes().contains("ChangedEventTriggerImpl")) {	
+						if (ruleParser.getMemberStatesInAssignmentLHSs().get(rule.getName()).contains(trigger) ||
+								ruleParser.getPostUpdateFirstArguments().get(rule.getName()).contains(trigger)) {							
+							conflicting_trigger=trigger;
+							rules.add(rule.getName());							
+							conflict_map.put(conflicting_trigger, rules);
+						}
 					}
 				}
-			}		
+			}
 		}				 
 		return conflict_map;	
 	}
