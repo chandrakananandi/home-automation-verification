@@ -118,8 +118,8 @@ Figure~\ref{fig:design} shows the design of our tool. It takes as input a \texti
 
 The rule file is parsed to extract the action block and the item file is parsed to extract all the item names, types (\texttt{Switches}, \texttt{Shutters}, \texttt{Dimmers} etc.), and the groups to which they belong; for example all the light switches in the living room may be grouped together.
 
-By statically analysing the abstract syntax tree of the action block, $A$, TrigGen first identifies all the items that appear in a rule, $R$. This is an exhaustive list of all potential event-based triggers. Let this list be $T$.
-Naively adding all $t \in T$ as triggers of $R$ would either unnecessarily fire $R$ too many time or add redundant triggers. Hence, we apply an elimination technique to get rid of triggers that are not required. For that, we define the following terms.
+By statically analysing the abstract syntax tree of the action block $A$ of rule $R$, TrigGen first identifies all the items that appear in $R$. This is an exhaustive list of all potential event-based triggers. Let this list be $T$.
+Naively adding all $t \in T$ as triggers of $R$ would either unnecessarily fire $R$ too many time or add wrong triggers. Hence, we apply an elimination technique to get rid of triggers that are not required or are wrong. For that, we define the following terms.
 
 \emph{Definition 1}. An item is \emph{live} in $R$ if its value is read before it is written to in the action block, $A$. 
 
@@ -127,11 +127,11 @@ Naively adding all $t \in T$ as triggers of $R$ would either unnecessarily fire 
  
 \emph{Definition 3}. An item is \emph{independent} in $R$ if  its value is directly obtained from a sensor or a user's input and not computed based on any other item or variable---this implies that the item is \emph{live} in $R$. 
 
-\emph{Definition 4}. An event-based trigger is \emph{redundant} if inclusion of the trigger in a rule \emph{never} changes the state of any item or the value of any variable involved in $S$ when the rule is fired due to it.
+\emph{Definition 4}. An event-based trigger is \emph{redundant} if inclusion of the trigger in a rule \emph{never} changes the state of any item or the value of any variable involved in $A$ when the rule is fired due to it.
 
 \emph{Trigger elimination strategy.} \textbf{ An item $d$ which is not \emph{live} in $R$ is not included in $T$ because it is \emph{redundant}. As a corollary, if $d$ is \emph{dependent}, it is also not included in $T$.} 
 
-\emph{Conflicting rules.} Two or more rules are said to have a conflict for an item if they all write to the item. TrigGen can detect such conflicts between every pair of rules and warn the end user for potential conflicts. 
+\emph{Conflicting rules.} Two or more rules are said to have a conflict for an item if they all write to the item. TrigGen can detect such conflicts between rules and warn the end user about potential conflicts. 
 \begin{figure}
 \centering
 \includegraphics [trim=2cm 18cm 0 5.5cm, scale=0.45]{images/design.pdf}
@@ -150,7 +150,8 @@ For 18 rules, our tool detected potential conflicts among one or more rules. The
 \end{figure} 
 
 \section{Conclusions}
-Not surprisingly, our research shows that end user written rules are often incorrect. We observed that a common error made by end users while writing the rules is having insufficient number of triggers, leading to fewer firings of the rules than necessary. To prevent this problem, we developed a tool that can automatically generate trigger conditions based on the actions in a rule as well as identify missing triggers if some of them are already provided. This reduces the burden of the end users by assisting them in including all the required triggers. \\
+Not surprisingly, our research shows that end user written rules are often incorrect. We observed that a common error made by end users while writing the rules is having insufficient number of triggers, leading to fewer firings of the rules than necessary. To prevent this problem, we developed TrigGen that can automatically generate trigger conditions based on the actions in a rule, identify missing triggers if some of them are already provided by the end user and also identify conflicting rules. This reduces the burden of the end users by assisting them in including all the required triggers and also helps them detect errors in the rules. 
+
 \emph{Scope.} Some rules are meant to be fired under temporal triggers only (such as at a certain time of the day). While our tool is capable of generating all event-based triggers, it cannot generate such temporal triggers. This is because it runs directly on the rules without any additional annotations from the end users about their preferences and without that, it is impossible to infer the exact temporal triggers the user expects. 
 
 \bibliographystyle{abbrv}
