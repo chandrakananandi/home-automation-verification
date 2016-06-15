@@ -88,14 +88,15 @@ Chandrakana Nandi\\
 \maketitle
 \begin{abstract}
 To customize the behavior of a smart home, an end user writes rules.
-When an external event triggers the rule, it executes; for example, when
+When an external event satisfies the rule's trigger, the rule's action executes; for example, when
 the temperature is above a certain threshold, then window awnings might be extended.
 End users often write incorrect rules~\cite{Huang}.
 This paper's technique prevents a certain type of mistake:  
 \textit{errors due to too few triggers}.
 It statically analyzes a rule's actions to determine what triggers are necessary.
 
-We have implemented the technique and tested it on 116 end-user written rules for an open-source home automation platform---openHAB.
+We have implemented the technique and tested it on 116 end-user written
+rules for openHAB, an open-source home automation platform.
 Our tool identified that 73\% of the rules had fewer triggers than required
 for correct behavior.
 The missing triggers could lead to unexpected behavior
@@ -109,9 +110,25 @@ and security vulnerabilities in a smart home.
 \keywords{Security, Home automation, Trigger action programming, Static analysis}
 
 \section{Introduction}
-Most home automation platforms support end-user customization components: a user writes rules to determine what actions should be taken by what device under what conditions~\cite{Newmannowwere}. For example, Samsung SmartThings~\cite{samsung} allows the users to create their own automation rules through their ``SmartApps" feature, while Apple HomeKit~\cite{homekit} allows the users to set up additional conditions to govern when an action should take place. A recent study~\cite{practical-tap} has shown that rule-based systems are one of the most practical solutions for enabling end-users to customize the behavior of their smart homes. A rule-based language has two main components: triggers that cause a rule to be fired and actions to be executed when a rules fires. This is also called Trigger Action Programming (TAP). Listing~\ref{lst:rule} shows an example of a rule. The part between \texttt{when} and \texttt{then} is the trigger block and the part between \texttt{then} and \texttt{end} is the action block. There can be multiple triggers in the trigger part---if one or more is satisfied, the rule is fired. 
+Most home automation platforms support end-user customization components: a
+user writes rules to determine what actions should be taken by what device
+under what conditions~\cite{Newmannowwere}. For example, Samsung
+SmartThings~\cite{samsung} allows users to create their own automation
+rules through their ``SmartApps" feature, while Apple
+HomeKit~\cite{homekit} allows users to set conditions that
+govern when an action should take place.
+
+A rule has two main components:
+triggers that cause a rule to be fired and actions to be executed when a
+rules fires. This is also called Trigger Action Programming
+(TAP)\todo{Add citation}. Listing~\ref{lst:rule} shows an example of a rule. The part between
+\texttt{when} and \texttt{then} is the trigger block and the part between
+\texttt{then} and \texttt{end} is the action block. There can be multiple
+triggers in the trigger part---if one or more is satisfied, the rule is
+fired.
 A rule engine fires the rules when its triggers are satisfied.
-\begin{lstlisting}[caption={Example of a rule for turning on the ceiling light on the first floor (FF) and turning off the light next to the living room couch at 10 pm during holiday mode. },label={lst:rule}]
+
+\begin{lstlisting}[caption={A rule for turning on the ceiling light on the first floor (FF) and turning off the light next to the living room couch at 10 pm during holiday mode. },label={lst:rule}]
 rule "Holiday lights on before going sleeping"
 when
  <@\textcolor{green}{ //trigger block}@>
@@ -123,22 +140,47 @@ then
   sendCommand(Light_FF_Floor_Ceiling,ON)
  }
 end
-
 \end{lstlisting}
-Even though TAP is the most commonly used and practical approach for home automation, end users often make errors in writing trigger-action programs~\cite{Huang},\cite{wild-tap}. These errors could be in 1) writing the triggers, or 2) writing the actions or 3) both. In a heterogeneous system like a smart home where there are multiple interacting devices, it is common for the rules to interact. As a result, an error in one rule can propagate to others and cause unexpected behavior or security vulnerabilities in different parts of the house. In this paper, we propose a solution to make it easier for the end users to write home automation rules correctly. Our approach eliminates one category of errors in the rules---errors due to too few triggers. By doing a static analysis of the actions, our approach automatically generates the trigger conditions so that the user does not have to worry about including the \textit{correct} and \textit{sufficient number} of trigger conditions in the rules. Our approach can identify potential bugs in the rules statically and thus ensure that the rules are free from \textit{errors due to too few triggers} once they are deployed. To the best of our knowledge, there has not been any prior research on analysing end-user written rules for home automation.
 
-We analysed 116 home automation rules written by end users in the openHAB framework~\cite{openhab} and implemented our tool for rules written in the domain specific language provided by openHAB, but our idea can be used for any rule-based system.
-By a combination of static analysis and manual inspection of the results of the analysis, we found 73\% rules to be vulnerable and deviating from the expected behavior due to lack of trigger conditions---this indicates that for rule-based smart home solutions, together with strong security guarantees provided by home automation framework developers, there is a serious need to focus on the end-user written rules because these are mostly written by non-programmers and are often prone to errors. 
+Even though TAP is the most commonly used and practical approach for home
+automation~\cite{practical-tap}, end users often make errors in writing
+trigger-action programs~\cite{Huang,wild-tap}.  In a smart home with
+multiple interacting devices, the rules may interact.  An error in one rule
+can cause unexpected behavior or security vulnerabilities in different
+parts of the house.
+
+This paper addresses errors in writing triggers.  Our approach eliminates
+one category of errors in the rules---errors due to too few triggers.  We
+have built a static analysis that determines a necessary and sufficient set
+of trigger conditions in the rules.  These inferred triggers can be
+compared to the user-written triggers to indicate two types of errors:
+errors due to too few triggers and unnecessary triggers.  The approach
+could also free users from the need to write triggers.
+To the best of our knowledge, this is the first research on analysing
+end-user written rules for home automation.
+
+We implemented our tool and ran it on 116 home automation rules written by
+end users in the openHAB framework~\cite{openhab}.  The tool reported
+insufficient trigger conditions for \todo{XX} rules, which is \todo{YY\%}
+of the rules.  We manually investigated the tool reports and determined
+that \todo{XX}, or \todo{XX\%} of the reports, are true positives.  The other 
+\todo{XX}, or \todo{XX\%}, are false positives (false alarms).
+\todo{Manually investigate the rest to determine true negative and false
+  negative rates.}
+
 Our contributions are the following:
 \begin{enumerate}[topsep=0pt,itemsep=-1ex]
-\item Analysis of end-user written rules for home automation and identifying the security and correctness issues due to \textit{too few triggers}.
-\item  Designing and implementing a static analysis tool that can determine appropriate triggers to be included in a rule and can be used to
+\item Identification of end-user written automation rules as a source of
+  errors and vulnerabilities, due to \textit{too few triggers}.
+\item A static analysis to determine a necessary and sufficient set of
+  triggers, based on the actions written by end users.
+  This analysis can be used to
 \begin{itemize}[topsep=-10pt,itemsep=-1ex,partopsep=1ex,parsep=1ex]
-\item suggest event-based triggers based on the actions written by end-users.
 \item identify missing triggers 
 \item eliminate triggers that are not needed.
 \end{itemize}
-\item Evaluating our tool on real end-user written rules for home automation in the openHAB framework.
+\item An evaluation of our tool on real end-user written rules for home
+  automation in the openHAB framework.\todo{Summarize results.}
 \end{enumerate}
 
 \section{Motivating Example}
