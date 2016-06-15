@@ -163,11 +163,11 @@ public class ConflictAvoidanceChecker {
 		HashMap<String, HashSet<String>> conflict_map=new HashMap<String, HashSet<String>>();
 		for(String trigger: triggers) {
 			HashSet<String> rules=new HashSet<String>();
-			if ((ruleParser.getMemberStatesInAssignmentLHSs().get(rule_info.getName()).contains(trigger) ||
-				ruleParser.getPostUpdateFirstArguments().get(rule_info.getName()).contains(trigger))) {			
+			if (ruleParser.getMemberStatesInAssignmentLHSs().get(rule_info.getName()).contains(trigger) || 
+					ruleParser.getPostUpdateFirstArguments().get(rule_info.getName()).contains(trigger)) {			
 				for(RuleInformation rule: ruleParser.getRuleSet()) {
 					if(!rule.equals(rule_info) && rule.getTriggerTypes().contains("ChangedEventTriggerImpl")) {	
-						if (ruleParser.getMemberStatesInAssignmentLHSs().get(rule.getName()).contains(trigger) ||
+						if (ruleParser.getMemberStatesInAssignmentLHSs().get(rule.getName()).contains(trigger) || 
 								ruleParser.getPostUpdateFirstArguments().get(rule.getName()).contains(trigger)) {							
 							conflicting_trigger=trigger;
 							rules.add(rule.getName());							

@@ -86,6 +86,7 @@ public class RuleParser {
 				int member_invocation_start_index=0;
 				int feature_invocation_start_index=0;
 				int postupdate_first_argument_start_index=0;
+				int postupdate_second_argument_start_index=0;
 				int assignments_start_index=0;
 			
 				if(ExpressionVisitorImpl.member_states_involved.size()==0){
@@ -100,6 +101,10 @@ public class RuleParser {
 				
 				if(ExpressionVisitorImpl.first_arguments_of_postUpdate.size() == 0){
 					postupdate_first_argument_start_index=0;
+				}
+				
+				if(ExpressionVisitorImpl.second_arguments_of_postUpdate.size() == 0){
+					postupdate_second_argument_start_index=0;
 				}
 				
 				if(ExpressionVisitorImpl.assignments_and_variable_declarations.size()==0) {
@@ -122,6 +127,11 @@ public class RuleParser {
 					postupdate_first_argument_start_index=ExpressionVisitorImpl.first_arguments_of_postUpdate.size();
 				}
 				
+				if(ExpressionVisitorImpl.second_arguments_of_postUpdate.size()>0){
+					postupdate_second_argument_start_index=ExpressionVisitorImpl.second_arguments_of_postUpdate.size();
+				}
+				
+				
 				if(ExpressionVisitorImpl.assignments_and_variable_declarations.size()>0) {
 					assignments_start_index=ExpressionVisitorImpl.assignments_and_variable_declarations.size();
 				}
@@ -140,14 +150,15 @@ public class RuleParser {
 				int feature_invocation_end_index=ExpressionVisitorImpl.feature_invocations.size();
 				int member_invocation_end_index=ExpressionVisitorImpl.member_feature_invocations.size();
 				int postupdate_first_argument_end_index=ExpressionVisitorImpl.first_arguments_of_postUpdate.size();
+				int postupdate_second_argument_end_index=ExpressionVisitorImpl.second_arguments_of_postUpdate.size();
 				int assignments_stop_index=ExpressionVisitorImpl.assignments_and_variable_declarations.size();
 				
 				Set<String>member_states=new HashSet<String>();
-				for(int x=member_feature_start_index; x<member_feature_end_index;x++){
+				for(int x=member_feature_start_index; x<member_feature_end_index;x++) {
 					member_states.add(ExpressionVisitorImpl.member_states_involved.get(x));
 				}
 								
-				for(int x=feature_invocation_start_index; x<feature_invocation_end_index;x++){
+				for(int x=feature_invocation_start_index; x<feature_invocation_end_index;x++) {
 					member_states.add(ExpressionVisitorImpl.feature_invocations.get(x).getMethodName());
 					if(ExpressionVisitorImpl.feature_invocations.get(x).getTarget()!=null) {
 						member_states.add(ExpressionVisitorImpl.feature_invocations.get(x).getTarget());
@@ -174,6 +185,10 @@ public class RuleParser {
 				ArrayList<String> post_update_first_argument=new ArrayList<String>();
 				for(int x=postupdate_first_argument_start_index; x<postupdate_first_argument_end_index;x++) {
 					post_update_first_argument.add(ExpressionVisitorImpl.first_arguments_of_postUpdate.get(x));
+				}
+				
+				for(int x=postupdate_second_argument_start_index; x<postupdate_second_argument_end_index;x++) {
+					member_states.add(ExpressionVisitorImpl.second_arguments_of_postUpdate.get(x));
 				}
 				
 				Set<String>discardable_member_states_in_assignments=new HashSet<String>();

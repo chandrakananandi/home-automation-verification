@@ -5,7 +5,9 @@ import java.util.List;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.xbase.XExpression;
+import org.eclipse.xtext.xbase.impl.XCastedExpressionImpl;
 import org.eclipse.xtext.xbase.impl.XFeatureCallImplCustom;
+import org.eclipse.xtext.xbase.impl.XMemberFeatureCallImplCustom;
 import org.xtext.example.rules.analysis.ConflictAvoidanceChecker;
 import org.xtext.example.rules.analysis.statements.Assignment;
 import org.xtext.example.rules.analysis.statements.BinaryOperation;
@@ -22,6 +24,7 @@ import org.xtext.example.rules.analysis.statements.UnaryOperation;
 @SuppressWarnings("rawtypes")
 public class ExpressionVisitorImpl implements ExpressionVisitor {	
 	public static List<String> first_arguments_of_postUpdate=new ArrayList<String>();
+	public static List<String> second_arguments_of_postUpdate=new ArrayList<String>();
 	public static List<FeatureInvocation> feature_invocations=new ArrayList<FeatureInvocation>();
 	public static List<MemberFeatureInvocation> member_feature_invocations=new ArrayList<MemberFeatureInvocation>();
 	public static List<Assignment> assignments_and_variable_declarations=new ArrayList<Assignment>();
@@ -96,7 +99,14 @@ public class ExpressionVisitorImpl implements ExpressionVisitor {
 		}
 		if(xFeatureCallImplCustom.getExpression().getConcreteSyntaxFeatureName().equals("postUpdate")
 			|| xFeatureCallImplCustom.getExpression().getConcreteSyntaxFeatureName().equals("sendCommand")) {
-			first_arguments_of_postUpdate.add(xFeatureCallImplCustom.getExpression().getActualArguments().get(0).toString());
+			first_arguments_of_postUpdate.add(xFeatureCallImplCustom.getExpression().getActualArguments().get(0).toString());			
+			if (xFeatureCallImplCustom.getExpression().getActualArguments().get(1).getClass().getSimpleName().equals("XMemberFeatureCallImplCustom")) {
+				second_arguments_of_postUpdate.add(((XMemberFeatureCallImplCustom)xFeatureCallImplCustom.getExpression().getActualArguments().get(1)).getMemberCallTarget().toString());
+			}
+			
+			if (xFeatureCallImplCustom.getExpression().getActualArguments().get(1).getClass().getSimpleName().equals("XCastedExpressionImpl")) {
+				expressionSwitch.caseXExpression((XCastedExpressionImpl)xFeatureCallImplCustom.getExpression().getActualArguments().get(1));				
+			}
 		}
 		
 		ConflictAvoidanceChecker.ast_writer.println("Feature ends:" + old_feature_counter);
