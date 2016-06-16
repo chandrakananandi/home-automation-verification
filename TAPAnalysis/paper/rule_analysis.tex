@@ -97,7 +97,7 @@ It statically analyzes a rule's actions to determine what triggers are necessary
 
 We have implemented the technique and tested it on 116 end-user written
 rules for openHAB, an open-source home automation platform.
-Our tool identified that 73\% of the rules had fewer triggers than required
+Our tool identified that 66\% of the rules had fewer triggers than required
 for correct behavior.
 The missing triggers could lead to unexpected behavior
 and security vulnerabilities in a smart home.
@@ -121,7 +121,7 @@ govern when an action should take place.
 A rule has two main components:
 triggers that cause a rule to be fired and actions to be executed when a
 rules fires. This is also called Trigger Action Programming
-(TAP)\todo{Add citation}. Listing~\ref{lst:rule} shows an example of a rule. The part between
+(TAP)~\cite{practical-tap}. Listing~\ref{lst:rule} shows an example of a rule. The part between
 \texttt{when} and \texttt{then} is the trigger block and the part between
 \texttt{then} and \texttt{end} is the action block. There can be multiple
 triggers in the trigger part---if one or more is satisfied, the rule is
@@ -159,9 +159,9 @@ could also free users from the need to write triggers.
 To the best of our knowledge, this is the first research on analysing
 end-user written rules for home automation.
 
-We implemented our tool and ran it on 116 home automation rules written by
-end users in the openHAB framework~\cite{openhab}.  The tool reported
-insufficient trigger conditions for \todo{XX} rules, which is \todo{YY\%}
+We implemented our tool, TrigGen and ran it on 116 home automation rules 
+written by end users in the openHAB framework~\cite{openhab}.  The tool reported
+insufficient trigger conditions for 77 rules, which is 66\%
 of the rules.  We manually investigated the tool reports and determined
 that \todo{XX}, or \todo{XX\%} of the reports, are true positives.  The other 
 \todo{XX}, or \todo{XX\%}, are false positives (false alarms).
@@ -172,15 +172,16 @@ Our contributions are the following:
 \begin{enumerate}[topsep=0pt,itemsep=-1ex]
 \item Identification of end-user written automation rules as a source of
   errors and vulnerabilities, due to \textit{too few triggers}.
-\item A static analysis to determine a necessary and sufficient set of
+\item A static analysis tool, TrigGen to determine a necessary and sufficient set of
   triggers, based on the actions written by end users.
-  This analysis can be used to
+  TrigGen can be used to
 \begin{itemize}[topsep=-10pt,itemsep=-1ex,partopsep=1ex,parsep=1ex]
 \item identify missing triggers 
 \item eliminate triggers that are not needed.
+\item identify rules which conflict with one another by trying to write to the same 
 \end{itemize}
-\item An evaluation of our tool on real end-user written rules for home
-  automation in the openHAB framework.\todo{Summarize results.}
+\item An evaluation of TrigGen on real end-user written rules for home
+  automation in the openHAB framework. It found 66\% of the rules to have fewer triggers than necessary for correct behavior. 
 \end{enumerate}
 
 \section{Motivating Example}
@@ -201,7 +202,7 @@ end
 This rule is supposed to set the value of \texttt{State\_Away} to \texttt{ON} when no one is in the house. It also sets \texttt{State\_Sleeping} to \texttt{OFF} if it currently \texttt{ON} so that  \texttt{State\_Away} and \texttt{State\_Sleeping} are not \texttt{ON} simultaneously. However, the trigger for this rule only contains \texttt{State\_Away}. As a result, this rule is only fired when \texttt{State\_Away} is changed by the end user. However, if the value of \texttt{State\_Sleeping} is changed after the value of \texttt{State\_Away}, then the rule is not fired due to which, it allows both values to be set at the same time. This deviates from the expected behavior of the rule---it is no longer clear whether the home inhabitants are away or inside sleeping. This is also a security vulnerability because if this rule triggers another rule for turning on the security alarm in the house and the security alarm is meant to be off when people are at home but on when they are away, then it could get wrongly deactivated if the value of \texttt{STATE\_SLEEPING} is set to \texttt{ON}. Figure~\ref{fig:awayrule} shows a snapshot of the desktop application with both states being set to \texttt{ON}. 
 \begin{figure}
 \centering
-\includegraphics [trim=1cm 13cm 0 0, scale=0.14]{images/openhab-runtime.png}
+\includegraphics [trim=4cm 5cm 0 5cm, scale=0.14]{images/openhab-runtime.png}
 \caption{Desktop UI showing that it is possible to set both \texttt{State\_Away} and \texttt{State\_Sleeping} to \texttt{ON} at the same time. Blue indicates that they are \texttt{ON}.}
 \label{fig:awayrule}
 \end{figure}
@@ -373,8 +374,7 @@ We evaluated our tool on 116 end user written rules. We obtained the rules from 
 \end{table}
 
 \section{Related work}
-\todo{\cite{smartthings16, todayToTomorrow, rvs, homer, utea}
-Recent work has mentioned possible security loopholes in smart homes~\cite{yoshi, dhanjani, jung}. Anything on static analysis of end user written rules? }
+Security loopholes in smart homes have been investigated in several papers~\cite{yoshi, dhanjani, jung, todayToTomorrow}. Recently, Fernandes et al.\cite{smartthings16} did a  security analysis of several apps based on Samsung SmartThings and discovered that many of them unnecessarily granted full access to the devices in the house. While they aimed at identifying security flaws in the SmartThings framework itself, our aim is to assist end users in writing correct automation rules and we do so by automatically generating the trigger conditions.  Further, instead of analysing apps for home automation, we analysed end user written rules which are mostly written by non-programmers. Some work has been done on detecting conflicts in trigger-action programs~\cite{rvs, homer, utea}. In addition to detecting conflicts in triggers, TrigGen is capable of automatically generating the correct triggers for a rule which makes it unique and different from previous work.
 
 \section{Conclusions}
 End users have a major role in home automation---they decide the automation rules for the devices. Not surprisingly, our research shows that these end user written rules \textit{are} a major source of security vulnerability in smart homes.
