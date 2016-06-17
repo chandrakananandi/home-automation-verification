@@ -6,8 +6,10 @@
 \usepackage{caption}
 \usepackage{listings}
 \usepackage{textcomp}
+\lstset{basicstyle=\ttfamily, 
+        captionpos=b, 
+        escapeinside={<@}{@>}}
 
-\lstset{basicstyle=\ttfamily, captionpos=b, escapeinside={<@}{@>}}
 \usepackage{xcolor}
 \newcommand\todo[1]{\textbf{\textcolor{red}{#1}}}
 \newcommand{\lstul}[1]{\underline{\mbox{\tt #1}}}
@@ -91,13 +93,13 @@ To customize the behavior of a smart home, an end user writes rules.
 When an external event satisfies the rule's trigger, the rule's action executes; for example, when
 the temperature is above a certain threshold, then window awnings might be extended.
 End users often write incorrect rules~\cite{Huang}.
-This paper's technique prevents a certain type of mistake:  
+This paper's technique prevents a certain type of mistake in the rules:  
 \textit{errors due to too few triggers}.
-It statically analyzes a rule's actions to determine what triggers are necessary.
+It statically analyzes a rule's actions to determine what triggers are necessary. 
 
-We have implemented the technique and tested it on 116 end-user written
+We have implemented the technique in the form of a tool called TrigGen and tested it on 116 end-user written
 rules for openHAB, an open-source home automation platform.
-Our tool identified that 66\% of the rules had fewer triggers than required
+It identified that 66\% of the rules had fewer triggers than required
 for correct behavior.
 The missing triggers could lead to unexpected behavior
 and security vulnerabilities in a smart home.
@@ -128,41 +130,41 @@ triggers in the trigger part---if one or more is satisfied, the rule is
 fired.
 A rule engine fires the rules when its triggers are satisfied.
 
-\begin{lstlisting}[caption={A rule for turning on the ceiling light on the first floor (FF) and turning off the light next to the living room couch at 10 pm during holiday mode. },label={lst:rule}]
-rule "Holiday lights on before going sleeping"
+\begin{lstlisting}[caption={A rule that updates the maximum and minimum temperature values for a day---it compares the current temperature with the values starting from midnight of the respective day. },label={lst:rule}]
+rule "Update max and min temperatures"
 when
- <@\textcolor{green}{ //trigger block}@>
- Time cron "0 0 22 * * ?" 
-then
- <@\textcolor{green}{ //action block}@>
- if(Auto_Holiday.state==ON){
-  sendCommand(Light_FF_Livingroom_Couch,OFF)
-  sendCommand(Light_FF_Floor_Ceiling,ON)
- }
+ // trigger block	
+ Item Temperature changed
+then	
+ // action block 
+ postUpdate(Temp_Max, 
+   Temperature.maximumSince(now.toDateMidnight))
+ postUpdate(Temp_Min, 
+   Temperature.minimumSince(now.toDateMidnight))
 end
 \end{lstlisting}
 
 Even though TAP is the most commonly used and practical approach for home
-automation~\cite{practical-tap}, end users often make errors in writing
+automation~\cite{practical-tap, dey}, end users often make errors in writing
 trigger-action programs~\cite{Huang,wild-tap}.  In a smart home with
 multiple interacting devices, the rules may interact.  An error in one rule
 can cause unexpected behavior or security vulnerabilities in different
 parts of the house.
 
 This paper addresses errors in writing triggers.  Our approach eliminates
-one category of errors in the rules---errors due to too few triggers.  We
-have built a static analysis that determines a necessary and sufficient set
+one category of errors in the rules---\textit{errors due to too few triggers}. We have built a static analysis that determines 
+a necessary and sufficient set
 of trigger conditions in the rules.  These inferred triggers can be
 compared to the user-written triggers to indicate two types of errors:
 errors due to too few triggers and unnecessary triggers.  The approach
-could also free users from the need to write triggers.
+could also free users from the need to write triggers. 
 To the best of our knowledge, this is the first research on analysing
 end-user written rules for home automation.
 
-We implemented our tool, TrigGen and ran it on 116 home automation rules 
-written by end users in the openHAB framework~\cite{openhab}.  The tool reported
+We implemented a tool, TrigGen and ran it on 116 home automation rules 
+written by end users in the openHAB framework~\cite{openhab}.  It reported
 insufficient trigger conditions for 77 rules, which is 66\%
-of the rules.  We manually investigated the tool reports and determined
+of the rules.  We manually investigated the reports and determined
 that \todo{XX}, or \todo{XX\%} of the reports, are true positives.  The other 
 \todo{XX}, or \todo{XX\%}, are false positives (false alarms).
 \todo{Manually investigate the rest to determine true negative and false
@@ -176,9 +178,9 @@ Our contributions are the following:
   triggers, based on the actions written by end users.
   TrigGen can be used to
 \begin{itemize}[topsep=-10pt,itemsep=-1ex,partopsep=1ex,parsep=1ex]
-\item identify missing triggers 
+\item identify missing triggers. 
 \item eliminate triggers that are not needed.
-\item identify rules which conflict with one another by trying to write to the same 
+\item automatically generate all event-based triggers and free users from doing this.
 \end{itemize}
 \item An evaluation of TrigGen on real end-user written rules for home
   automation in the openHAB framework. It found 66\% of the rules to have fewer triggers than necessary for correct behavior. 
@@ -199,7 +201,7 @@ then
   }
 end
 \end{lstlisting}
-This rule is supposed to set the value of \texttt{State\_Away} to \texttt{ON} when no one is in the house. It also sets \texttt{State\_Sleeping} to \texttt{OFF} if it currently \texttt{ON} so that  \texttt{State\_Away} and \texttt{State\_Sleeping} are not \texttt{ON} simultaneously. However, the trigger for this rule only contains \texttt{State\_Away}. As a result, this rule is only fired when \texttt{State\_Away} is changed by the end user. However, if the value of \texttt{State\_Sleeping} is changed after the value of \texttt{State\_Away}, then the rule is not fired due to which, it allows both values to be set at the same time. This deviates from the expected behavior of the rule---it is no longer clear whether the home inhabitants are away or inside sleeping. This is also a security vulnerability because if this rule triggers another rule for turning on the security alarm in the house and the security alarm is meant to be off when people are at home but on when they are away, then it could get wrongly deactivated if the value of \texttt{STATE\_SLEEPING} is set to \texttt{ON}. Figure~\ref{fig:awayrule} shows a snapshot of the desktop application with both states being set to \texttt{ON}. 
+This rule is supposed to set the value of \texttt{State\_Away} to \texttt{ON} when no one is in the house. It also sets \texttt{State\_Sleeping} to \texttt{OFF} if it currently \texttt{ON} so that  \texttt{State\_Away} and \texttt{State\_Sleeping} are not \texttt{ON} simultaneously. However, the trigger for this rule only contains \texttt{State\_Away}. As a result, this rule is only fired when \texttt{State\_Away} is changed by the end user. However, if the value of \texttt{State\_Sleeping} is changed after the value of \texttt{State\_Away}, then the rule is not fired due to which, it allows both values to be set at the same time. This deviates from the expected behavior of the rule---it is no longer clear whether the home inhabitants are away or inside sleeping.  Figure~\ref{fig:awayrule} shows a snapshot of the desktop application with both states being set to \texttt{ON}. 
 \begin{figure}
 \centering
 \includegraphics [trim=4cm 5cm 0 5cm, scale=0.14]{images/openhab-runtime.png}
@@ -207,16 +209,26 @@ This rule is supposed to set the value of \texttt{State\_Away} to \texttt{ON} wh
 \label{fig:awayrule}
 \end{figure}
 This example shows that even if the action block of a rule is implemented correctly, not having all the correct triggers can lead to too few firings of the rule and thus, unexpected behavior. To solve this problem, we propose a technique based on static analysis that can automatically generate event-based triggers and also detect missing ones by analysing code in the action block. 
-\begin{lstlisting}[caption={Missing triggers detection by our tool for the Away rule.},label={lst:output}]
-rule:Away rule
-missing trigger: State_Sleeping
-
-\end{lstlisting}
-The result of running our tool on the rule in listing~\ref{lst:away} is shown in listing~\ref{lst:output}. It shows the trigger that is missing from the rule.
 
 \section{Threat model}
-Our focus is on security vulnerabilities and incorrect behavior that result due to \textit{too few triggers}. Our approach can prevent any attack that relies on incorrect number of rule firings. One such example is described below with reference to the \texttt{Away rule} in section~\ref{sec:motivation}.\\
-\textit{Example attack.}
+Since TrigGen can prevent incorrect behavior due to \textit{too few triggers}, it can also help eliminate security loopholes in the house that arise due to \textit{too few triggers}. Our approach can prevent any attack that relies on incorrect number of rule firings. One such example is described below with reference to the \texttt{Away rule} in section~\ref{sec:motivation}.
+
+\textit{Example attack.} Smart homes often have a security notification system that sends a message to the owner's smart phone when there is someone at the door. There may be a rule (one possible rule is shown in listing~\ref{lst:security}) that activates the security notification system when everyone is away and deactivates it when everyone is sleeping at home. Since the "Away rule" in listing~\ref{lst:away} allows \texttt{STATE\_SLEEPING} to be set to \texttt{ON}  
+when \texttt{STATE\_AWAY} is \texttt{ON}, firing it will wrongly deactivate the security notification system by triggering the rule in Listing~\ref{lst:security}. This will prevent the home inhabitants from knowing if there is an unwanted visitor in the house while they are away.
+\begin{lstlisting}[caption={Rule for activating the security notification system in the house.},label={lst:security}]
+rule "Security notification system rule"
+when
+  Item State_Away changed or
+  Item State_Sleeping changed	
+then
+  if(State_Away.state == ON){
+    postUpdate(Notification_System,ON)
+  }
+  if(State_Sleeping.state == ON){
+    postUpdate(Notification_System,OFF)
+  }
+end
+\end{lstlisting}
 
 We assume that the action block of the rules is written correctly and rely on it for generating the trigger conditions.
 
@@ -225,7 +237,9 @@ We trust that the devices in the house are not compromised and once they receive
 \section{\MakeLowercase{open}HAB background}
 openHAB~\cite{openhab} is an open source software for integrating different types of smart devices in a home. openHAB has a runtime implemented in Java and a UI which can be used by end users for monitoring and controlling the devices. It supports 135 technologies, including more than 50 devices, cloud services like Twitter, DropBox, Google Calendar etc. and multiple communication protocols~\cite{openhabtech}. It has UI support for Android and iOS and an IFTTT integration~\cite{ifttt}. It is a java based solution which can be run on standard Linux, Windows and MacOS X machines as well as on embedded platforms such as Raspberry Pi and Cubietruck. It has about 50,000 downloads in the Google Play store with a rating of 4.4/5 and unlike most proprietary solutions, openHAB does not require any hardware installation and is completely technology and vendor agnostic, which makes it more accessible to home owners. 
 
-The runtime provides a communication platform between the devices. These are connected by means of an event bus. Figure~\ref{fig:framework} shows the main components of the openHAB framework. The item repository stores the states of the devices. It is connected to the UI and the rule base. Changes to the states can be made through the UI and by rule firings. The latest state is communicated to the actual device through the event bus. The bindings are libraries that connect the physical devices to the openHAB framework. As shown in the figure, there are two types of events that are communicated by the event bus---1) commands: causing an action or change of state in a device, such as \texttt{ON}, \texttt{OFF}, \texttt{UP}, \texttt{DOWN} and 2) updates: informing the UI component or the rule engine or other devices about a change in the state of a device.
+The runtime provides a communication platform between the devices. 
+%These are connected by means of an event bus. 
+Figure~\ref{fig:framework} shows the main components of the openHAB framework. The item repository stores the states of the devices. It is connected to the UI and the rule base. Changes to the states can be made through the UI and by rule firings. The latest state is communicated to the actual device through the event bus. The bindings are libraries that connect the physical devices to the openHAB framework. As shown in the figure, there are two types of events that are communicated by the event bus---1) commands: causing an action or change of state in a device, such as \texttt{ON}, \texttt{OFF}, \texttt{UP}, \texttt{DOWN} and 2) updates: informing the UI component or the rule engine or other devices about a change in the state of a device.
 \begin{figure}
 \centering
 \includegraphics [trim=-2cm 15cm 0 6.5cm, scale=0.4]{images/framework.pdf}
@@ -235,7 +249,8 @@ The runtime provides a communication platform between the devices. These are con
 
 End users can write the configuration files to customize the home. The main configuration files include a \textit{.rules} file containing the automation rules and an \textit{.items} file for storing the states of the devices installed. Each of these are written in small domain specific languages developed using the xtext framework~\cite{xtext}. The \textit{action block} in the rules, also called the \textit{script} is written in a Java like language called xbase, which is implemented using xtext. For our research, we required access to the item files and the rule files. 
 \subsection{Items}
-An item is any device installed in the house. There is an item file that contains a list of all items that are to be included in the automation. Every item has a type that indicates the values it can hold and the commands it can receive. Items can also be grouped together---all lights in the living room can be in one group so that they can be controlled together. There are 11 types of items that are currently supported~\cite{openhabitem}. Listing~\ref{lst:items} shows the syntax of an item definition (contents in [~] are optional) and two entries in a sample item file. The binding part is responsible for connecting the item to an actual device ID.
+An item is any device installed in the house. There is an item file that contains a list of all items that are to be included in the automation. Every item has a type that indicates the values it can hold and the commands it can receive. Items can also be grouped together---all lights in the living room can be in one group so that they can be controlled together. An item may belong to multiple groups.
+There are 11 types of items that are currently supported~\cite{openhabitem}. Listing~\ref{lst:items} shows the syntax of an item definition (contents in [~] are optional) and two entries in a sample item file. The binding part is responsible for connecting the item to an actual device ID.
 \begin{lstlisting}[caption={Syntax and two examples of item definitions.},label={lst:items}]
 <type> <name> ["label"] [<icon>] 
               [(group*)] [{binding}]
@@ -247,10 +262,9 @@ Contact Window_Bedroom "Bedroom"
 \subsection{Rules}
 Listing~\ref{lst:rule} shows an example of a rule---it has two parts: a \emph{trigger block} and an \emph{action block}. The \emph{trigger block} can have one or more triggers. There are three types of triggers.
 \begin{enumerate} [topsep=0pt,itemsep=-1ex]
-\item event-based triggers: These triggers are related to changes in the state of a device. Some examples---\\
-\texttt{Item LightSwitch received command} \\
+\item event-based triggers: These triggers are related to changes in the state of a device. For examples---\\
 \texttt{Item State\_Away changed}
-\item temporal triggers: They cause actions to happen at a certain time. An example---\\ \texttt{Time cron "second minute hour day month weekday year"}
+\item temporal triggers: They cause rules to be fired at a certain time. 
 \item system triggers: There are two system triggers---system start up and system shut down.
 \end{enumerate}
 The \emph{action block} of a rule in openHAB is also called the \emph{script}. It describes what the rule should do when the triggers occur.
@@ -320,67 +334,56 @@ temporal and system & none  \\ \hline
 \begin{figure*}
 \centering
 \includegraphics [trim=0cm 18cm 0 5cm, scale=0.8]{images/design.pdf}
-\caption{Design of trigger generator tool.}
+\caption{Design of the TrigGen tool.}
 \label{fig:design}
 \end{figure*} 
 
 \section{Implementation}
-We implemented the automatic trigger generator and missing trigger identifier in Java. It involved $\sim$ 3000 LOC. Our tool can be used directly on a rule file without any pre-processing of the rules. 
+We implemented TrigGen in Java. It involved $\sim$ 3500 LOC. Our tool can be used directly on a rule file without any pre-processing or annotations from the end users. 
 
-We used the AST generated by xtext for the rule \textit{scripts} and visited the nodes in the tree to extract relevant information such as the names of the device states used in the method calls or in conditional statements. 
-\todo{[do people care to know about the details?]}
+Figure~\ref{fig:design} shows the design of TriGen. The 
+
+We used the AST generated by xtext for the rule \textit{scripts} and visited the nodes in the tree to extract the required information such as the names of the device states, actual method arguments etc.  
+
  
 \section{Experimental Evaluation}
-\todo{THIS WILL CHANGE}
-We evaluated our tool on 116 end user written rules. We obtained the rules from links provided on the openHAB wiki~\cite{data1},\cite{data2}. It took $\sim$ 7.12 ms for the tool to generate the triggers and find the missing triggers for all the rules. Tables~\ref{tab:results1} and ~\ref{tab:results2} show the summary of our results. For 100 out of the 116 rules, our tool suggested a list of all required event-based triggers and for 77 out the 116 rules, our tool found missing triggers when some triggers were already provide by the users. For the suggested triggers, it did not suggest any trigger if no member states are mentioned in the script. Examples are in the demo app, ``Timer Demo", ``Records last weather update time", ``Select Radio Station", ``Volume control".
-\begin{table}[ht]
-\centering
-\begin{tabular}{|c|p{1.1cm}|}
-\hline
-\# suggested triggers & \# rules \\ \hline
-0 & 17\\ \hline
-1 & 17\\ \hline
-2 & 40\\ \hline
-3 & 18\\ \hline
-4 & 8\\ \hline
-5 & 8\\ \hline
-6 & 4\\ \hline
-8 & 1\\ \hline
-9 & 1\\ \hline
-10 & 1\\ \hline
-18 & 1\\ \hline
-\end{tabular}
-\caption{Summary of results for suggested trigger.}
-\label{tab:results1}
-\end{table}
+We evaluated TrigGen on 116 end user written rules. We obtained the rules from links provided on the openHAB wiki~\cite{data1},\cite{data2}. We ran TrigGen on a machine running 64 bit Ubuntu 14.04 LTS with 2.6 GHz quad core processor. Table~\ref{tab:time} shows the time taken for TrigGen to complete executing.
+For 109 out of the 116 rules, TrigGen suggested a list of all required event-based triggers and for 77 out the 116 rules, it found missing triggers when some triggers were already provide by the users. 
 
 \begin{table}[ht]
 \centering
-\begin{tabular}{|c|p{1.1cm}|}
+\begin{tabular}{|l|c|}
 \hline
-\# missing triggers & \# rules \\ \hline
-0 & 42 \\\hline
-1 & 54 \\\hline
-2 & 3 \\\hline
-3 & 5\\\hline
-4 & 7\\\hline
-5 & 2\\\hline
-8 & 1 \\\hline
-9 & 1 \\\hline
-14 & 1 \\\hline
+Action & Execution time\\ \hline
+generate all triggers & 6.88 s \\ \hline
+detect missing triggers & 7.31 s \\\hline
 \end{tabular}
-\caption{Summary of results for missing triggers.}
-\label{tab:results2}
+\caption{Execution time  (in seconds) summary of TrigGen for 116 rules for 1) generating all event-based triggers, and 2) detecting missing triggers. }
+\label{tab:time}
 \end{table}
+
+For the suggested triggers, it did not suggest any trigger if no member states are mentioned in the script. Examples are in the demo app, ``Timer Demo", ``Records last weather update time", ``Select Radio Station", ``Volume control".
+
 
 \section{Related work}
-Security loopholes in smart homes have been investigated in several papers~\cite{yoshi, dhanjani, jung, todayToTomorrow}. Recently, Fernandes et al.\cite{smartthings16} did a  security analysis of several apps based on Samsung SmartThings and discovered that many of them unnecessarily granted full access to the devices in the house. While they aimed at identifying security flaws in the SmartThings framework itself, our aim is to assist end users in writing correct automation rules and we do so by automatically generating the trigger conditions.  Further, instead of analysing apps for home automation, we analysed end user written rules which are mostly written by non-programmers. Some work has been done on detecting conflicts in trigger-action programs~\cite{rvs, homer, utea}. In addition to detecting conflicts in triggers, TrigGen is capable of automatically generating the correct triggers for a rule which makes it unique and different from previous work.
+Security goals and potential vulnerabilities in smart homes have been investigated in several papers~\cite{yoshi, dhanjani, jung, todayToTomorrow}. Denning et al.~\cite{yoshi} identified assets within a home that are susceptible to security attacks and suggested security goals for smart homes. Ur et al.~\cite{jung} conducted a case study of three specific smart devices to analyse the state of access control for home automation. Mennicken et al.~\cite{todayToTomorrow} studied the importance of human-home-collaboration in making smart homes more accessible.
+
+Recently, Fernandes et al.\cite{smartthings16} did a security analysis of several apps based on Samsung SmartThings and discovered that many of them unnecessarily granted full access to the devices in the house. While they aimed at identifying security flaws in the SmartThings framework itself, our aim is to assist end users in writing correct automation rules and we do so by automatically generating the trigger conditions.  Further, instead of analysing apps for home automation, we analysed end user written automation rules.
+
+Some work has been done on detecting conflicts in trigger-action programs~\cite{rvs, homer, utea, Nakamura05featureinteractions}. TrigGen's main capability is to automatically generating the correct triggers for a rule although it can also identify rules which can potentially have conflicts. None of the previous tools can automatically determine trigger conditions.
+
+The usefulness of TAP for customizing smart homes has been studied by Ur et al.~\cite{practical-tap} and Dey et al.~\cite{dey}. Their findings motivated us to focus on end user written rules for home automation because they showed by conducting user studies that about 80\% of the automation requirements of the users could be formalized into trigger action programs~\cite{dey} and even non-programmers could easily learn TAP~\cite{practical-tap}.
+
+Huang et al.~\cite{Huang} conducted user studies on TAP to identify inconsistencies in interpreting the behavior of a trigger action programs and errors in writing them and found that often the interpretation of a rule by a user is different from the semantics of the rule. 
+
+One of the observations in some recent work is that the IFTTT framework~\cite{iftttframework} which only allows single trigger is not sufficient for expression complex automation rules for smart homes~\cite{Huang, practical-tap}. This motivated us to evaluate our tool on the openHAB framework which has a more expressive rule language. 
+
 
 \section{Conclusions}
-End users have a major role in home automation---they decide the automation rules for the devices. Not surprisingly, our research shows that these end user written rules \textit{are} a major source of security vulnerability in smart homes.
-We observed that a common error made by end users while writing the rules is having insufficient number of triggers, leading to fewer firings of the rules than necessary. To prevent this problem, we developed a tool that can automatically generate trigger conditions based on the actions in a rule as well as identify missing triggers if some of them are already provided. This reduces the burden of end user by assisting them in including all the required triggers. 
+End users have a major role in home automation---they decide the automation rules for the devices. Not surprisingly, our research shows that these end user written rules are often error-prone.
+We observed that a common error made by end users while writing the rules is having insufficient number of triggers, leading to fewer firings of the rules than necessary. To prevent this problem, we developed TrigGen that can automatically generate a set of necessary and sufficient triggers based on the actions in a rule. This also reduces the burden of end user by assisting them in writing the necessary and sufficient triggers. 
 
-We evaluated our tool on real home automation rules written by end users and found that out of 116 rules, 74 had insufficient number of triggers. By manual inspecting the suggestions provided by the tool, we found that each one of them were relevant and including them in the rules prevented the unexpected behaviors observed previously. 
+We evaluated TrigGen on real home automation rules written by end users and found that out of 116 rules, 77 had insufficient number of triggers. By manual inspecting the suggestions provided by the tool, we found that each one of them were relevant and including them in the rules prevented the unexpected behaviors observed previously. 
 
 
 \section{Acknowledgements}
