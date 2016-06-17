@@ -354,7 +354,7 @@ TrigGen also identifies rules which might conflict with each other due to modify
  
 \section{Experimental Evaluation}
 We evaluated TrigGen on 116 end user written rules. We obtained the rules from links provided on the openHAB wiki~\cite{data1},\cite{data2}. We ran TrigGen on a machine running 64 bit Ubuntu 14.04 LTS with 2.6 GHz quad core processor. Table~\ref{tab:time} shows the time taken for TrigGen to complete executing.
-For 109 out of the 116 rules, TrigGen suggested a list of all required event-based triggers and for 77 out the 116 rules, it found missing triggers when some triggers were already provide by the users. For 19 rules, TrigGen generated warnings about potential conflicts. 
+For 109 out of the 116 rules (94\%), TrigGen suggested a list of all required event-based triggers and for 77 out the 116 rules (66\%), it found missing triggers when some triggers were already provide by the users. For 19 rules (16\%), TrigGen generated warnings about potential conflicts. 
 
 \begin{table}[ht]
 \centering
@@ -369,17 +369,22 @@ detect missing triggers & 7.31 s \\\hline
 \end{table}
 
 Figure~\ref{fig:resultgraph} shows the output of TrigGen for generating the necessary and sufficient set of triggers. As is evident from the figure, for majority of the rules, TrigGen suggested 2 event-based triggers and detected 1 missing trigger. The large number of triggers which were determined for some rules was due to the grouping of items. TrigGen expanded the groups as explained in section~\ref{sec:theory} to enumerate all the contents of the groups. 
-For the suggested triggers, it did not suggest any trigger if no member states are mentioned in the script. Examples are in the demo app, ``Timer Demo", ``Records last weather update time", ``Select Radio Station", ``Volume control".
+
+For 2 out of the 7 rules for which TrigGen did not suggest any event-based triggers, we compared the report with the triggers written by the end user. We found that the triggers were System triggers---the rules were supposed to be fired only once at system start-up. Hence TrigGen's output was correct because it did not suggest any event-based triggers. 
+
+\textbf{Limitations.}
+For the remaining 5 rules, TrigGen failed to suggest triggers due to two reasons---1) since TrigGen uses the AST of the rule script to extract items that can be potential triggers, if there is no reference to an item in the script, TrigGen cannot detect the trigger. This happened in 4 out of the 5 cases. 2) For the remaining one case, the item suggested by the end user as a trigger is written to before being read from. According to our technique, such items are considered non-live and not included in the list of triggers. As a result, TrigGen failed to identify it.
+
+\begin{figure*}[t]
+\centering
+\includegraphics [trim=0 550 50 70, scale=0.9]{images/plot.pdf}
+\caption{Summary of the output of TrigGen for suggesting a set of necessary and sufficient triggers (in blue) and detecting missing triggers (in red). The x-axis shows the number of suggested triggers and the y-axis shows the number of rules.}
+\label{fig:resultgraph}
+\end{figure*} 
 
 
 \section{Related work}
 Security goals and potential vulnerabilities in smart homes have been investigated in several papers~\cite{yoshi, dhanjani, jung, todayToTomorrow}. Denning et al.~\cite{yoshi} identified assets within a home that are susceptible to security attacks and suggested security goals for smart homes. Ur et al.~\cite{jung} conducted a case study of three specific smart devices to analyse the state of access control for home automation. Mennicken et al.~\cite{todayToTomorrow} studied the importance of human-home-collaboration in making smart homes more accessible.
-\begin{figure*}[t]
-\centering
-\includegraphics [trim=1.5cm 0 50 20, scale=0.7]{images/resultgraph.png}
-\caption{Summary of the output of TrigGen for suggesting a set of necessary and sufficient triggers (in blue) and detecting missing triggers (in red). The x-axis shows the number of suggested triggers and the y-axis shows the number of rules.}
-\label{fig:resultgraph}
-\end{figure*} 
 
 Recently, Fernandes et al.\cite{smartthings16} did a security analysis of several apps based on Samsung SmartThings and discovered that many of them unnecessarily granted full access to the devices in the house. While they aimed at identifying security flaws in the SmartThings framework itself, our aim is to assist end users in writing correct automation rules and we do so by automatically generating the trigger conditions.  Further, instead of analysing apps for home automation, we analysed end user written automation rules.
 
