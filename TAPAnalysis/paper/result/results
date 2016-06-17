@@ -1,0 +1,1449 @@
+rule:Auto changed
+number of suggested triggers:5
+suggested trigger: Auto_Holiday
+suggested trigger: Auto_Attic_Light
+suggested trigger: AutoStatus
+CONFLICT POSSIBLE FOR: AutoStatus in rules: [Attic_Light_Mode]
+suggested trigger: Auto_Rollershutter
+suggested trigger: Auto_Christmas
+------------------------------
+rule:Attic_Light_Mode
+number of suggested triggers:1
+suggested trigger: Auto_Attic_Light
+------------------------------
+rule:Christmas lamps on
+number of suggested triggers:5
+suggested trigger: Socket_Floor
+CONFLICT POSSIBLE FOR: Socket_Floor in rules: [Christmas lamps off]
+suggested trigger: State_Away
+suggested trigger: Socket_Livingroom
+CONFLICT POSSIBLE FOR: Socket_Livingroom in rules: [Scene 1, Christmas lamps off]
+suggested trigger: Auto_Christmas
+suggested trigger: State_Sleeping
+------------------------------
+rule:Christmas lamps off
+number of suggested triggers:5
+suggested trigger: Socket_Floor
+CONFLICT POSSIBLE FOR: Socket_Floor in rules: [Christmas lamps on]
+suggested trigger: State_Away
+suggested trigger: Socket_Livingroom
+CONFLICT POSSIBLE FOR: Socket_Livingroom in rules: [Christmas lamps on, Scene 1]
+suggested trigger: Auto_Christmas
+suggested trigger: State_Sleeping
+------------------------------
+rule:Holiday lights on at the evening
+number of suggested triggers:1
+suggested trigger: Auto_Holiday
+------------------------------
+rule:Holiday lights on before going sleeping
+number of suggested triggers:1
+suggested trigger: Auto_Holiday
+------------------------------
+rule:Holiday lights off
+number of suggested triggers:15
+suggested trigger: Light_FF_Livingroom_Couch
+suggested trigger: Light_FF_Livingroom_Diningtable
+suggested trigger: Light_FF_GuestWC_Mirror
+suggested trigger: Light_FF_Floor_Ceiling
+suggested trigger: Light_FF_Floor_Mirror
+suggested trigger: Light_FF_Kitchen_Ceiling
+suggested trigger: Light_FF_Utilityroom_Ceiling
+suggested trigger: Light_FF_GuestWC_Ceiling
+suggested trigger: Light_FF_Garage
+suggested trigger: Light_FF_Guestroom_Ceiling
+suggested trigger: Light_FF_Livingroom_Brightness_Standard
+suggested trigger: Auto_Holiday
+suggested trigger: Light_FF_Kitchen_Cupboard
+suggested trigger: Light_FF_Kitchen_Bar
+suggested trigger: Light_FF_Boxroom_Ceiling
+------------------------------
+rule:Rollershutter auto
+number of suggested triggers:15
+suggested trigger: Shutters_SF_Attic
+suggested trigger: State_Rollershutter
+suggested trigger: Shutters_FF_Kitchen
+suggested trigger: Shutters_SF_Dressingroom
+suggested trigger: Shutters_SF_Bedroom
+suggested trigger: Shutters_SF_Child1
+suggested trigger: Shutters_SF_Child2
+suggested trigger: Auto_Rollershutter
+suggested trigger: Shutters_FF_GuestWC
+suggested trigger: Shutters_FF_Livingroom_Terrace
+suggested trigger: Shutters_SF_Bathroom
+suggested trigger: Shutters_FF_Livingroom_Couch
+suggested trigger: State_Away
+suggested trigger: Shutters_FF_Guestroom
+suggested trigger: Window_FF_Livingroom_Terrace
+------------------------------
+rule:Door opener
+number of suggested triggers:2
+suggested trigger: Dooropener_FF_Floor
+suggested trigger: Dooropener_Timer
+------------------------------
+rule:Heating_Power Message
+number of suggested triggers:3
+suggested trigger: Heating_Power
+suggested trigger: Heating_Circuit_Pump_Speed
+suggested trigger: Heating_Power_Message
+------------------------------
+rule:Heating_Temperature_Outdoor Message
+number of suggested triggers:4
+suggested trigger: Heating_Temperature_Outdoor
+suggested trigger: Heating_Temperature_Outdoor_Message
+suggested trigger: Temperature_Garden_Forecast
+suggested trigger: Heating_Temperature_Outdoor_Subdued
+------------------------------
+rule:Heating_Temperature_Offset Message
+number of suggested triggers:3
+suggested trigger: Heating_Temperature_Offset_Target
+suggested trigger: Heating_Temperature_Offset
+suggested trigger: Heating_Temperature_Offset_Message
+------------------------------
+rule:Heating_Temperature_Boiler Message
+number of suggested triggers:3
+suggested trigger: Heating_Temperature_Boiler_Message
+suggested trigger: Heating_Temperature_Boiler
+suggested trigger: Heating_Temperature_Boiler_Target
+------------------------------
+rule:Last burner starts per day
+number of suggested triggers:2
+suggested trigger: Heating_Burner_Starts_Last
+suggested trigger: Heating_Burner_Starts
+------------------------------
+rule:Burner starts
+number of suggested triggers:2
+suggested trigger: Heating_Burner_Starts
+suggested trigger: Heating_Burner_Starts_Message
+------------------------------
+rule:Last Burner Hours per day
+number of suggested triggers:2
+suggested trigger: Heating_Burner_Hours_Last
+suggested trigger: Heating_Burner_Hours
+------------------------------
+rule:Burner Hours
+number of suggested triggers:2
+suggested trigger: Heating_Burner_Hours_Message
+suggested trigger: Heating_Burner_Hours
+------------------------------
+rule:Heating Temperature Solar Message
+number of suggested triggers:3
+suggested trigger: Heating_Temperature_Solar_Storage
+suggested trigger: Heating_Temperature_Solar_Collector
+suggested trigger: Heating_Temperature_Solar_Message
+------------------------------
+rule:Heating Solar State Message
+number of suggested triggers:3
+suggested trigger: Heating_Solar_Pump_State
+suggested trigger: Heating_Solar_Reheating_State
+suggested trigger: Heating_Solar_State_Message
+------------------------------
+rule:Solar Hours
+number of suggested triggers:2
+suggested trigger: Heating_Solar_Hours_Message
+suggested trigger: Heating_Solar_Hours
+------------------------------
+rule:Last Solar Power per day
+number of suggested triggers:2
+suggested trigger: Heating_Solar_Power
+suggested trigger: Heating_Solar_Power_Last
+------------------------------
+rule:Solar Power
+number of suggested triggers:2
+suggested trigger: Heating_Solar_Power_Message
+suggested trigger: Heating_Solar_Power
+------------------------------
+rule:Solar Power 5min
+number of suggested triggers:2
+suggested trigger: Heating_Solar_Power
+suggested trigger: Heating_Solar_Power_Current5Min
+------------------------------
+rule:Temperature Check
+number of suggested triggers:8
+suggested trigger: Heating_Operating_Mode
+suggested trigger: Heating_Temperature_Livingroom_Target
+suggested trigger: Temperature_Livingroom
+suggested trigger: Temperature_Bedroom
+suggested trigger: Heating_Temperature_Room_Target
+suggested trigger: Temperature_Garden_Forecast
+suggested trigger: Heating_Temperature_Overall_OK
+suggested trigger: Heating_Temperature_Bedroom_Target
+------------------------------
+rule:heating mode check
+number of suggested triggers:10
+suggested trigger: Heating_Operating_Mode
+suggested trigger: Heating_Circuit_Pump_Speed
+suggested trigger: Heating_Power
+suggested trigger: Temperature_Livingroom
+suggested trigger: Heating_Auto_Mode
+suggested trigger: Heating_Burner_Starts
+suggested trigger: Heating_Temperature_Room_Target
+suggested trigger: Heating_Temperature_Overall_OK
+suggested trigger: Temperature_Garden_Forecast
+suggested trigger: Heating_Livingroom_Circuit
+------------------------------
+rule:Hue brightness changed
+number of suggested triggers:4
+suggested trigger: Light_FF_Livingroom_Brightness_Standard1
+suggested trigger: Light_FF_Livingroom_Brightness_Standard3
+suggested trigger: Light_FF_Livingroom_Brightness_Standard2
+suggested trigger: Light_FF_Livingroom_Brightness_Standard
+------------------------------
+rule:Hue color changed
+number of suggested triggers:1
+suggested trigger: Light_FF_Livingroom_Color_Standard
+------------------------------
+rule:Hue brightness changed backward
+number of suggested triggers:4
+suggested trigger: Light_FF_Livingroom_Brightness_Standard1
+suggested trigger: Light_FF_Livingroom_Brightness_Standard3
+suggested trigger: Light_FF_Livingroom_Brightness_Standard2
+suggested trigger: Light_FF_Livingroom_Brightness_Standard
+------------------------------
+rule:Motiondetector_Outdoor_Switch
+number of suggested triggers:6
+suggested trigger: Motiondetector_Outdoor_Switch
+suggested trigger: Motiondetector_Outdoor_Terrace_Switch
+suggested trigger: Motiondetector_Outdoor_Frontdoor_Switch
+suggested trigger: Motiondetector_Outdoor_Garage_Streetside_Switch
+suggested trigger: Motiondetector_Outdoor_Garage_Gardenside_Switch
+suggested trigger: Motiondetector_Outdoor_Carport_Switch
+------------------------------
+rule:Motiondetector_Outdoor_Detail_Switch
+number of suggested triggers:6
+suggested trigger: Motiondetector_Outdoor_Switch
+suggested trigger: Motiondetector_Outdoor_Terrace_Switch
+suggested trigger: Motiondetector_Outdoor_Frontdoor_Switch
+suggested trigger: Motiondetector_Outdoor_Garage_Streetside_Switch
+suggested trigger: Motiondetector_Outdoor_Garage_Gardenside_Switch
+suggested trigger: Motiondetector_Outdoor_Carport_Switch
+------------------------------
+rule:Front door light
+number of suggested triggers:1
+suggested trigger: Light_Outdoor_Frontdoor
+------------------------------
+rule:Front door manual
+number of suggested triggers:2
+suggested trigger: Light_Outdoor_Frontdoor
+CONFLICT POSSIBLE FOR: Light_Outdoor_Frontdoor in rules: [Front door motion detector]
+suggested trigger: Light_Outdoor_Frontdoor_Manual
+------------------------------
+rule:Front door motion detector
+number of suggested triggers:5
+suggested trigger: Motiondetector_Outdoor_Frontdoor_Switch
+suggested trigger: Light_Outdoor_Frontdoor_Manual
+suggested trigger: Motiondetector_Outdoor_Frontdoor
+suggested trigger: Light_Outdoor_Frontdoor
+CONFLICT POSSIBLE FOR: Light_Outdoor_Frontdoor in rules: [Front door manual]
+suggested trigger: State_Outdoorlights
+------------------------------
+rule:Carpot light
+number of suggested triggers:1
+suggested trigger: Light_Outdoor_Carport
+------------------------------
+rule:Carport manual
+number of suggested triggers:2
+suggested trigger: Light_Outdoor_Carport
+CONFLICT POSSIBLE FOR: Light_Outdoor_Carport in rules: [Carport motion detector]
+suggested trigger: Light_Outdoor_Carport_Manual
+------------------------------
+rule:Carport motion detector
+number of suggested triggers:5
+suggested trigger: Light_Outdoor_Carport
+CONFLICT POSSIBLE FOR: Light_Outdoor_Carport in rules: [Carport manual]
+suggested trigger: Light_Outdoor_Carport_Manual
+suggested trigger: Motiondetector_Outdoor_Carport
+suggested trigger: Motiondetector_Outdoor_Carport_Switch
+suggested trigger: State_Outdoorlights
+------------------------------
+rule:Terrace light
+number of suggested triggers:2
+suggested trigger: Light_Outdoor_Terrace
+suggested trigger: Light_Outdoor_Terrace_Manual
+------------------------------
+rule:Terrace manual
+number of suggested triggers:2
+suggested trigger: Light_Outdoor_Terrace
+CONFLICT POSSIBLE FOR: Light_Outdoor_Terrace in rules: [terrace motion detector]
+suggested trigger: Light_Outdoor_Terrace_Manual
+------------------------------
+rule:terrace motion detector
+number of suggested triggers:6
+suggested trigger: Motiondetector_Outdoor_Terrace1
+suggested trigger: Light_Outdoor_Terrace
+CONFLICT POSSIBLE FOR: Light_Outdoor_Terrace in rules: [Terrace manual]
+suggested trigger: Motiondetector_Outdoor_Terrace_Switch
+suggested trigger: Motiondetector_Outdoor_Terrace2
+suggested trigger: State_Outdoorlights
+suggested trigger: Light_Outdoor_Terrace_Manual
+------------------------------
+rule:Garage streetside light
+number of suggested triggers:1
+suggested trigger: Light_Outdoor_Garage_Streedside
+------------------------------
+rule:Garage streetside manual
+number of suggested triggers:2
+suggested trigger: Light_Outdoor_Garage_Streedside_Manual
+suggested trigger: Light_Outdoor_Garage_Streedside
+CONFLICT POSSIBLE FOR: Light_Outdoor_Garage_Streedside in rules: [Garage streetside motion detector]
+------------------------------
+rule:Garage streetside motion detector
+number of suggested triggers:5
+suggested trigger: Light_Outdoor_Garage_Streedside_Manual
+suggested trigger: Light_Outdoor_Garage_Streedside
+CONFLICT POSSIBLE FOR: Light_Outdoor_Garage_Streedside in rules: [Garage streetside manual]
+suggested trigger: Motiondetector_Outdoor_Garage_Streetside_Switch
+suggested trigger: State_Outdoorlights
+suggested trigger: Motiondetector_Outdoor_Garage_Streetside
+------------------------------
+rule:Garage gardenside light
+number of suggested triggers:1
+suggested trigger: Light_Outdoor_Garage_Gardenside
+------------------------------
+rule:Garage gardenside manual
+number of suggested triggers:2
+suggested trigger: Light_Outdoor_Garage_Gardenside
+CONFLICT POSSIBLE FOR: Light_Outdoor_Garage_Gardenside in rules: [Garage gardenside motion detector]
+suggested trigger: Light_Outdoor_Garage_Gardenside_Manual
+------------------------------
+rule:Garage gardenside motion detector
+number of suggested triggers:5
+suggested trigger: Light_Outdoor_Garage_Gardenside
+CONFLICT POSSIBLE FOR: Light_Outdoor_Garage_Gardenside in rules: [Garage gardenside manual]
+suggested trigger: Motiondetector_Outdoor_Garage_Gardenside_Switch
+suggested trigger: Light_Outdoor_Garage_Gardenside_Manual
+suggested trigger: Motiondetector_Outdoor_Garage_Gardenside
+suggested trigger: State_Outdoorlights
+------------------------------
+rule:Filterruntime
+number of suggested triggers:2
+suggested trigger: Ventilation_Filter_Runtime
+suggested trigger: Ventilation_Filter_Runtime_Message
+------------------------------
+rule:Filter State Message
+number of suggested triggers:4
+suggested trigger: Ventilation_Filter_Error_I
+suggested trigger: Ventilation_Filter_Error_E
+suggested trigger: Ventilation_Error_Message
+suggested trigger: Ventilation_State_Message
+------------------------------
+rule:Filter Outdoor Temperature Message
+number of suggested triggers:3
+suggested trigger: Ventilation_Outdoor_Temperature_Message
+suggested trigger: Ventilation_Outdoor_Outgoing_Temperature
+suggested trigger: Ventilation_Outdoor_Incoming_Temperature
+------------------------------
+rule:Filter Indoor Temperature Message
+number of suggested triggers:3
+suggested trigger: Ventilation_Indoor_Temperature_Message
+suggested trigger: Ventilation_Indoor_Incoming_Temperature
+suggested trigger: Ventilation_Indoor_Outgoing_Temperature
+------------------------------
+rule:Filter Ventilation Message
+number of suggested triggers:3
+suggested trigger: Ventilation_Incoming
+suggested trigger: Ventilation_Outgoing
+suggested trigger: Ventilation_Fan_Message
+------------------------------
+rule:Filter Manual Action
+no suggested triggers
+------------------------------
+rule:Filter Fan Level
+number of suggested triggers:9
+suggested trigger: Ventilation_Comfort_Temperature
+suggested trigger: Window_SF_Dressingroom
+suggested trigger: Window_SF_Bedroom
+suggested trigger: Ventilation_Auto_Mode
+suggested trigger: State_Away
+suggested trigger: Ventilation_Outdoor_Incoming_Temperature
+suggested trigger: Ventilation_Fan_Level
+suggested trigger: Ventilation_Indoor_Outgoing_Temperature
+suggested trigger: State_Sleeping
+------------------------------
+rule:Switch off Bassbox
+number of suggested triggers:1
+suggested trigger: Socket_Bassbox
+------------------------------
+rule:Periodically check presence
+number of suggested triggers:2
+suggested trigger: Device_Present
+CONFLICT POSSIBLE FOR: Device_Present in rules: [Phone changing]
+suggested trigger: Phone1
+------------------------------
+rule:Phone changing
+number of suggested triggers:2
+suggested trigger: Device_Present
+suggested trigger: Phone1
+------------------------------
+rule:Presence changing
+number of suggested triggers:1
+suggested trigger: Device_Present
+------------------------------
+rule:Away check
+number of suggested triggers:4
+suggested trigger: State_Away
+suggested trigger: Motiondetector_FF_Floor
+suggested trigger: Door_FF_Floor
+suggested trigger: Window_FF_Livingroom_Terrace
+------------------------------
+rule:Motion check
+number of suggested triggers:2
+suggested trigger: State_Away
+suggested trigger: State_Sleeping
+CONFLICT POSSIBLE FOR: State_Sleeping in rules: [Away rule]
+------------------------------
+rule:Away rule
+number of suggested triggers:3
+suggested trigger: State_Notify
+suggested trigger: State_Away
+suggested trigger: State_Sleeping
+------------------------------
+rule:Sleeping SF check
+number of suggested triggers:27
+suggested trigger: Light_SF_Bedroom_Ceiling
+suggested trigger: Light_FF_Livingroom_Couch
+suggested trigger: Light_SF_Bathroom_Ceiling
+suggested trigger: Light_FF_Floor_Ceiling
+suggested trigger: Light_FF_Floor_Mirror
+suggested trigger: Light_FF_Kitchen_Ceiling
+suggested trigger: Light_FF_Utilityroom_Ceiling
+suggested trigger: State_Sleeping
+CONFLICT POSSIBLE FOR: State_Sleeping in rules: [Away rule]
+suggested trigger: Light_SF_Bedroom_Left
+suggested trigger: Light_SF_Child2_Ceiling
+suggested trigger: Light_FF_Garage
+suggested trigger: Light_SF_Child1_Ceiling
+suggested trigger: Light_FF_Livingroom_Brightness_Standard
+suggested trigger: Light_SF_Attic
+suggested trigger: Light_FF_Boxroom_Ceiling
+suggested trigger: Light_SF_Floor_Ceiling
+suggested trigger: Light_SF_Dressingroom_Ceiling
+suggested trigger: Light_FF_Livingroom_Diningtable
+suggested trigger: Light_FF_GuestWC_Mirror
+suggested trigger: Motiondetector_FF_Floor
+suggested trigger: Light_FF_GuestWC_Ceiling
+suggested trigger: Light_SF_Bathroom_Mirror
+suggested trigger: Light_FF_Guestroom_Ceiling
+suggested trigger: State_Away
+suggested trigger: Light_SF_Bedroom_Right
+suggested trigger: Light_FF_Kitchen_Cupboard
+suggested trigger: Light_FF_Kitchen_Bar
+------------------------------
+rule:Startup init
+no suggested triggers
+------------------------------
+rule:Bell State
+number of suggested triggers:2
+suggested trigger: Bell_Last_Change
+suggested trigger: Bell
+------------------------------
+rule:Window_FF_GuestWC
+number of suggested triggers:2
+suggested trigger: State_Notify
+suggested trigger: Window_FF_GuestWC
+------------------------------
+rule:Window_FF_Kitchen
+number of suggested triggers:2
+suggested trigger: Window_FF_Kitchen
+suggested trigger: State_Notify
+------------------------------
+rule:Window_FF_Livingroom_Terrace
+number of suggested triggers:2
+suggested trigger: State_Notify
+suggested trigger: Window_FF_Livingroom_Terrace
+------------------------------
+rule:Window_FF_Livingroom_Couch
+number of suggested triggers:2
+suggested trigger: Window_FF_Livingroom_Couch
+suggested trigger: State_Notify
+------------------------------
+rule:Window_FF_Guestroom
+number of suggested triggers:2
+suggested trigger: State_Notify
+suggested trigger: Window_FF_Guestroom
+------------------------------
+rule:Door_FF_Floor
+number of suggested triggers:2
+suggested trigger: State_Notify
+suggested trigger: Door_FF_Floor
+------------------------------
+rule:Door_FF_Garage1
+number of suggested triggers:2
+suggested trigger: Door_FF_Garage1
+suggested trigger: State_Notify
+------------------------------
+rule:Door_FF_Garage2
+number of suggested triggers:2
+suggested trigger: Door_FF_Garage2
+suggested trigger: State_Notify
+------------------------------
+rule:Window_FF_Garage2
+number of suggested triggers:2
+suggested trigger: State_Notify
+suggested trigger: Window_FF_Garage
+------------------------------
+rule:Window_SF_Bathroom
+number of suggested triggers:2
+suggested trigger: State_Notify
+suggested trigger: Window_SF_Bathroom
+------------------------------
+rule:Window_SF_Dressingroom
+number of suggested triggers:2
+suggested trigger: Window_SF_Dressingroom
+suggested trigger: State_Notify
+------------------------------
+rule:Window_SF_Bedroom
+number of suggested triggers:2
+suggested trigger: Window_SF_Bedroom
+suggested trigger: State_Notify
+------------------------------
+rule:Window_SF_Child1
+number of suggested triggers:2
+suggested trigger: State_Notify
+suggested trigger: Window_SF_Child1
+------------------------------
+rule:Window_SF_Child2
+number of suggested triggers:2
+suggested trigger: State_Notify
+suggested trigger: Window_SF_Child2
+------------------------------
+rule:Window_SF_Attic
+number of suggested triggers:2
+suggested trigger: State_Notify
+suggested trigger: Window_SF_Attic
+------------------------------
+rule:Scene 1
+number of suggested triggers:26
+suggested trigger: Scene1
+suggested trigger: Light_SF_Bedroom_Ceiling
+suggested trigger: Light_FF_Livingroom_Couch
+suggested trigger: Light_SF_Bathroom_Ceiling
+suggested trigger: Light_FF_Floor_Ceiling
+suggested trigger: Light_FF_Floor_Mirror
+suggested trigger: Light_FF_Kitchen_Ceiling
+suggested trigger: Socket_Livingroom
+CONFLICT POSSIBLE FOR: Socket_Livingroom in rules: [Christmas lamps on, Christmas lamps off]
+suggested trigger: Light_FF_Utilityroom_Ceiling
+suggested trigger: Light_SF_Bedroom_Left
+suggested trigger: Light_SF_Child2_Ceiling
+suggested trigger: Light_FF_Garage
+suggested trigger: Light_SF_Child1_Ceiling
+suggested trigger: Light_SF_Attic
+suggested trigger: Light_FF_Livingroom_Brightness_Standard
+suggested trigger: Light_FF_Boxroom_Ceiling
+suggested trigger: Light_SF_Floor_Ceiling
+suggested trigger: Light_SF_Dressingroom_Ceiling
+suggested trigger: Light_FF_Livingroom_Diningtable
+suggested trigger: Light_FF_GuestWC_Mirror
+suggested trigger: Light_FF_GuestWC_Ceiling
+suggested trigger: Light_SF_Bathroom_Mirror
+suggested trigger: Light_FF_Guestroom_Ceiling
+suggested trigger: Light_SF_Bedroom_Right
+suggested trigger: Light_FF_Kitchen_Cupboard
+suggested trigger: Light_FF_Kitchen_Bar
+------------------------------
+rule:Scene 2
+number of suggested triggers:1
+suggested trigger: Scene2
+------------------------------
+rule:Scene 3
+number of suggested triggers:25
+suggested trigger: Light_SF_Bedroom_Ceiling
+suggested trigger: Scene3
+suggested trigger: Light_FF_Livingroom_Couch
+suggested trigger: Light_SF_Bathroom_Ceiling
+suggested trigger: Light_FF_Floor_Ceiling
+CONFLICT POSSIBLE FOR: Light_FF_Floor_Ceiling in rules: [Scene 2]
+suggested trigger: Light_FF_Floor_Mirror
+suggested trigger: Light_FF_Kitchen_Ceiling
+suggested trigger: Light_FF_Utilityroom_Ceiling
+suggested trigger: Light_SF_Bedroom_Left
+suggested trigger: Light_SF_Child2_Ceiling
+suggested trigger: Light_FF_Garage
+suggested trigger: Light_SF_Child1_Ceiling
+suggested trigger: Light_SF_Attic
+suggested trigger: Light_FF_Livingroom_Brightness_Standard
+suggested trigger: Light_FF_Boxroom_Ceiling
+suggested trigger: Light_SF_Floor_Ceiling
+suggested trigger: Light_SF_Dressingroom_Ceiling
+suggested trigger: Light_FF_Livingroom_Diningtable
+suggested trigger: Light_FF_GuestWC_Mirror
+suggested trigger: Light_FF_GuestWC_Ceiling
+suggested trigger: Light_SF_Bathroom_Mirror
+CONFLICT POSSIBLE FOR: Light_SF_Bathroom_Mirror in rules: [Scene 2]
+suggested trigger: Light_FF_Guestroom_Ceiling
+suggested trigger: Light_SF_Bedroom_Right
+suggested trigger: Light_FF_Kitchen_Cupboard
+suggested trigger: Light_FF_Kitchen_Bar
+------------------------------
+rule:Init wathering
+no suggested triggers
+------------------------------
+rule:Wathering program
+number of suggested triggers:7
+suggested trigger: Watering_Streetside_Beds
+suggested trigger: Watering_Gardenside_Lawn_right
+suggested trigger: Watering_Program_Start
+suggested trigger: Watering_Gardenside_Lawn_left
+suggested trigger: Watering_Streetside_Lawn
+suggested trigger: Watering_Gardenside_Beds_Terrace
+suggested trigger: Watering_Gardenside_Beds_behind
+------------------------------
+rule:Last daily electricity consumption
+number of suggested triggers:2
+suggested trigger: Electricity_Meter
+suggested trigger: Electricity_Last_Daily_Consumption
+------------------------------
+rule:Stromverbrauch
+number of suggested triggers:5
+suggested trigger: Electricity_Meter
+suggested trigger: Electricity_Current_Daily_Consumption
+suggested trigger: Electricity_Forecast
+suggested trigger: Electricity_Current_Consumption
+suggested trigger: Electricity_Annual_Consumption
+------------------------------
+rule:Last daily gas consumption
+number of suggested triggers:2
+suggested trigger: Gas_Last_Daily_Consumption
+suggested trigger: Gas_Current_Count
+------------------------------
+rule:Gas consumption
+number of suggested triggers:5
+suggested trigger: Gas_Current_Daily_Consumption
+suggested trigger: Gas_Current_Consumption
+suggested trigger: Gas_Pulse_Counter
+suggested trigger: Gas_Annual_Consumption
+suggested trigger: Gas_Current_Count
+------------------------------
+rule:Is night detection
+number of suggested triggers:6
+suggested trigger: State_Rollershutter
+suggested trigger: Dawn_Time
+suggested trigger: Sunset_Time
+suggested trigger: Sunrise_Time
+suggested trigger: State_Outdoorlights
+suggested trigger: Dusk_Time
+------------------------------
+rule:Check Roommessages
+number of suggested triggers:16
+suggested trigger: RoomStatus
+suggested trigger: Window_SF_Bedroom
+suggested trigger: Window_FF_Livingroom_Couch
+suggested trigger: Window_SF_Child1
+suggested trigger: Window_SF_Child2
+suggested trigger: Window_SF_Bathroom
+suggested trigger: Window_FF_GuestWC
+suggested trigger: Door_FF_Garage1
+suggested trigger: Door_FF_Garage2
+suggested trigger: Window_SF_Dressingroom
+suggested trigger: Window_FF_Kitchen
+suggested trigger: Window_SF_Attic
+suggested trigger: Window_FF_Garage
+suggested trigger: Door_FF_Floor
+suggested trigger: Window_FF_Livingroom_Terrace
+suggested trigger: Window_FF_Guestroom
+------------------------------
+rule:Check Errormessages
+number of suggested triggers:19
+suggested trigger: SystemTemp
+suggested trigger: LoadAvg_15min
+suggested trigger: Heating_Common_Fault
+suggested trigger: HardDisk0_Status
+suggested trigger: HardDisk1_Status
+suggested trigger: CPUTemp
+suggested trigger: Mountpoint1_Percent
+suggested trigger: HardDisk1_Temp
+suggested trigger: HardDisk2_Temp
+suggested trigger: HardDisk2_Status
+suggested trigger: Mountpoint2_Percent
+suggested trigger: MainStatus
+suggested trigger: Ventilation_Filter_Error_I
+suggested trigger: HardDisk0_Temp
+suggested trigger: Ventilation_Filter_Error_E
+suggested trigger: Ventilation_Error_Message
+suggested trigger: MemoryUsage_Percent
+suggested trigger: FanSpeed
+suggested trigger: Mountpoint0_Percent
+------------------------------
+rule:Security State Sensor
+number of suggested triggers:1
+suggested trigger: Security_Last_Change
+------------------------------
+rule:Air livingroom
+number of suggested triggers:4
+suggested trigger: Heating_Temperature_Livingroom_Target
+suggested trigger: Temperature_Livingroom
+suggested trigger: Air_Livingroom_Message
+suggested trigger: Humidity_Livingroom
+------------------------------
+rule:Air bedroom
+number of suggested triggers:4
+suggested trigger: Humidity_Bedroom
+suggested trigger: Temperature_Bedroom
+suggested trigger: Air_Bedroom_Message
+suggested trigger: Heating_Temperature_Bedroom_Target
+------------------------------
+rule:Air floor
+number of suggested triggers:3
+suggested trigger: Air_Floor_Message
+suggested trigger: Temperature_Floor
+suggested trigger: Humidity_Floor
+------------------------------
+rule:Air attic
+number of suggested triggers:3
+suggested trigger: Temperature_Attic
+suggested trigger: Air_Attic_Message
+suggested trigger: Humidity_Attic
+------------------------------
+rule:Air garage
+number of suggested triggers:3
+suggested trigger: Humidity_Garage
+suggested trigger: Air_Garage_Message
+suggested trigger: Temperature_Garage
+------------------------------
+rule:Air garden
+number of suggested triggers:3
+suggested trigger: Humidity_Garden
+suggested trigger: Air_Garden_Message
+suggested trigger: Temperature_Garden
+------------------------------
+rule:Update garden min max
+number of suggested triggers:2
+suggested trigger: Temperature_Garden_Message
+suggested trigger: Temperature_Garden
+------------------------------
+rule:Update rain today
+number of suggested triggers:3
+suggested trigger: Rain_Garden_Message
+suggested trigger: Rain_Garden_Counter
+suggested trigger: Rain_State_Garden
+------------------------------
+rule:Update rain last hour
+number of suggested triggers:2
+suggested trigger: Rain_Garden_Current
+suggested trigger: Rain_Garden_Counter
+------------------------------
+rule:Rain convert
+number of suggested triggers:2
+suggested trigger: Wind_Garden
+suggested trigger: Wind_Garden_Converted
+------------------------------
+rule:Update wind last 15 minutes
+number of suggested triggers:2
+suggested trigger: Wind_Garden_Current
+suggested trigger: Wind_Garden_Converted
+------------------------------
+rule:Wind
+number of suggested triggers:3
+suggested trigger: Wind_Direction
+suggested trigger: Wind_Garden_Converted
+suggested trigger: Wind_Message
+------------------------------
+total rules with suggested triggers: 99
+total number of rules with potential conflicts:18
+------------------------------
+------------------------------
+rule:Auto changed
+number of missing triggers:1
+missing trigger: AutoStatus
+------------------------------
+rule:Attic_Light_Mode
+no missing trigger
+------------------------------
+rule:Christmas lamps on
+number of missing triggers:4
+missing trigger: Socket_Floor
+missing trigger: State_Away
+missing trigger: Socket_Livingroom
+missing trigger: Auto_Christmas
+------------------------------
+rule:Christmas lamps off
+number of missing triggers:3
+missing trigger: Socket_Floor
+missing trigger: Socket_Livingroom
+missing trigger: Auto_Christmas
+------------------------------
+rule:Holiday lights on at the evening
+no missing trigger
+------------------------------
+rule:Holiday lights on before going sleeping
+no missing trigger
+------------------------------
+rule:Holiday lights off
+no missing trigger
+------------------------------
+rule:Rollershutter auto
+number of missing triggers:14
+missing trigger: Shutters_SF_Attic
+missing trigger: Shutters_FF_Kitchen
+missing trigger: Shutters_SF_Dressingroom
+missing trigger: Shutters_SF_Bedroom
+missing trigger: Shutters_SF_Child1
+missing trigger: Shutters_SF_Child2
+missing trigger: Auto_Rollershutter
+missing trigger: Shutters_FF_GuestWC
+missing trigger: Shutters_FF_Livingroom_Terrace
+missing trigger: Shutters_SF_Bathroom
+missing trigger: Shutters_FF_Livingroom_Couch
+missing trigger: State_Away
+missing trigger: Shutters_FF_Guestroom
+missing trigger: Window_FF_Livingroom_Terrace
+------------------------------
+rule:Door opener
+number of missing triggers:1
+missing trigger: Dooropener_FF_Floor
+------------------------------
+rule:Heating_Power Message
+number of missing triggers:1
+missing trigger: Heating_Power_Message
+------------------------------
+rule:Heating_Temperature_Outdoor Message
+number of missing triggers:1
+missing trigger: Heating_Temperature_Outdoor_Message
+------------------------------
+rule:Heating_Temperature_Offset Message
+number of missing triggers:1
+missing trigger: Heating_Temperature_Offset_Message
+------------------------------
+rule:Heating_Temperature_Boiler Message
+number of missing triggers:1
+missing trigger: Heating_Temperature_Boiler_Message
+------------------------------
+rule:Last burner starts per day
+no missing trigger
+------------------------------
+rule:Burner starts
+number of missing triggers:1
+missing trigger: Heating_Burner_Starts_Message
+------------------------------
+rule:Last Burner Hours per day
+no missing trigger
+------------------------------
+rule:Burner Hours
+number of missing triggers:1
+missing trigger: Heating_Burner_Hours_Message
+------------------------------
+rule:Heating Temperature Solar Message
+number of missing triggers:1
+missing trigger: Heating_Temperature_Solar_Message
+------------------------------
+rule:Heating Solar State Message
+number of missing triggers:1
+missing trigger: Heating_Solar_State_Message
+------------------------------
+rule:Solar Hours
+number of missing triggers:1
+missing trigger: Heating_Solar_Hours_Message
+------------------------------
+rule:Last Solar Power per day
+no missing trigger
+------------------------------
+rule:Solar Power
+number of missing triggers:1
+missing trigger: Heating_Solar_Power_Message
+------------------------------
+rule:Solar Power 5min
+no missing trigger
+------------------------------
+rule:Temperature Check
+number of missing triggers:5
+missing trigger: Heating_Operating_Mode
+missing trigger: Heating_Temperature_Livingroom_Target
+missing trigger: Heating_Temperature_Room_Target
+missing trigger: Heating_Temperature_Overall_OK
+missing trigger: Heating_Temperature_Bedroom_Target
+------------------------------
+rule:heating mode check
+number of missing triggers:9
+missing trigger: Heating_Operating_Mode
+missing trigger: Heating_Circuit_Pump_Speed
+missing trigger: Heating_Power
+missing trigger: Temperature_Livingroom
+missing trigger: Heating_Burner_Starts
+missing trigger: Heating_Temperature_Room_Target
+missing trigger: Heating_Temperature_Overall_OK
+missing trigger: Temperature_Garden_Forecast
+missing trigger: Heating_Livingroom_Circuit
+------------------------------
+rule:Hue brightness changed
+number of missing triggers:3
+missing trigger: Light_FF_Livingroom_Brightness_Standard1
+missing trigger: Light_FF_Livingroom_Brightness_Standard3
+missing trigger: Light_FF_Livingroom_Brightness_Standard2
+------------------------------
+rule:Hue color changed
+no missing trigger
+------------------------------
+rule:Hue brightness changed backward
+number of missing triggers:1
+missing trigger: Light_FF_Livingroom_Brightness_Standard
+------------------------------
+rule:Motiondetector_Outdoor_Switch
+number of missing triggers:5
+missing trigger: Motiondetector_Outdoor_Terrace_Switch
+missing trigger: Motiondetector_Outdoor_Frontdoor_Switch
+missing trigger: Motiondetector_Outdoor_Garage_Streetside_Switch
+missing trigger: Motiondetector_Outdoor_Garage_Gardenside_Switch
+missing trigger: Motiondetector_Outdoor_Carport_Switch
+------------------------------
+rule:Motiondetector_Outdoor_Detail_Switch
+number of missing triggers:1
+missing trigger: Motiondetector_Outdoor_Switch
+------------------------------
+rule:Front door light
+no missing trigger
+------------------------------
+rule:Front door manual
+number of missing triggers:1
+missing trigger: Light_Outdoor_Frontdoor
+------------------------------
+rule:Front door motion detector
+number of missing triggers:4
+missing trigger: Motiondetector_Outdoor_Frontdoor_Switch
+missing trigger: Light_Outdoor_Frontdoor_Manual
+missing trigger: Light_Outdoor_Frontdoor
+missing trigger: State_Outdoorlights
+------------------------------
+rule:Carpot light
+no missing trigger
+------------------------------
+rule:Carport manual
+number of missing triggers:1
+missing trigger: Light_Outdoor_Carport
+------------------------------
+rule:Carport motion detector
+number of missing triggers:4
+missing trigger: Light_Outdoor_Carport
+missing trigger: Light_Outdoor_Carport_Manual
+missing trigger: Motiondetector_Outdoor_Carport_Switch
+missing trigger: State_Outdoorlights
+------------------------------
+rule:Terrace light
+number of missing triggers:1
+missing trigger: Light_Outdoor_Terrace_Manual
+------------------------------
+rule:Terrace manual
+number of missing triggers:1
+missing trigger: Light_Outdoor_Terrace
+------------------------------
+rule:terrace motion detector
+number of missing triggers:4
+missing trigger: Light_Outdoor_Terrace
+missing trigger: Motiondetector_Outdoor_Terrace_Switch
+missing trigger: State_Outdoorlights
+missing trigger: Light_Outdoor_Terrace_Manual
+------------------------------
+rule:Garage streetside light
+no missing trigger
+------------------------------
+rule:Garage streetside manual
+number of missing triggers:1
+missing trigger: Light_Outdoor_Garage_Streedside
+------------------------------
+rule:Garage streetside motion detector
+number of missing triggers:4
+missing trigger: Light_Outdoor_Garage_Streedside_Manual
+missing trigger: Light_Outdoor_Garage_Streedside
+missing trigger: Motiondetector_Outdoor_Garage_Streetside_Switch
+missing trigger: State_Outdoorlights
+------------------------------
+rule:Garage gardenside light
+no missing trigger
+------------------------------
+rule:Garage gardenside manual
+number of missing triggers:1
+missing trigger: Light_Outdoor_Garage_Gardenside
+------------------------------
+rule:Garage gardenside motion detector
+number of missing triggers:4
+missing trigger: Light_Outdoor_Garage_Gardenside
+missing trigger: Motiondetector_Outdoor_Garage_Gardenside_Switch
+missing trigger: Light_Outdoor_Garage_Gardenside_Manual
+missing trigger: State_Outdoorlights
+------------------------------
+rule:Filterruntime
+number of missing triggers:1
+missing trigger: Ventilation_Filter_Runtime_Message
+------------------------------
+rule:Filter State Message
+number of missing triggers:1
+missing trigger: Ventilation_State_Message
+------------------------------
+rule:Filter Outdoor Temperature Message
+number of missing triggers:1
+missing trigger: Ventilation_Outdoor_Temperature_Message
+------------------------------
+rule:Filter Indoor Temperature Message
+number of missing triggers:1
+missing trigger: Ventilation_Indoor_Temperature_Message
+------------------------------
+rule:Filter Ventilation Message
+number of missing triggers:1
+missing trigger: Ventilation_Fan_Message
+------------------------------
+rule:Filter Manual Action
+no missing trigger
+------------------------------
+rule:Filter Fan Level
+number of missing triggers:8
+missing trigger: Ventilation_Comfort_Temperature
+missing trigger: Window_SF_Dressingroom
+missing trigger: Window_SF_Bedroom
+missing trigger: State_Away
+missing trigger: Ventilation_Outdoor_Incoming_Temperature
+missing trigger: Ventilation_Fan_Level
+missing trigger: Ventilation_Indoor_Outgoing_Temperature
+missing trigger: State_Sleeping
+------------------------------
+rule:Switch off Bassbox
+number of missing triggers:1
+missing trigger: Socket_Bassbox
+------------------------------
+rule:Periodically check presence
+no missing trigger
+------------------------------
+rule:Phone changing
+number of missing triggers:2
+missing trigger: Device_Present
+missing trigger: Phone1
+------------------------------
+rule:Presence changing
+no missing trigger
+------------------------------
+rule:Away check
+number of missing triggers:3
+missing trigger: State_Away
+missing trigger: Motiondetector_FF_Floor
+missing trigger: Window_FF_Livingroom_Terrace
+------------------------------
+rule:Motion check
+number of missing triggers:2
+missing trigger: State_Away
+missing trigger: State_Sleeping
+------------------------------
+rule:Away rule
+number of missing triggers:2
+missing trigger: State_Notify
+missing trigger: State_Sleeping
+------------------------------
+rule:Sleeping SF check
+number of missing triggers:27
+missing trigger: Light_SF_Bedroom_Ceiling
+missing trigger: Light_FF_Livingroom_Couch
+missing trigger: Light_SF_Bathroom_Ceiling
+missing trigger: Light_FF_Floor_Ceiling
+missing trigger: Light_FF_Floor_Mirror
+missing trigger: Light_FF_Kitchen_Ceiling
+missing trigger: Light_FF_Utilityroom_Ceiling
+missing trigger: State_Sleeping
+missing trigger: Light_SF_Bedroom_Left
+missing trigger: Light_SF_Child2_Ceiling
+missing trigger: Light_FF_Garage
+missing trigger: Light_SF_Child1_Ceiling
+missing trigger: Light_FF_Livingroom_Brightness_Standard
+missing trigger: Light_SF_Attic
+missing trigger: Light_FF_Boxroom_Ceiling
+missing trigger: Light_SF_Floor_Ceiling
+missing trigger: Light_SF_Dressingroom_Ceiling
+missing trigger: Light_FF_Livingroom_Diningtable
+missing trigger: Light_FF_GuestWC_Mirror
+missing trigger: Motiondetector_FF_Floor
+missing trigger: Light_FF_GuestWC_Ceiling
+missing trigger: Light_SF_Bathroom_Mirror
+missing trigger: Light_FF_Guestroom_Ceiling
+missing trigger: State_Away
+missing trigger: Light_SF_Bedroom_Right
+missing trigger: Light_FF_Kitchen_Cupboard
+missing trigger: Light_FF_Kitchen_Bar
+------------------------------
+rule:Startup init
+no missing trigger
+------------------------------
+rule:Bell State
+number of missing triggers:1
+missing trigger: Bell_Last_Change
+------------------------------
+rule:Window_FF_GuestWC
+number of missing triggers:1
+missing trigger: State_Notify
+------------------------------
+rule:Window_FF_Kitchen
+number of missing triggers:1
+missing trigger: State_Notify
+------------------------------
+rule:Window_FF_Livingroom_Terrace
+number of missing triggers:1
+missing trigger: State_Notify
+------------------------------
+rule:Window_FF_Livingroom_Couch
+number of missing triggers:1
+missing trigger: State_Notify
+------------------------------
+rule:Window_FF_Guestroom
+number of missing triggers:1
+missing trigger: State_Notify
+------------------------------
+rule:Door_FF_Floor
+number of missing triggers:1
+missing trigger: State_Notify
+------------------------------
+rule:Door_FF_Garage1
+number of missing triggers:1
+missing trigger: State_Notify
+------------------------------
+rule:Door_FF_Garage2
+number of missing triggers:1
+missing trigger: State_Notify
+------------------------------
+rule:Window_FF_Garage2
+number of missing triggers:1
+missing trigger: State_Notify
+------------------------------
+rule:Window_SF_Bathroom
+number of missing triggers:1
+missing trigger: State_Notify
+------------------------------
+rule:Window_SF_Dressingroom
+number of missing triggers:1
+missing trigger: State_Notify
+------------------------------
+rule:Window_SF_Bedroom
+number of missing triggers:1
+missing trigger: State_Notify
+------------------------------
+rule:Window_SF_Child1
+number of missing triggers:1
+missing trigger: State_Notify
+------------------------------
+rule:Window_SF_Child2
+number of missing triggers:1
+missing trigger: State_Notify
+------------------------------
+rule:Window_SF_Attic
+number of missing triggers:1
+missing trigger: State_Notify
+------------------------------
+rule:Scene 1
+number of missing triggers:25
+missing trigger: Light_SF_Bedroom_Ceiling
+missing trigger: Light_FF_Livingroom_Couch
+missing trigger: Light_SF_Bathroom_Ceiling
+missing trigger: Light_FF_Floor_Ceiling
+missing trigger: Light_FF_Floor_Mirror
+missing trigger: Light_FF_Kitchen_Ceiling
+missing trigger: Socket_Livingroom
+missing trigger: Light_FF_Utilityroom_Ceiling
+missing trigger: Light_SF_Bedroom_Left
+missing trigger: Light_SF_Child2_Ceiling
+missing trigger: Light_FF_Garage
+missing trigger: Light_SF_Child1_Ceiling
+missing trigger: Light_SF_Attic
+missing trigger: Light_FF_Livingroom_Brightness_Standard
+missing trigger: Light_FF_Boxroom_Ceiling
+missing trigger: Light_SF_Floor_Ceiling
+missing trigger: Light_SF_Dressingroom_Ceiling
+missing trigger: Light_FF_Livingroom_Diningtable
+missing trigger: Light_FF_GuestWC_Mirror
+missing trigger: Light_FF_GuestWC_Ceiling
+missing trigger: Light_SF_Bathroom_Mirror
+missing trigger: Light_FF_Guestroom_Ceiling
+missing trigger: Light_SF_Bedroom_Right
+missing trigger: Light_FF_Kitchen_Cupboard
+missing trigger: Light_FF_Kitchen_Bar
+------------------------------
+rule:Scene 2
+no missing trigger
+------------------------------
+rule:Scene 3
+number of missing triggers:24
+missing trigger: Light_SF_Floor_Ceiling
+missing trigger: Light_SF_Bedroom_Ceiling
+missing trigger: Light_SF_Dressingroom_Ceiling
+missing trigger: Light_FF_Livingroom_Couch
+missing trigger: Light_SF_Bathroom_Ceiling
+missing trigger: Light_FF_Livingroom_Diningtable
+missing trigger: Light_FF_GuestWC_Mirror
+missing trigger: Light_FF_Floor_Ceiling
+missing trigger: Light_FF_Floor_Mirror
+missing trigger: Light_FF_Kitchen_Ceiling
+missing trigger: Light_FF_Utilityroom_Ceiling
+missing trigger: Light_FF_GuestWC_Ceiling
+missing trigger: Light_SF_Bedroom_Left
+missing trigger: Light_SF_Bathroom_Mirror
+missing trigger: Light_SF_Child2_Ceiling
+missing trigger: Light_FF_Garage
+missing trigger: Light_SF_Child1_Ceiling
+missing trigger: Light_FF_Guestroom_Ceiling
+missing trigger: Light_SF_Attic
+missing trigger: Light_FF_Livingroom_Brightness_Standard
+missing trigger: Light_SF_Bedroom_Right
+missing trigger: Light_FF_Kitchen_Cupboard
+missing trigger: Light_FF_Kitchen_Bar
+missing trigger: Light_FF_Boxroom_Ceiling
+------------------------------
+rule:Init wathering
+no missing trigger
+------------------------------
+rule:Wathering program
+number of missing triggers:6
+missing trigger: Watering_Streetside_Beds
+missing trigger: Watering_Gardenside_Lawn_right
+missing trigger: Watering_Gardenside_Lawn_left
+missing trigger: Watering_Streetside_Lawn
+missing trigger: Watering_Gardenside_Beds_Terrace
+missing trigger: Watering_Gardenside_Beds_behind
+------------------------------
+rule:Last daily electricity consumption
+no missing trigger
+------------------------------
+rule:Stromverbrauch
+number of missing triggers:4
+missing trigger: Electricity_Current_Daily_Consumption
+missing trigger: Electricity_Forecast
+missing trigger: Electricity_Current_Consumption
+missing trigger: Electricity_Annual_Consumption
+------------------------------
+rule:Last daily gas consumption
+no missing trigger
+------------------------------
+rule:Gas consumption
+no missing trigger
+------------------------------
+rule:Is night detection
+no missing trigger
+------------------------------
+rule:Check Roommessages
+number of missing triggers:16
+missing trigger: RoomStatus
+missing trigger: Window_SF_Bedroom
+missing trigger: Window_FF_Livingroom_Couch
+missing trigger: Window_SF_Child1
+missing trigger: Window_SF_Child2
+missing trigger: Window_SF_Bathroom
+missing trigger: Window_FF_GuestWC
+missing trigger: Door_FF_Garage1
+missing trigger: Door_FF_Garage2
+missing trigger: Window_SF_Dressingroom
+missing trigger: Window_FF_Kitchen
+missing trigger: Window_SF_Attic
+missing trigger: Window_FF_Garage
+missing trigger: Door_FF_Floor
+missing trigger: Window_FF_Livingroom_Terrace
+missing trigger: Window_FF_Guestroom
+------------------------------
+rule:Check Errormessages
+number of missing triggers:15
+missing trigger: SystemTemp
+missing trigger: LoadAvg_15min
+missing trigger: HardDisk0_Status
+missing trigger: HardDisk1_Status
+missing trigger: CPUTemp
+missing trigger: Mountpoint1_Percent
+missing trigger: HardDisk1_Temp
+missing trigger: HardDisk2_Temp
+missing trigger: HardDisk2_Status
+missing trigger: Mountpoint2_Percent
+missing trigger: MainStatus
+missing trigger: HardDisk0_Temp
+missing trigger: MemoryUsage_Percent
+missing trigger: FanSpeed
+missing trigger: Mountpoint0_Percent
+------------------------------
+rule:Security State Sensor
+number of missing triggers:1
+missing trigger: Security_Last_Change
+------------------------------
+rule:Air livingroom
+number of missing triggers:1
+missing trigger: Air_Livingroom_Message
+------------------------------
+rule:Air bedroom
+number of missing triggers:1
+missing trigger: Air_Bedroom_Message
+------------------------------
+rule:Air floor
+number of missing triggers:1
+missing trigger: Air_Floor_Message
+------------------------------
+rule:Air attic
+number of missing triggers:1
+missing trigger: Air_Attic_Message
+------------------------------
+rule:Air garage
+number of missing triggers:1
+missing trigger: Air_Garage_Message
+------------------------------
+rule:Air garden
+number of missing triggers:1
+missing trigger: Air_Garden_Message
+------------------------------
+rule:Update garden min max
+number of missing triggers:1
+missing trigger: Temperature_Garden_Message
+------------------------------
+rule:Update rain today
+number of missing triggers:1
+missing trigger: Rain_Garden_Message
+------------------------------
+rule:Update rain last hour
+no missing trigger
+------------------------------
+rule:Rain convert
+number of missing triggers:1
+missing trigger: Wind_Garden_Converted
+------------------------------
+rule:Update wind last 15 minutes
+no missing trigger
+------------------------------
+rule:Wind
+number of missing triggers:1
+missing trigger: Wind_Message
+------------------------------
+total rules: 102
+total potential buggy rules: 77
+Time:4338
+
+
+rule:Dimmed Light
+number of suggested triggers:1
+suggested trigger: DimmedLight
+------------------------------
+rule:Select Radio Station
+no suggested triggers
+------------------------------
+rule:Volume control
+no suggested triggers
+------------------------------
+rule:Initialize light states
+number of suggested triggers:20
+suggested trigger: Light_FF_Bath_Ceiling
+suggested trigger: Light_FF_Corridor_Ceiling
+suggested trigger: Light_GF_Toilet_Mirror
+suggested trigger: Light_C_Washing_Ceiling
+suggested trigger: Light_GF_Toilet_Ceiling
+suggested trigger: Light_FF_Office_Ceiling
+suggested trigger: Light_Outdoor_Garage
+suggested trigger: Light_GF_Kitchen_Table
+suggested trigger: Light_Outdoor_Terrace
+suggested trigger: Light_FF_Bath_Mirror
+suggested trigger: Light_C_Corridor_Ceiling
+suggested trigger: Light_GF_Kitchen_Ceiling
+suggested trigger: Light_FF_Child_Ceiling
+suggested trigger: Light_FF_Bed_Ceiling
+suggested trigger: Light_C_Staircase
+suggested trigger: Light_Outdoor_Frontdoor
+suggested trigger: Light_C_Workshop
+suggested trigger: Light_GF_Living_Table
+suggested trigger: Light_GF_Corridor_Ceiling
+suggested trigger: Light_GF_Corridor_Wardrobe
+------------------------------
+rule:Initialize heating states
+number of suggested triggers:8
+suggested trigger: Heating_FF_Bed
+suggested trigger: Heating_GF_Corridor
+suggested trigger: Heating_GF_Living
+suggested trigger: Heating_FF_Bath
+suggested trigger: Heating_FF_Child
+suggested trigger: Heating_GF_Toilet
+suggested trigger: Heating_GF_Kitchen
+suggested trigger: Heating_FF_Office
+------------------------------
+rule:Initialize contact states
+number of suggested triggers:9
+suggested trigger: Window_FF_Office_Window
+suggested trigger: Window_FF_Bath
+suggested trigger: Window_GF_Frontdoor
+suggested trigger: Window_GF_Kitchen
+suggested trigger: Window_GF_Living
+suggested trigger: Garage_Door
+suggested trigger: Window_FF_Office_Door
+suggested trigger: Window_GF_Toilet
+suggested trigger: Window_FF_Bed
+------------------------------
+rule:Initialize Location
+number of suggested triggers:1
+suggested trigger: DemoLocation
+------------------------------
+rule:Set random room temperatures
+number of suggested triggers:8
+suggested trigger: Temperature_GF_Corridor
+suggested trigger: Temperature_FF_Office
+suggested trigger: Temperature_GF_Living
+suggested trigger: Temperature_FF_Bath
+suggested trigger: Temperature_FF_Bed
+suggested trigger: Temperature_GF_Toilet
+suggested trigger: Temperature_GF_Kitchen
+suggested trigger: Temperature_FF_Child
+------------------------------
+rule:Update max and min temperatures
+number of suggested triggers:1
+suggested trigger: Weather_Temperature
+------------------------------
+rule:Persistence Demo
+number of suggested triggers:1
+suggested trigger: Weather_Temperature
+------------------------------
+rule:Persistence Demo 2
+number of suggested triggers:1
+suggested trigger: DemoSwitch
+------------------------------
+rule:Timer Demo
+no suggested triggers
+------------------------------
+rule:Records last weather update time
+no suggested triggers
+------------------------------
+rule:Compute humidex
+number of suggested triggers:2
+suggested trigger: Weather_Humidity
+suggested trigger: Weather_Temperature
+------------------------------
+total rules with suggested triggers: 10
+total number of rules with potential conflicts:0
+------------------------------
+------------------------------
+rule:Dimmed Light
+no missing trigger
+------------------------------
+rule:Select Radio Station
+no missing trigger
+------------------------------
+rule:Volume control
+no missing trigger
+------------------------------
+rule:Initialize light states
+no missing trigger
+------------------------------
+rule:Initialize heating states
+no missing trigger
+------------------------------
+rule:Initialize contact states
+no missing trigger
+------------------------------
+rule:Initialize Location
+no missing trigger
+------------------------------
+rule:Set random room temperatures
+no missing trigger
+------------------------------
+rule:Update max and min temperatures
+no missing trigger
+------------------------------
+rule:Persistence Demo
+no missing trigger
+------------------------------
+rule:Persistence Demo 2
+no missing trigger
+------------------------------
+rule:Timer Demo
+no missing trigger
+------------------------------
+rule:Records last weather update time
+no missing trigger
+------------------------------
+rule:Compute humidex
+no missing trigger
+------------------------------
+total rules: 14
+total potential buggy rules: 0
+Time:2651
+
