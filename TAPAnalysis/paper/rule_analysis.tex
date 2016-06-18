@@ -138,9 +138,9 @@ when
 then	
  // action block 
  postUpdate(Temp_Max, 
-   Temperature.maximumSince(now.toDateMidnight))
+   Temperature.maxSince(now.toDateMidnight))
  postUpdate(Temp_Min, 
-   Temperature.minimumSince(now.toDateMidnight))
+   Temperature.minSince(now.toDateMidnight))
 end
 \end{lstlisting}
 
@@ -285,13 +285,13 @@ Actions are predefined methods that can be used in the \textit{action block} of 
 \item By statically analysing the AST of the script, $S$, we first identify all the items that appear in the action block of a rule, $R$. This is an exhaustive list of all potential event-based triggers. Let this list be $T$.
 \item Naively adding all $t \in T$ as triggers of $R$ would either unnecessarily fire $R$ too many time or add redundant triggers which would make $R$ too complicated. Hence, we apply an elimination technique to get rid of triggers that are not required. The following definitions are used in the elimination algorithm. 
 
-\emph{Live item}. An item is live in $R$ if its value is read before it is written to in the rule script, $S$. 
+\emph{Definition 1}. An item is \emph{live} in $R$ if its value is read before it is written to in the rule script, $S$. 
 
-\emph{Dependent item}. We define an item to be \emph{dependent} in $R$ if its value is computed based on other items or variables in the rule---this implies that the item is \emph{not live}. 
+\emph{Definition 2}. We define an item to be \emph{dependent} in $R$ if its value is computed based on other items or variables in the rule---this implies that the item is \emph{not live}. 
  
-\emph{Independent item}. We define an item to be \emph{independent} in $R$ if  its value is directly obtained from a sensor or a user's input and not computed based on any other item or variable---this implies that the item is \emph{live} in $R$. 
+\emph{Definition 3}. We define an item to be \emph{independent} in $R$ if  its value is directly obtained from a sensor or a user's input and not computed based on any other item or variable---this implies that the item is \emph{live} in $R$. 
 
-\emph{Redundant trigger}. We define an event-based trigger to be redundant if inclusion of the trigger in a rule \emph{never} changes the state of any item or the value of any variable involved in $S$ when the rule is fired due to it.
+\emph{Definition 4}. We define an event-based trigger to be \emph{redundant} if inclusion of the trigger in a rule \emph{never} changes the state of any item or the value of any variable involved in $S$ when the rule is fired due to it.
 
 \textbf{An item $d$ which is not \textit{live} in $R$ is not included in $T$ because it is redundant. As a corollary, if $d$ is dependent, it is also not included in $T$.}
 
@@ -303,8 +303,30 @@ Actions are predefined methods that can be used in the \textit{action block} of 
 \end{itemize}
 This shows that $d$ never causes the value of $a$ to change. Therefore, our assumption that $d$ is not redundant is wrong. Hence, $d$ must be redundant. $\blacksquare$
 \end{enumerate}
-\emph{Enumerating groups}.\\
-\emph{Conflict resolution}.\\
+
+\emph{Enumerating groups}. Items can be grouped so that they can be controlled together if needed---the rule scripts can perform operations on all the member items of a group.
+A group can have multiple items and one item can belong to one or more groups. Groups can also be contained in other groups. For such rules, TrigGen generates triggers by enumerating all members of a group. \\
+
+\noindent \emph{Conflict resolution}. If there are multiple rules that modify the state of the same item, then TrigGen warns the users about a potential conflict. Consider the rule written by an end user in listing~\ref{lst:conflict} as an example. Before \texttt{Air\_G\_Message} is updated, its current value is checked against \texttt{msg}. If there is another rule, say $R'$ that writes to \texttt{Air\_G\_Message}, then there could be a conflict between this rule and $R'$. TrigGen detects such conflicts and warn the end user about the possibility of a conflict. It is then upto the user to determine the severity of the warning and whether the rules need to be corrected.
+\begin{lstlisting}[caption={Rule for updating the status message for the air quality in the garage.},label={lst:conflict}]
+rule "Air garage"
+when
+ Item Temp_G changed
+ or
+ Item Humidity_G changed
+then
+ if(Temp_G.state != null && 
+    Humidity_G.state != null){
+     var String msg = Temp_G.state.toString()
+                + Humidity_G.state.toString()
+     if(Air_G_Message.state != msg){
+      postUpdate(Air_G_Message,msg)
+     }
+ }
+end
+\end{lstlisting}
+ 
+
 
 \begin{figure*}
 \centering
@@ -362,7 +384,7 @@ For 2 out of the 7 rules for which TrigGen did not \textit{suggest} any event-ba
 \textbf{Limitations.}
 By comparing the suggested trigger for the 109 rules with the triggers written by the end user, we found that for 20 of them the  event-based triggers suggestions from TrigGen were incorrect. This was because for these 20 rules, the end user only expected temporal or system triggers while TrigGen is a tool for generating event-based triggers only.
 
-For 5 rules TrigGen failed to suggest triggers due to two reasons---1) since TrigGen uses the AST of the rule script to extract items that can be potential triggers, if there is no reference to an item in the script, TrigGen cannot detect the trigger. This happened in 4 out of the 5 cases. 2) For the remaining one case, the item suggested by the end user as a trigger is written to before being read from. According to our technique, such items are considered non-live and not included in the list of triggers. As a result, TrigGen failed to identify it.
+For 5 rules TrigGen failed to suggest triggers due to two reasons---1) since TrigGen uses the AST of the rule script to extract items that can be potential triggers, if there is no reference to an item in the script, TrigGen cannot detect the trigger. This happened in 4 out of the 5 cases. 2) For the remaining one case, the item suggested by the end user as a trigger is read from using a \todo{need to consider this one case where the tool fails} . According to our technique, such items are considered non-live and not included in the list of triggers. As a result, TrigGen failed to identify it.
 
 \begin{figure*}[t]
 \centering
