@@ -305,36 +305,6 @@ This shows that $d$ never causes the value of $a$ to change. Therefore, our assu
 \end{enumerate}
 \emph{Enumerating groups}.\\
 \emph{Conflict resolution}.\\
-\emph{Scope}. The algorithm for automatically generating triggers described above targets event-based triggers only---our tool does not aim to suggest temporal or system triggers. This is because temporal and system based triggers are highly dependent on the end user's preference and without any additional annotations from the user, it is impossible to suggest a generic temporal or system trigger that will be applicable to all users. Since our tool does not require any annotations from the end user, the scope of our tool is limited to event-based triggers. This means that if the end user intends a rule to be fired only under system or temporal triggers, the suggestions provided by our tool will not be useful. Table~\ref{tab:scope1} summarizes the usefulness of our tool for suggesting triggers with respect to the conditions under which the user actually expects the rule to be fired.
-\begin{table}[ht]
-\centering
-\begin{tabular}{|l|l|}
-\hline
-user's expectation & usefulness \\ \hline
-event-based & high \\ \hline
-combination of event-based, temporal, system  & medium \\ \hline
-temporal & low \\\hline
-system & low \\ \hline
-combination of temporal, system & low  \\ \hline
-\end{tabular}
-\caption{Scope of our tool for suggesting triggers only based on the rule script (no triggers written by the user)---\textit{high} indicates that all the suggestions are useful, \textit{medium} indicates that only the event-based suggestions are useful and \textit{low} indicates that none of the suggestions are useful. }
-\label{tab:scope1}
-\end{table}
-
-As mentioned before, our tool can also identify triggers that are missing, in case the end user already has written some triggers. Table~\ref{tab:scope2} summarizes the scope of our tool for identifying missing triggers. If the triggers written by the end users only include system and temporal triggers, then our tool does not suggest any other event-based trigger because that would modify the behavior of the rule. If however, at least one event-based trigger is included, then our tool identifies all other event-based triggers that should also be included. 
-\begin{table}[ht]
-\centering
-\begin{tabular}{|l|l|}
-\hline
-user written triggers & tool's output \\ \hline
-at least one event-based & missing event-based triggers \\ \hline
-only temporal & none \\\hline
-only system & none \\ \hline
-temporal and system & none  \\ \hline
-\end{tabular}
-\caption{Scope of our tool for detecting missing triggers when some triggers are already written by the user.}
-\label{tab:scope2}
-\end{table}
 
 \begin{figure*}
 \centering
@@ -373,7 +343,19 @@ detect missing triggers & 7.31 s \\\hline
 
 Figure~\ref{fig:resultgraph} shows the output of TrigGen for generating the necessary and sufficient set of triggers. As is evident from the figure, for majority of the rules, TrigGen suggested 2 event-based triggers and detected 1 missing trigger. The large number of triggers which were determined for some rules (as shown in figure~\ref{fig:resultgraph}) was due to the grouping of items. TrigGen expanded the groups as explained in section~\ref{sec:theory} to enumerate all the contents of the groups. 
 
-All the triggers that TrigGen detected as \textit{missing} were true positives.
+All the triggers that TrigGen detected as \textit{missing} were true positives. If the triggers written by the end users only include system and temporal triggers, then TrigGen does not suggest any other event-based trigger because that would modify the behavior of the rule. If however, at least one event-based trigger is included, then it detects those event-based triggers that are missing. 
+Table~\ref{tab:scope2} summarizes the scope of our tool for identifying missing triggers. 
+\begin{table}[ht]
+\centering
+\begin{tabular}{|l|p{4cm}|}
+\hline
+user written triggers & tool's output \\ \hline
+at least one event-based & \parbox[t]{5cm}{missing event-based triggers, \\extraneous triggers}  \\ \hline
+only temporal and/or system & none \\\hline
+\end{tabular}
+\caption{Output of TrigGen for detecting missing triggers when some triggers are already written by the user.}
+\label{tab:scope2}
+\end{table}
 
 For 2 out of the 7 rules for which TrigGen did not \textit{suggest} any event-based triggers, we compared the report with the triggers written by the end user. We found that the triggers were System triggers---the rules were supposed to be fired only once at system start-up. Hence TrigGen's output was correct because it did not suggest any event-based triggers. 
 
@@ -389,6 +371,19 @@ For 5 rules TrigGen failed to suggest triggers due to two reasons---1) since Tri
 \label{fig:resultgraph}
 \end{figure*} 
 
+Table~\ref{tab:scope1} summarizes the usefulness of our tool for suggesting triggers with respect to the conditions under which the user actually expects the rule to be fired.
+\begin{table}[ht]
+\centering
+\begin{tabular}{|l|l|}
+\hline
+user's expectation & usefulness \\ \hline
+event-based & high \\ \hline
+temporal & low \\\hline
+system & low \\ \hline
+\end{tabular}
+\caption{Usefulness of TrigGen for suggesting triggers only based on the rule script (no triggers written by the user)---\textit{high} indicates that all the suggestions are useful and \textit{low} indicates that none of the suggestions are useful. }
+\label{tab:scope1}
+\end{table}
 
 \section{Related work}
 Security goals and potential vulnerabilities in smart homes have been investigated in several papers~\cite{yoshi, dhanjani, jung, todayToTomorrow}. Denning et al.~\cite{yoshi} identified assets within a home that are susceptible to security attacks and suggested security goals for smart homes. Ur et al.~\cite{jung} conducted a case study of three specific smart devices to analyse the state of access control for home automation. Mennicken et al.~\cite{todayToTomorrow} studied the importance of human-home-collaboration in making smart homes more accessible.
