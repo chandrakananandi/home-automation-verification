@@ -335,7 +335,7 @@ Dimmer Light_GF_Living(GF_Living,
         (D) edge				 node {} (E)          
         (C) edge 			 node {} (E);             
 \end{tikzpicture}
-\caption{Graph representation of item grouping shown in listing~\ref{lst:group}}
+\caption{Graph representing the item grouping shown in listing~\ref{lst:group}}
 \label{fig:graphstructure} 
 \end{figure}
 \noindent \emph{Conflict resolution}. If there are multiple rules that modify the state of the same item, then TrigGen warns the users about a potential conflict. Consider the rule written by an end user in listing~\ref{lst:conflict} as an example. Before \texttt{Air\_G\_Message} is updated, its current value is checked against \texttt{msg}. If there is another rule, say $R'$ that writes to \texttt{Air\_G\_Message}, then there could be a conflict between this rule and $R'$. TrigGen detects such conflicts and warn the end user about the possibility of a conflict. It is then upto the user to determine the severity of the warning and whether the rules need to be corrected.
