@@ -90,7 +90,7 @@
      inkscape:window-width="1855"
      inkscape:window-height="1056"
      inkscape:window-x="65"
-     inkscape:window-y="144"
+     inkscape:window-y="24"
      inkscape:window-maximized="1" />
   <metadata
      id="metadata7">
@@ -236,14 +236,14 @@
     <text
        xml:space="preserve"
        style="font-size:13px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Sawasdee;-inkscape-font-specification:Sawasdee"
-       x="135.33833"
-       y="320.78326"
+       x="133.08269"
+       y="320.03137"
        id="text5659"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan5661"
-         x="135.33833"
-         y="320.78326">ruleParser</tspan></text>
+         x="133.08269"
+         y="320.03137">ruleParser</tspan></text>
     <rect
        style="color:#000000;fill:#00000e;fill-opacity:0.05490196;fill-rule:nonzero;stroke:#000f13;stroke-width:3.59243035;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
        id="rect5665"
